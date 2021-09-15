@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<test-run id="2" testcasecount="8" result="Passed" total="8" passed="8" failed="0" inconclusive="0" skipped="0" asserts="0" engine-version="3.5.0.0" clr-version="4.0.30319.42000" start-time="2020-06-02 00:16:54Z" end-time="2020-06-02 00:16:54Z" duration="0.0709847">
+  <test-suite type="TestSuite" id="1023" name="NightOwl" fullname="NightOwl" runstate="Runnable" testcasecount="12" result="Passed" start-time="2020-06-02 00:16:54Z" end-time="2020-06-02 00:16:54Z" duration="0.070985" total="8" passed="8" failed="0" inconclusive="0" skipped="0" asserts="0">
+    <properties />
+    <test-suite type="Assembly" id="1037" name="dotBunny.Hydrogen.Tests.Editor.dll" fullname="D:/BuildAgent/work/NO-Main-Tests/Projects/NightOwl/Library/ScriptAssemblies/dotBunny.Hydrogen.Tests.Editor.dll" runstate="Runnable" testcasecount="12" result="Passed" start-time="2020-06-02 00:16:54Z" end-time="2020-06-02 00:16:54Z" duration="0.057660" total="8" passed="8" failed="0" inconclusive="0" skipped="0" asserts="0">
+      <properties>
+        <property name="_PID" value="5680" />
+        <property name="_APPDOMAIN" value="Unity Child Domain" />
+        <property name="platform" value="EditMode" />
+      </properties>
+      <test-suite type="TestSuite" id="1038" name="Hydrogen" fullname="Hydrogen" runstate="Runnable" testcasecount="12" result="Passed" start-time="2020-06-02 00:16:54Z" end-time="2020-06-02 00:16:54Z" duration="0.055798" total="8" passed="8" failed="0" inconclusive="0" skipped="0" asserts="0">
+        <properties />
+        <test-suite type="TestSuite" id="1039" name="Tests" fullname="Hydrogen.Tests" runstate="Runnable" testcasecount="12" result="Passed" start-time="2020-06-02 00:16:54Z" end-time="2020-06-02 00:16:54Z" duration="0.049734" total="8" passed="8" failed="0" inconclusive="0" skipped="0" asserts="0">
+          <properties />
+          <test-suite type="TestSuite" id="1040" name="Editor" fullname="Hydrogen.Tests.Editor" runstate="Runnable" testcasecount="12" result="Passed" start-time="2020-06-02 00:16:54Z" end-time="2020-06-02 00:16:54Z" duration="0.043259" total="8" passed="8" failed="0" inconclusive="0" skipped="0" asserts="0">
+            <properties />
+            <test-suite type="TestFixture" id="1024" name="StringsTests" fullname="Hydrogen.Tests.Editor.StringsTests" classname="Hydrogen.Tests.Editor.StringsTests" runstate="Runnable" testcasecount="12" result="Passed" start-time="2020-06-02 00:16:54Z" end-time="2020-06-02 00:16:54Z" duration="0.035738" total="8" passed="8" failed="0" inconclusive="0" skipped="0" asserts="0">
+              <properties />
+              <test-case id="1025" name="Equal_ToLowerGetHashCode_GetLowerCaseHashCode_ComplexString" fullname="Hydrogen.Tests.Editor.StringsTests.Equal_ToLowerGetHashCode_GetLowerCaseHashCode_ComplexString" methodname="Equal_ToLowerGetHashCode_GetLowerCaseHashCode_ComplexString" classname="Hydrogen.Tests.Editor.StringsTests" runstate="Runnable" seed="1923740326" result="Passed" start-time="2020-06-02 00:16:54Z" end-time="2020-06-02 00:16:54Z" duration="0.010747" asserts="0">
+                <properties>
+                  <property name="Category" value="Hydrogen.Tests" />
+                </properties>
+              </test-case>
+              <test-case id="1026" name="Equal_ToLowerGetHashCode_GetLowerCaseHashCode_LowerCase" fullname="Hydrogen.Tests.Editor.StringsTests.Equal_ToLowerGetHashCode_GetLowerCaseHashCode_LowerCase" methodname="Equal_ToLowerGetHashCode_GetLowerCaseHashCode_LowerCase" classname="Hydrogen.Tests.Editor.StringsTests" runstate="Runnable" seed="419965173" result="Passed" start-time="2020-06-02 00:16:54Z" end-time="2020-06-02 00:16:54Z" duration="0.000680" asserts="0">
+                <properties>
+                  <property name="Category" value="Hydrogen.Tests" />
+                </properties>
+              </test-case>
+              <test-case id="1027" name="Equal_ToLowerGetHashCode_GetLowerCaseHashCode_Simple" fullname="Hydrogen.Tests.Editor.StringsTests.Equal_ToLowerGetHashCode_GetLowerCaseHashCode_Simple" methodname="Equal_ToLowerGetHashCode_GetLowerCaseHashCode_Simple" classname="Hydrogen.Tests.Editor.StringsTests" runstate="Runnable" seed="1837839467" result="Passed" start-time="2020-06-02 00:16:54Z" end-time="2020-06-02 00:16:54Z" duration="0.000445" asserts="0">
+                <properties>
+                  <property name="Category" value="Hydrogen.Tests" />
+                </properties>
+              </test-case>
+              <test-case id="1028" name="Equal_ToLowerGetHashCode_GetLowerCaseHashCode_UpperCase" fullname="Hydrogen.Tests.Editor.StringsTests.Equal_ToLowerGetHashCode_GetLowerCaseHashCode_UpperCase" methodname="Equal_ToLowerGetHashCode_GetLowerCaseHashCode_UpperCase" classname="Hydrogen.Tests.Editor.StringsTests" runstate="Runnable" seed="1344412217" result="Passed" start-time="2020-06-02 00:16:54Z" end-time="2020-06-02 00:16:54Z" duration="0.000349" asserts="0">
+                <properties>
+                  <property name="Category" value="Hydrogen.Tests" />
+                </properties>
+              </test-case>
+              <test-case id="1031" name="Equal_ToUpperGetHashCode_GetUpperCaseHashCode_ComplexString" fullname="Hydrogen.Tests.Editor.StringsTests.Equal_ToUpperGetHashCode_GetUpperCaseHashCode_ComplexString" methodname="Equal_ToUpperGetHashCode_GetUpperCaseHashCode_ComplexString" classname="Hydrogen.Tests.Editor.StringsTests" runstate="Runnable" seed="1352907673" result="Passed" start-time="2020-06-02 00:16:54Z" end-time="2020-06-02 00:16:54Z" duration="0.000660" asserts="0">
+                <properties>
+                  <property name="Category" value="Hydrogen.Tests" />
+                </properties>
+              </test-case>
+              <test-case id="1032" name="Equal_ToUpperGetHashCode_GetUpperCaseHashCode_LowerCase" fullname="Hydrogen.Tests.Editor.StringsTests.Equal_ToUpperGetHashCode_GetUpperCaseHashCode_LowerCase" methodname="Equal_ToUpperGetHashCode_GetUpperCaseHashCode_LowerCase" classname="Hydrogen.Tests.Editor.StringsTests" runstate="Runnable" seed="955766513" result="Passed" start-time="2020-06-02 00:16:54Z" end-time="2020-06-02 00:16:54Z" duration="0.000438" asserts="0">
+                <properties>
+                  <property name="Category" value="Hydrogen.Tests" />
+                </properties>
+              </test-case>
+              <test-case id="1033" name="Equal_ToUpperGetHashCode_GetUpperCaseHashCode_Simple" fullname="Hydrogen.Tests.Editor.StringsTests.Equal_ToUpperGetHashCode_GetUpperCaseHashCode_Simple" methodname="Equal_ToUpperGetHashCode_GetUpperCaseHashCode_Simple" classname="Hydrogen.Tests.Editor.StringsTests" runstate="Runnable" seed="940225206" result="Passed" start-time="2020-06-02 00:16:54Z" end-time="2020-06-02 00:16:54Z" duration="0.000347" asserts="0">
+                <properties>
+                  <property name="Category" value="Hydrogen.Tests" />
+                </properties>
+              </test-case>
+              <test-case id="1034" name="Equal_ToUpperGetHashCode_GetUpperCaseHashCode_UpperCase" fullname="Hydrogen.Tests.Editor.StringsTests.Equal_ToUpperGetHashCode_GetUpperCaseHashCode_UpperCase" methodname="Equal_ToUpperGetHashCode_GetUpperCaseHashCode_UpperCase" classname="Hydrogen.Tests.Editor.StringsTests" runstate="Runnable" seed="297079747" result="Passed" start-time="2020-06-02 00:16:54Z" end-time="2020-06-02 00:16:54Z" duration="0.000347" asserts="0">
+                <properties>
+                  <property name="Category" value="Hydrogen.Tests" />
+                </properties>
+              </test-case>
+            </test-suite>
+          </test-suite>
+        </test-suite>
+      </test-suite>
+    </test-suite>
+  </test-suite>
+</test-run>
