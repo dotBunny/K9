@@ -32,4 +32,11 @@
       <None Remove="Content\testrun-performance.xml" />
     </ItemGroup>
 
+    <ItemGroup>
+      <None Remove="Content\unityTestResults-Performance.xml" />
+      <EmbeddedResource Include="Content\unityTestResults-Performance.xml" />
+      <None Remove="Content\unityTestResults-UnitTests.xml" />
+      <EmbeddedResource Include="Content\unityTestResults-UnitTests.xml" />
+    </ItemGroup>
+
 </Project>

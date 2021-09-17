@@ -16,7 +16,7 @@ namespace K9.Unity.Tests
         {
             // Get TestRun Performance Data
             var assembly = Assembly.GetExecutingAssembly();
-            using var stream = assembly.GetManifestResourceStream("K9.Unity.Tests.Content.testrun-performance.xml");
+            using var stream = assembly.GetManifestResourceStream("K9.Unity.Tests.Content.unityTestResults-Performance.xml");
             using var reader = new StreamReader(stream);
             var byteArray = Encoding.ASCII.GetBytes(reader.ReadToEnd());
             _testRunPerformanceDataStream = new MemoryStream(byteArray);
@@ -37,7 +37,6 @@ namespace K9.Unity.Tests
         [Test]
         public void Detect_PerformanceResult()
         {
-            //Assert.Pass();
         }
 
         [Test]
