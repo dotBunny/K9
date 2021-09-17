@@ -15,11 +15,13 @@
         <ItemGroup>
             <AllFiles Include="..\Build\$(Configuration)\*.*"/>
             <K9Files Include="@(AllFiles)"
-                     Condition="'%(Filename.Substring(0,2))' == 'K9'" />
+                     Condition="$([System.Text.RegularExpressions.Regex]::IsMatch(%(Filename), 'K9\.'))" />
+            <K9Core Include="@(K9Files)"
+                    Condition="$([System.String]::Copy(%(Filename)).StartsWith('K9.Core'))" />
             <ReferencesFiles Include="@(AllFiles)"
-                             Condition="'%(Filename.Substring(0,2))' != 'K9'"/>
+                             Condition="!$([System.String]::Copy(%(Filename)).StartsWith('K9'))" />
         </ItemGroup>
-        <Move SourceFiles="@(K9Files)" DestinationFolder="..\Build\$(Configuration)\References" />
+        <Move SourceFiles="@(ReferencesFiles)" DestinationFolder="..\Build\$(Configuration)\ref" />
     </Target>
     
     <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
