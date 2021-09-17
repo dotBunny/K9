@@ -11,14 +11,14 @@
         <ProduceReferenceAssembly>False</ProduceReferenceAssembly>
     </PropertyGroup>
     
-    <Target Name="OrganizeFiles" AfterTargets="Build">
-        <ItemGroup>
-            <AllFiles Include="..\Build\$(Configuration)\*.*"/>
-            <ReferencesFiles Include="@(AllFiles)"
-                             Condition="!$([System.String]::Copy(%(Filename)).StartsWith('K9'))" />
-        </ItemGroup>
-        <Move SourceFiles="@(ReferencesFiles)" DestinationFolder="..\Build\$(Configuration)\ref" />
-    </Target>
+<!--    <Target Name="OrganizeFiles" AfterTargets="Build">-->
+<!--        <ItemGroup>-->
+<!--            <AllFiles Include="..\Build\$(Configuration)\*.*"/>-->
+<!--            <ReferencesFiles Include="@(AllFiles)"-->
+<!--                             Condition="!$([System.String]::Copy(%(Filename)).StartsWith('K9'))" />-->
+<!--        </ItemGroup>-->
+<!--        <Move SourceFiles="@(ReferencesFiles)" DestinationFolder="..\Build\$(Configuration)\ref" />-->
+<!--    </Target>-->
     
     <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
         <OutputPath>..\Build\Release\</OutputPath>
