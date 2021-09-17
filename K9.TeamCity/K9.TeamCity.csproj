@@ -14,10 +14,6 @@
     <Target Name="OrganizeFiles" AfterTargets="Build">
         <ItemGroup>
             <AllFiles Include="..\Build\$(Configuration)\*.*"/>
-            <K9Files Include="@(AllFiles)"
-                     Condition="$([System.Text.RegularExpressions.Regex]::IsMatch(%(Filename), 'K9\.'))" />
-            <K9Core Include="@(K9Files)"
-                    Condition="$([System.String]::Copy(%(Filename)).StartsWith('K9.Core'))" />
             <ReferencesFiles Include="@(AllFiles)"
                              Condition="!$([System.String]::Copy(%(Filename)).StartsWith('K9'))" />
         </ItemGroup>
