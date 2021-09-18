@@ -16,13 +16,18 @@ namespace K9.Setup
             Core.Init(Instance);
 
             var parser = new Parser(Settings => Settings.CaseInsensitiveEnumValues = true);
-            var results = parser.ParseArguments<Perforce>(Core.Arguments)
-                .WithParsed(v =>
-                {
-                    if (v.CanExecute()) v.Execute();
-                });
+            
+            var results = parser.ParseArguments<Perforce, SetEnvironmentVariable>(Core.Arguments);
+            
+            var newResult = results.MapResult(
+                (Perforce perforce) => perforce.CanExecute() && perforce.Execute(),
+                (SetEnvironmentVariable env) => env.CanExecute() && env.Execute(),
+                _ => false);
 
-            CommandLineUtil.HandleParserResults(results);
+            if (!newResult)
+            {
+                CommandLineUtil.HandleParserResults(results);
+            }
         }
     }
 }
