@@ -16,13 +16,18 @@ namespace K9.TeamCity
             Core.Init(Instance);
 
             var parser = new Parser(Settings => Settings.CaseInsensitiveEnumValues = true);
-            var results = parser.ParseArguments<BuildChangelist>(Core.Arguments)
-                .WithParsed<BuildChangelist>(v =>
-                {
-                    if (v.CanExecute()) v.Execute();
-                });
             
-            CommandLineUtil.HandleParserResults(results);
+            var results = parser.ParseArguments<BuildChangelist, SetParameter>(Core.Arguments);
+            
+            var newResult = results.MapResult(
+                (BuildChangelist changelist) => changelist.CanExecute() && changelist.Execute(),
+                (SetParameter param) => param.CanExecute() && param.Execute(),
+                _ => false);
+
+            if (!newResult)
+            {
+                CommandLineUtil.HandleParserResults(results);
+            }
         }
     }
 }

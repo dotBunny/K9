@@ -1,13 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 using CommandLine;
-using K9.Utils;
 
-namespace K9.Setup.Verbs
+namespace K9.TeamCity.Verbs
 {
-    [Verb("SetEnvironmentVariable")]
-    public class SetEnvironmentVariable : IVerb
+    [Verb("SetParameter")]
+    public class SetParameter : IVerb
     {
         [Option('f', "file", Required = false, HelpText = "Path to file to parse in var=val format.")]
         public string File { get; set; }
@@ -40,16 +37,14 @@ namespace K9.Setup.Verbs
                     var split = line.Split('=', 1);
                     if (split.Length == 2)
                     {
-                        Log.WriteLine($"SET User Environment Variable {split[0]}={split[1]} (", Program.Instance.DefaultLogCategory);
-                        Environment.SetEnvironmentVariable(split[0], split[1], EnvironmentVariableTarget.User);
+                        Console.WriteLine($"##teamcity[setParameter name='{split[0]}' value='{split[1]}']");
                     }
                 }
             }
 
             if (!string.IsNullOrEmpty(Name))
             {
-                Log.WriteLine($"SET User Environment Variable {Name}={Value}", Program.Instance.DefaultLogCategory);
-                Environment.SetEnvironmentVariable(Name, Value, EnvironmentVariableTarget.User);
+                Console.WriteLine($"##teamcity[setParameter name='{Name}' value='{Value}']");
             }
 
             return true;
