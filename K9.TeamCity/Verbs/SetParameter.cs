@@ -34,7 +34,7 @@ namespace K9.TeamCity.Verbs
                 var lines = System.IO.File.ReadAllLines(File);
                 foreach (string line in lines)
                 {
-                    var split = line.Split('=', 1);
+                    var split = line.Split('=', 2);
                     if (split.Length == 2)
                     {
                         Console.WriteLine($"##teamcity[setParameter name='{split[0]}' value='{split[1]}']");

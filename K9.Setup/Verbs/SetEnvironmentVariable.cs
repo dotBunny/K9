@@ -37,7 +37,7 @@ namespace K9.Setup.Verbs
                 var lines = System.IO.File.ReadAllLines(File);
                 foreach (string line in lines)
                 {
-                    var split = line.Split('=', 1);
+                    var split = line.Split('=', 2);
                     if (split.Length == 2)
                     {
                         Log.WriteLine($"SET User Environment Variable {split[0]}={split[1]} (", Program.Instance.DefaultLogCategory);
