@@ -23,6 +23,9 @@ namespace K9.Setup.Verbs
             {
                 System.IO.Directory.CreateDirectory(folder);
             }
+
+            // Some single line fixes
+            Content = Content.Replace("___SPACE___", " ");
             
             System.IO.File.WriteAllText(File, Content);
             return true;
