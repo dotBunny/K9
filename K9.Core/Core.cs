@@ -90,7 +90,7 @@ namespace K9
                 {
                     if (arg.Contains("="))
                     {
-                        var split = arg.LastIndexOf('=');
+                        var split = arg.IndexOf('=');
                         OverrideArguments.Add(arg.Substring(2, split - 2).ToUpper(), arg.Substring(split + 1));
                     }
                     else
