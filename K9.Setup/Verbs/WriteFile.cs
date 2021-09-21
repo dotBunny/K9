@@ -27,7 +27,7 @@ namespace K9.Setup.Verbs
             // Some single line fixes
             Content = Content.Replace("___SPACE___", " ");
             
-            System.IO.File.WriteAllText(File, Content);
+            System.IO.File.WriteAllLines(File, Content.Split("___NEWLINE___"));
             return true;
         }
     }
