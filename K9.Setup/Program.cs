@@ -17,13 +17,14 @@ namespace K9.Setup
 
             var parser = new Parser(Settings => Settings.CaseInsensitiveEnumValues = true);
             
-            var results = parser.ParseArguments<Perforce, SetEnvironmentVariable, WriteFile, DeleteFolder>(Core.Arguments);
+            var results = parser.ParseArguments<Perforce, SetEnvironmentVariable, WriteFile, DeleteFolder, Extract>(Core.Arguments);
             
             var newResult = results.MapResult(
                 (Perforce perforce) => perforce.CanExecute() && perforce.Execute(),
                 (SetEnvironmentVariable env) => env.CanExecute() && env.Execute(),
                 (WriteFile write) => write.CanExecute() && write.Execute(),
                 (DeleteFolder delete) => delete.CanExecute() && delete.Execute(),
+                (Extract extract) => extract.CanExecute() && extract.Execute(),
                 _ => false);
 
             if (!newResult)
