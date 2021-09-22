@@ -7,15 +7,21 @@ using K9.Utils;
 namespace K9.Setup.Verbs
 {
     [Verb("Perforce")]
-    public class Perforce : DefaultOptions, IVerb
+    public class Perforce : IVerb
     {
         [Option('c', "client", Required = true, HelpText = "The client identifier for this workspace.")]
         public string Client { get; set; }
+        
+        [Option('p', "password", Required = false, HelpText = "The provided password.")]
+        public string Password { get; set; }
 
         [Option('p', "port", Required = false, HelpText = "The server host:port.",
             Default = Services.Perforce.Config.DefaultPort)]
         public string Port { get; set; }
-
+        
+        [Option('u', "user", Required = true, HelpText = "The provided username.")]
+        public string Username { get; set; }
+        
         public bool CanExecute()
         {
             if (string.IsNullOrEmpty(Username)) return false;

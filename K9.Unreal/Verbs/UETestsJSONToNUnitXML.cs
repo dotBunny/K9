@@ -8,7 +8,7 @@ using Newtonsoft.Json.Linq;
 namespace K9.Unreal.Verbs
 {
     [Verb("UERunTestsJSONToNUnitXML")]
-    public class UERunTestsJSONToNUnitXML : DefaultOptions, IVerb
+    public class UERunTestsJSONToNUnitXML : IVerb
     {
         [Option('i', "inputPath", Required = false, HelpText = "The path to the source file to be converted.")]
         public string InputPath { get; set; }

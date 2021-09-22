@@ -8,8 +8,20 @@ using File = System.IO.File;
 namespace K9.TeamCity.Verbs
 {
     [Verb("BuildChangelist")]
-    public class BuildChangelist : DefaultOptions, IVerb
+    public class BuildChangelist : IVerb
     {
+        [Option('h', "host", Required = false, HelpText = "TeamCity Host:Port", Default = "dotbunny.dyndns.org:2018")]
+        public string Host { get; set; }
+        
+        [Option('u', "username", Required = false, HelpText = "TeamCity Username")]
+        public string Username { get; set; }
+        
+        [Option('p', "password", Required = false, HelpText = "TeamCity Password")]
+        public string Password { get; set; }
+        
+        [Option('t', "token", Required = false, HelpText = "TeamCity Token")]
+        public string Token { get; set; }
+        
         [Option('b', "build", Required = false, HelpText = "Target Build ID")]
         public string BuildID { get; set; }
         

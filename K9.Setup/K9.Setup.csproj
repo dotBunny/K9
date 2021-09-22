@@ -33,4 +33,8 @@
         <ProjectReference Include="..\K9.Core\K9.Core.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+      <PackageReference Include="SMBLibrary" Version="1.4.6.2" />
+    </ItemGroup>
+
 </Project>
