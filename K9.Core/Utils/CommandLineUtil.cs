@@ -12,10 +12,10 @@ namespace K9.Utils
                 {
                     foreach (var e in v)
                         if (e.Tag == ErrorType.HelpRequestedError || e.Tag == ErrorType.HelpVerbRequestedError)
-                            Log.Write(HelpText.AutoBuild(results, _ => _, _ => _));
+                            Log.WriteLine(HelpText.AutoBuild(results, _ => _, _ => _));
                         else
                         {
-                            Log.Write($"{e.Tag} - No actions taken.");
+                            Log.WriteLine($"{e.Tag} - No actions taken.");
                         }
                 });
         }

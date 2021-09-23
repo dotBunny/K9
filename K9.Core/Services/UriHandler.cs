@@ -10,7 +10,6 @@ namespace K9.Services
             switch (uri.Scheme.ToUpper())
             {
                 case "SMB":
-
                     // Determine address
                     var address = uri.Host;
                     
@@ -19,7 +18,13 @@ namespace K9.Services
                     var filePath = string.Empty;
                     if (!string.IsNullOrEmpty(uri.AbsolutePath))
                     {
-                        var info = uri.AbsolutePath.Split('\\', 2);
+                        var fullPath = uri.AbsolutePath;
+                        if (fullPath.StartsWith('/'))
+                        {
+                            fullPath = fullPath.Substring(1);
+                        }
+                        
+                        var info = fullPath.Split('/', 2);
                         share = info[0];
                         filePath = info[1];
                     }

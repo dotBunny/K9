@@ -28,8 +28,14 @@ namespace K9.Setup.Verbs
         {
             if (CheckExists)
             {
-                if (File.Exists(OutputPath) || Directory.Exists(OutputPath)) return true;
+                if (File.Exists(OutputPath) || Directory.Exists(OutputPath))
+                {
+                    Log.WriteLine("Output already found.", Program.Instance.DefaultLogCategory);
+                    return true;
+                }
             }
+
+            Log.WriteLine("Extracting ...", Program.Instance.DefaultLogCategory);
             
             var upperCaseFilePath = UriString.ToUpper();
             var protocolHandler = Services.UriHandler.GetFileAccessor(UriString);
@@ -41,25 +47,29 @@ namespace K9.Setup.Verbs
                     if (upperCaseFilePath.EndsWith(".ZIP"))
                     {
                         var archive = new ZipArchive(stream, ZipArchiveMode.Read);
+                        if (!Directory.Exists(OutputPath))
+                        {
+                            Directory.CreateDirectory(OutputPath);
+                        }
                         archive.ExtractToDirectory(OutputPath);
+                        archive.Dispose();
                     }
                     else
                     {
-                        Log.WriteLine("Unsupported file format.", Program.Instance.DefaultLogCategory);
-                        // if (File.Exists(OutputPath))
-                        // {
-                        //     using var file = new FileStream(OutputPath, FileMode.Truncate, FileAccess.Write);
-                        //     var bytes = new byte[stream.Length];
-                        //     stream.Read(bytes, 0, (int)stream.Length);
-                        //     file.Write(bytes, 0, bytes.Length);
-                        // }
-                        // else
-                        // {
-                        //     using var file = new FileStream(OutputPath, FileMode.Create, FileAccess.Write);
-                        //     var bytes = new byte[stream.Length];
-                        //     stream.Read(bytes, 0, (int)stream.Length);
-                        //     file.Write(bytes, 0, bytes.Length);
-                        // }
+                        if (File.Exists(OutputPath))
+                        {
+                            using var file = new FileStream(OutputPath, FileMode.Truncate, FileAccess.Write);
+                            var bytes = new byte[stream.Length];
+                            stream.Read(bytes, 0, (int)stream.Length);
+                            file.Write(bytes, 0, bytes.Length);
+                        }
+                        else
+                        {
+                            using var file = new FileStream(OutputPath, FileMode.Create, FileAccess.Write);
+                            var bytes = new byte[stream.Length];
+                            stream.Read(bytes, 0, (int)stream.Length);
+                            file.Write(bytes, 0, bytes.Length);
+                        }
                     }
                 }
                 stream.Close();

@@ -62,33 +62,58 @@ namespace K9.Services
         {
             if (!ValidConnection()) return false;
             
+            
             var fileCreateStatus = _fileStore.CreateFile(out object fileHandle, out var fileStatus, _filePath, 
                 AccessMask.GENERIC_READ | AccessMask.SYNCHRONIZE, SMBLibrary.FileAttributes.Normal, 
                 ShareAccess.Read, CreateDisposition.FILE_OPEN, 
                 CreateOptions.FILE_NON_DIRECTORY_FILE | CreateOptions.FILE_SYNCHRONOUS_IO_ALERT, null);
-            
+
             if (fileCreateStatus == NTStatus.STATUS_SUCCESS && fileStatus == FileStatus.FILE_OPENED)
             {
-                long bytesRead = 0;
-                while (true)
-                {
-                    var readFileStatus = _fileStore.ReadFile(out var data, fileHandle, bytesRead, (int)_client.MaxReadSize);
-                    if (readFileStatus != NTStatus.STATUS_SUCCESS && readFileStatus != NTStatus.STATUS_END_OF_FILE)
-                    {
-                        Cleanup();
-                        return false;
-                    }
+                var fileInfoStatus = _fileStore.GetFileInformation(out var result, fileHandle,
+                    FileInformationClass.FileAllocationInformation);
 
-                    if (readFileStatus == NTStatus.STATUS_END_OF_FILE || data.Length == 0)
-                    {
-                        break;
-                    }
-                    bytesRead += data.Length;
-                    stream.Write(data, 0, data.Length);
+                if (fileInfoStatus == NTStatus.STATUS_SUCCESS)
+                {
+                    FileAllocationInformation fileInfo = (FileAllocationInformation)result;
+                    byte[] buffer = new byte[fileInfo.AllocationSize];
+                }
+                else
+                {
+                    Log.WriteLine($"Unable to query file stats. {fileInfoStatus}");
                 }
             }
-            _fileStore.CloseFile(fileHandle);
-            Cleanup();
+            else
+            {
+                Log.WriteLine($"File not found, or unable to open. {fileCreateStatus}|{fileStatus}");
+            }
+
+            throw new Exception();
+            
+            //
+            // if (fileCreateStatus == NTStatus.STATUS_SUCCESS && fileStatus == FileStatus.FILE_OPENED)
+            // {
+            //     long bytesRead = 0;
+            //   
+            //     while (true)
+            //     {
+            //         var readFileStatus = _fileStore.ReadFile(out var data, fileHandle, bytesRead, (int)_client.MaxReadSize);
+            //         if (readFileStatus != NTStatus.STATUS_SUCCESS && readFileStatus != NTStatus.STATUS_END_OF_FILE)
+            //         {
+            //             Cleanup();
+            //             return false;
+            //         }
+            //
+            //         if (readFileStatus == NTStatus.STATUS_END_OF_FILE || data.Length == 0)
+            //         {
+            //             break;
+            //         }
+            //         bytesRead += data.Length;
+            //         stream.Write(data, 0, data.Length);
+            //     }
+            // }
+            // _fileStore.CloseFile(fileHandle);
+            // Cleanup();
             return true;
         }
     }
