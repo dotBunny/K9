@@ -10,7 +10,7 @@ namespace K9.Services.Office
     {
         public static void Post(string baseFolder, ref List<IResult> results)
         {
-            Dictionary<string, List<IResult>> sortedResults = new Dictionary<string, List<IResult>>();
+            Dictionary<string, List<IResult>> sortedResults = new();
             foreach (IResult r in results)
             {
                 IResult reporter = r;
@@ -26,7 +26,7 @@ namespace K9.Services.Office
                 }
             }
 
-            Dictionary<string, XLWorkbook> workbooks = new Dictionary<string, XLWorkbook>();
+            Dictionary<string, XLWorkbook> workbooks = new();
             foreach (string key in sortedResults.Keys)
             {
                 string path = Path.Combine(baseFolder, key + ".xlsx");
@@ -36,7 +36,7 @@ namespace K9.Services.Office
                 }
                 else
                 {
-                    XLWorkbook newWorkbook = new XLWorkbook();
+                    XLWorkbook newWorkbook = new();
                     newWorkbook.AddWorksheet("Data");
                     newWorkbook.SaveAs(path);
                     workbooks[key] = newWorkbook;

@@ -58,7 +58,7 @@ namespace K9.TeamCity.Verbs
 
         public bool Execute()
         {
-            TeamCityClient client = new TeamCityClient(Host);
+            TeamCityClient client = new(Host);
             if (!string.IsNullOrEmpty(Token))
             {
                 client.ConnectWithAccessToken(Token);

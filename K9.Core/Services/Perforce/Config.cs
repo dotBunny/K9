@@ -20,7 +20,7 @@ namespace K9.Services.Perforce
             if (File.Exists(path))
             {
                 Log.WriteLine("P4Config found at " + path, Core.LogCategory);
-                FileIniDataParser parser = new FileIniDataParser();
+                FileIniDataParser parser = new();
                 IniData data = parser.ReadFile(path);
 
                 // Assign to our data structure

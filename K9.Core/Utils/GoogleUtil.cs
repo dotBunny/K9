@@ -16,7 +16,7 @@ namespace K9.Services.Google
                 return null;
             }
 
-            using (FileStream stream = new FileStream(TokenPath, FileMode.Open, FileAccess.Read))
+            using (FileStream stream = new(TokenPath, FileMode.Open, FileAccess.Read))
             {
                 credential = GoogleCredential.FromStream(stream).CreateScoped(Scopes);
             }
@@ -32,7 +32,7 @@ namespace K9.Services.Google
 
         public static SheetsService GetSheetsService(this GoogleCredential Credential, string ApplicationName)
         {
-            SheetsService service = new SheetsService(new BaseClientService.Initializer
+            SheetsService service = new(new BaseClientService.Initializer
             {
                 HttpClientInitializer = Credential, ApplicationName = ApplicationName
             });

@@ -61,14 +61,19 @@ namespace K9.Utils
         public static string GetPathWithCorrectCase(this FileInfo InInfo)
         {
             DirectoryInfo parentInfo = InInfo.Directory;
-            return parentInfo != null ? Path.Combine(GetPathWithCorrectCase(parentInfo),
-                InInfo.Exists ? parentInfo.GetFiles(InInfo.Name)[0].Name : InInfo.Name) : null;
+            return parentInfo != null
+                ? Path.Combine(GetPathWithCorrectCase(parentInfo),
+                    InInfo.Exists ? parentInfo.GetFiles(InInfo.Name)[0].Name : InInfo.Name)
+                : null;
         }
 
         public static string GetPathWithCorrectCase(this DirectoryInfo InInfo)
         {
             DirectoryInfo parentInfo = InInfo.Parent;
-            return parentInfo == null ? InInfo.FullName.ToUpperInvariant() : Path.Combine(GetPathWithCorrectCase(parentInfo), InInfo.Exists ? parentInfo.GetDirectories(InInfo.Name)[0].Name : InInfo.Name);
+            return parentInfo == null
+                ? InInfo.FullName.ToUpperInvariant()
+                : Path.Combine(GetPathWithCorrectCase(parentInfo),
+                    InInfo.Exists ? parentInfo.GetDirectories(InInfo.Name)[0].Name : InInfo.Name);
         }
 
         public static MemoryStream GetMemoryStream(this string FilePath)

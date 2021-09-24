@@ -10,7 +10,7 @@ namespace K9.Utils
     {
         public static bool SpawnProcess(string FileName, string CommandLine)
         {
-            using (Process ChildProcess = new Process())
+            using (Process ChildProcess = new())
             {
                 ChildProcess.StartInfo.FileName = FileName;
                 ChildProcess.StartInfo.Arguments = string.IsNullOrEmpty(CommandLine) ? "" : CommandLine;
@@ -21,7 +21,7 @@ namespace K9.Utils
 
         public static bool SpawnHiddenProcess(string FileName, string CommandLine)
         {
-            using (Process ChildProcess = new Process())
+            using (Process ChildProcess = new())
             {
                 ChildProcess.StartInfo.FileName = FileName;
                 ChildProcess.StartInfo.Arguments = string.IsNullOrEmpty(CommandLine) ? "" : CommandLine;
@@ -42,7 +42,7 @@ namespace K9.Utils
         public static int ExecuteProcess(string FileName, string WorkingDir, string CommandLine, string Input,
             out List<string> OutputLines)
         {
-            List<string> output = new List<string>();
+            List<string> output = new();
             int returnValue = ExecuteProcess(FileName, WorkingDir, CommandLine, Input, Line => output.Add(Line));
             OutputLines = output;
             return returnValue;
@@ -51,9 +51,9 @@ namespace K9.Utils
         public static int ExecuteProcess(string FileName, string WorkingDir, string CommandLine, string Input,
             Action<string> OutputLine)
         {
-            using (Process ChildProcess = new Process())
+            using (Process ChildProcess = new())
             {
-                object LockObject = new object();
+                object LockObject = new();
 
                 DataReceivedEventHandler OutputHandler = (x, y) =>
                 {

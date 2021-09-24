@@ -26,7 +26,10 @@ namespace K9.Setup.Verbs
                 Directory.CreateDirectory(folder);
             }
 
-            if (string.IsNullOrEmpty(File)) return false;
+            if (string.IsNullOrEmpty(File))
+            {
+                return false;
+            }
 
             // Some single line fixes
             if (!string.IsNullOrEmpty(Content))

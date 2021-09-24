@@ -40,7 +40,7 @@ namespace K9.Services.Perforce
             {
                 string Suffix = string.Format("{0}", Idx);
 
-                DescribeFileRecord File = new DescribeFileRecord();
+                DescribeFileRecord File = new();
                 if (!Tags.TryGetValue("depotFile" + Suffix, out File.DepotFile))
                 {
                     break;

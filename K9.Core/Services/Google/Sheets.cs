@@ -33,7 +33,7 @@ namespace K9.Services.Google
             _existingDataCache = new Dictionary<string, IList<IList<object>>>();
 
             // Get Credentials
-            using FileStream stream = new FileStream(credentialsPath, FileMode.Open, FileAccess.Read);
+            using FileStream stream = new(credentialsPath, FileMode.Open, FileAccess.Read);
             _googleCredential = GoogleCredential.FromStream(stream)
                 .CreateScoped(SheetsService.Scope.Spreadsheets)
                 .UnderlyingCredential as ServiceAccountCredential;
@@ -89,11 +89,11 @@ namespace K9.Services.Google
 
         public bool RemoveRowImmediately(int startRowIndex, int numberOfRows)
         {
-            BatchUpdateSpreadsheetRequest batchUpdateSpreadsheetRequest = new BatchUpdateSpreadsheetRequest();
+            BatchUpdateSpreadsheetRequest batchUpdateSpreadsheetRequest = new();
             batchUpdateSpreadsheetRequest.Requests = new List<Request>();
 
 
-            Request request = new Request();
+            Request request = new();
 
             // request.DeleteDimension = new DeleteDimensionRequest
             // {
@@ -156,13 +156,13 @@ namespace K9.Services.Google
 
         public bool CreateSheetImmediately(string name)
         {
-            BatchUpdateSpreadsheetRequest batchUpdateSpreadsheetRequest = new BatchUpdateSpreadsheetRequest();
+            BatchUpdateSpreadsheetRequest batchUpdateSpreadsheetRequest = new();
             batchUpdateSpreadsheetRequest.Requests = new List<Request>();
 
-            AddSheetRequest addSheetRequest = new AddSheetRequest();
+            AddSheetRequest addSheetRequest = new();
             addSheetRequest.Properties = new SheetProperties { Title = name };
 
-            Request request = new Request { AddSheet = addSheetRequest };
+            Request request = new() { AddSheet = addSheetRequest };
             batchUpdateSpreadsheetRequest.Requests.Add(request);
 
             BatchUpdateSpreadsheetResponse result = _sheetService.Spreadsheets
@@ -251,7 +251,7 @@ namespace K9.Services.Google
                         _existingDataCache.Add(entry.Key, GetSheetData(entry.Key));
                     }
 
-                    BatchUpdateValuesRequest batchUpdateRequest = new BatchUpdateValuesRequest();
+                    BatchUpdateValuesRequest batchUpdateRequest = new();
                     batchUpdateRequest.Data = new List<ValueRange>();
                     batchUpdateRequest.ValueInputOption = "USER_ENTERED";
 

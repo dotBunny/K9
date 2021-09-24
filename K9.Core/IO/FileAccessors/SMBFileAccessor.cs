@@ -9,11 +9,11 @@ namespace K9.IO.FileAccessors
     public class SMBFileAccessor : IFileAccessor
     {
         private readonly SMB2Client _client;
-        private bool _connected;
         private readonly string _filePath;
         private readonly ISMBFileStore _fileStore;
         private readonly NTStatus _fileStoreStatus;
         private readonly NTStatus _loginStatus;
+        private bool _connected;
 
         public SMBFileAccessor(string address, string username, string password, string share, string filePath)
         {

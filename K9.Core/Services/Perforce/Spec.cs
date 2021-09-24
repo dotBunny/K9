@@ -73,7 +73,7 @@ namespace K9.Services.Perforce
                     string SectionName = Lines[LineIdx].Substring(0, SeparatorIdx);
 
                     // Parse the section value
-                    StringBuilder Value = new StringBuilder(Lines[LineIdx].Substring(SeparatorIdx + 1).TrimStart());
+                    StringBuilder Value = new(Lines[LineIdx].Substring(SeparatorIdx + 1).TrimStart());
                     for (; LineIdx + 1 < Lines.Count; LineIdx++)
                     {
                         if (Lines[LineIdx + 1].Length == 0)
@@ -103,7 +103,7 @@ namespace K9.Services.Perforce
         /// <returns></returns>
         public override string ToString()
         {
-            StringBuilder Result = new StringBuilder();
+            StringBuilder Result = new();
             foreach (KeyValuePair<string, string> Section in Sections)
             {
                 if (Section.Value.Contains('\n'))

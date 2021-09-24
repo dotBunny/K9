@@ -44,7 +44,7 @@ namespace K9.Setup.Verbs
             {
                 Log.WriteLine("Unable to find p4config.txt! (" + p4configPath + ").",
                     Program.Instance.DefaultLogCategory);
-                StringBuilder fileContents = new StringBuilder();
+                StringBuilder fileContents = new();
 
                 fileContents.Append("P4USER=");
                 fileContents.AppendLine(Username);
@@ -60,7 +60,7 @@ namespace K9.Setup.Verbs
             }
 
             // Perforce Client Settings
-            List<string> outputLines = new List<string>();
+            List<string> outputLines = new();
 
             Log.WriteLine("SET P4CONFIG=" + Services.Perforce.Config.FileName, Program.Instance.DefaultLogCategory);
             int p4ConfigCode = ProcessUtil.ExecuteProcess("p4.exe", workspaceRoot,

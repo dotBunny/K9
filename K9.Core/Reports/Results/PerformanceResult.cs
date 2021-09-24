@@ -21,7 +21,7 @@ namespace K9.Reports.Results
 
         public override string ToString()
         {
-            StringBuilder sb = new StringBuilder();
+            StringBuilder sb = new();
             sb.Append("==> ");
             sb.AppendLine(FullName);
             foreach (PerformanceTestResultSample s in Samples)

@@ -8,7 +8,7 @@ namespace K9
     {
         public static IFileAccessor GetFileAccessor(string connectionString)
         {
-            Uri uri = new Uri(connectionString);
+            Uri uri = new(connectionString);
             switch (uri.Scheme.ToUpper())
             {
                 case "SMB":

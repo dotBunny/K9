@@ -70,7 +70,7 @@ namespace K9.Services.Perforce
 
         public bool GetLoggedInState(out bool bIsLoggedIn)
         {
-            List<OutputLine> Lines = new List<OutputLine>();
+            List<OutputLine> Lines = new();
             bool bResult = RunCommand("login -s", null, Line =>
             {
                 Lines.Add(Line);
@@ -101,7 +101,7 @@ namespace K9.Services.Perforce
 
         public LoginResult Login(out string ErrorMessage)
         {
-            List<OutputLine> Lines = new List<OutputLine>();
+            List<OutputLine> Lines = new();
             bool bResult = RunCommand("login", Password, Line =>
             {
                 Lines.Add(Line);
@@ -216,7 +216,7 @@ namespace K9.Services.Perforce
 
         public bool CreateClient(Spec Client, out string ErrorMessage)
         {
-            List<string> Lines = new List<string>();
+            List<string> Lines = new();
             bool bResult = RunCommand("client -i", Client.ToString(), Line =>
             {
                 Lines.Add(Line.Text);
@@ -378,7 +378,7 @@ namespace K9.Services.Perforce
                 }
                 else
                 {
-                    StringBuilder Description = new StringBuilder();
+                    StringBuilder Description = new();
                     for (; Idx + 1 < Lines.Count; Idx++)
                     {
                         if (Lines[Idx + 1].Length == 0)
@@ -416,7 +416,7 @@ namespace K9.Services.Perforce
             string[] Tokens = Line.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
             if (Tokens.Length == 7 && Tokens[0] == "Change" && Tokens[2] == "on" && Tokens[5] == "by")
             {
-                ChangeSummary Change = new ChangeSummary();
+                ChangeSummary Change = new();
                 if (int.TryParse(Tokens[1], out Change.Number) &&
                     DateTime.TryParse(Tokens[3] + " " + Tokens[4], out Change.Date))
                 {
@@ -477,7 +477,7 @@ namespace K9.Services.Perforce
                 return false;
             }
 
-            FileChangeSummary Change = new FileChangeSummary();
+            FileChangeSummary Change = new();
             if (!int.TryParse(Tokens[0].Substring(1), out Change.Revision) ||
                 !int.TryParse(Tokens[2], out Change.ChangeNumber) ||
                 !DateTime.TryParse(Tokens[5] + " " + Tokens[6], out Change.Date))
@@ -498,7 +498,7 @@ namespace K9.Services.Perforce
             Change.User = Tokens[8].Substring(0, UserClientIdx);
             Change.Client = Tokens[8].Substring(UserClientIdx + 1);
 
-            StringBuilder Description = new StringBuilder();
+            StringBuilder Description = new();
             for (; LineIdx + 1 < Lines.Count; LineIdx++)
             {
                 if (Lines[LineIdx + 1].Length == 0)
@@ -562,7 +562,7 @@ namespace K9.Services.Perforce
 
         public bool FindStreams(out List<StreamRecord> OutStreams)
         {
-            List<Dictionary<string, string>> Records = new List<Dictionary<string, string>>();
+            List<Dictionary<string, string>> Records = new();
             if (RunCommandWithBinaryOutput("streams", Records, CommandOptions.None))
             {
                 OutStreams = Records.Select(x => new StreamRecord(x)).ToList();
@@ -582,7 +582,7 @@ namespace K9.Services.Perforce
                 return false;
             }
 
-            List<string> StreamNames = new List<string>();
+            List<string> StreamNames = new();
             foreach (string Line in Lines)
             {
                 string[] Tokens = Line.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
@@ -603,7 +603,7 @@ namespace K9.Services.Perforce
 
         public bool HasOpenFiles()
         {
-            List<FileRecord> Records = new List<FileRecord>();
+            List<FileRecord> Records = new();
             bool bResult = RunCommand("opened -m 1", out Records, CommandOptions.None);
             return bResult && Records.Count > 0;
         }
@@ -618,7 +618,7 @@ namespace K9.Services.Perforce
         {
             string CommandLine = string.Format("describe -s {0}", ChangeNumber);
 
-            List<Dictionary<string, string>> Records = new List<Dictionary<string, string>>();
+            List<Dictionary<string, string>> Records = new();
             if (!RunCommandWithBinaryOutput(CommandLine, Records, CommandOptions.None))
             {
                 Record = null;
@@ -697,7 +697,7 @@ namespace K9.Services.Perforce
 
         public bool Stat(string Options, List<string> Files, out List<FileRecord> FileRecords)
         {
-            StringBuilder Arguments = new StringBuilder("fstat");
+            StringBuilder Arguments = new("fstat");
             if (!string.IsNullOrEmpty(Options))
             {
                 Arguments.AppendFormat(" {0}", Options);
@@ -730,9 +730,9 @@ namespace K9.Services.Perforce
 
                 // Create a filter to strip all the sync records
                 bool bResult;
-                using (TagRecordParser Parser = new TagRecordParser(x => SyncOutput(new FileRecord(x))))
+                using (TagRecordParser Parser = new(x => SyncOutput(new FileRecord(x))))
                 {
-                    StringBuilder CommandLine = new StringBuilder();
+                    StringBuilder CommandLine = new();
                     CommandLine.AppendFormat("-x \"{0}\" -z tag", TempFileName);
                     if (Options != null && Options.NumRetries > 0)
                     {
@@ -891,8 +891,8 @@ namespace K9.Services.Perforce
                 return false;
             }
 
-            List<Dictionary<string, string>> LocalOutput = new List<Dictionary<string, string>>();
-            using (TagRecordParser Parser = new TagRecordParser(Record => LocalOutput.Add(Record)))
+            List<Dictionary<string, string>> LocalOutput = new();
+            using (TagRecordParser Parser = new(Record => LocalOutput.Add(Record)))
             {
                 foreach (string Line in Lines)
                 {
@@ -951,7 +951,7 @@ namespace K9.Services.Perforce
             }
             else
             {
-                List<string> LocalLines = new List<string>();
+                List<string> LocalLines = new();
                 foreach (string RawOutputLine in RawOutputLines)
                 {
                     bResult &= PerforceUtil.ParseCommandOutput(RawOutputLine,
@@ -995,7 +995,7 @@ namespace K9.Services.Perforce
 
         private string GetFullCommandLine(string CommandLine, CommandOptions Options)
         {
-            StringBuilder FullCommandLine = new StringBuilder();
+            StringBuilder FullCommandLine = new();
             if (ServerAndPort != null)
             {
                 FullCommandLine.AppendFormat("-p{0} ", ServerAndPort);
@@ -1053,8 +1053,8 @@ namespace K9.Services.Perforce
             CommandOptions Options)
         {
             // Execute Perforce, consuming the binary output into a memory stream
-            MemoryStream MemoryStream = new MemoryStream();
-            using (Process Process = new Process())
+            MemoryStream MemoryStream = new();
+            using (Process Process = new())
             {
                 Process.StartInfo.FileName = "p4.exe";
                 Process.StartInfo.Arguments =
@@ -1076,8 +1076,8 @@ namespace K9.Services.Perforce
             MemoryStream.Position = 0;
 
             // Parse the records
-            List<Dictionary<string, string>> Records = new List<Dictionary<string, string>>();
-            using (BinaryReader Reader = new BinaryReader(MemoryStream, Encoding.UTF8))
+            List<Dictionary<string, string>> Records = new();
+            using (BinaryReader Reader = new(MemoryStream, Encoding.UTF8))
             {
                 while (Reader.BaseStream.Position < Reader.BaseStream.Length)
                 {
@@ -1090,7 +1090,7 @@ namespace K9.Services.Perforce
                     }
 
                     // Read all the fields in the record
-                    Dictionary<string, string> Record = new Dictionary<string, string>();
+                    Dictionary<string, string> Record = new();
                     for (;;)
                     {
                         // Read the next field type. Perforce only outputs string records. A '0' character indicates the end of the dictionary.

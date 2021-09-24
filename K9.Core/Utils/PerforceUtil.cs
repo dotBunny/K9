@@ -142,7 +142,7 @@ namespace K9.Services.Utils
         {
             if (Options.HasFlag(P4.CommandOptions.NoChannels))
             {
-                OutputLine Line = new OutputLine(OutputChannel.Unknown, Text);
+                OutputLine Line = new(OutputChannel.Unknown, Text);
                 return HandleOutput(Line);
             }
 

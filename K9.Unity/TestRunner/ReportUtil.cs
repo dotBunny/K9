@@ -13,7 +13,7 @@ namespace K9.Unity.TestRunner
 
         public static List<TestCase> GetTestCases(this TestSuite inTestSuite)
         {
-            List<TestCase> returnList = new List<TestCase>();
+            List<TestCase> returnList = new();
 
             if (inTestSuite.TestCases != null && inTestSuite.TestCases.Count > 0)
             {
@@ -42,7 +42,7 @@ namespace K9.Unity.TestRunner
         public static List<IResult> GetResults(this List<TestCase> inTestCases)
         {
             int count = inTestCases.Count;
-            List<IResult> returnResults = new List<IResult>(count);
+            List<IResult> returnResults = new(count);
             for (int i = 0; i < count; i++)
             {
                 if (inTestCases[i] == null)

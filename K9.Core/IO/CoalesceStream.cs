@@ -8,9 +8,9 @@ namespace K9.IO
     {
         private readonly List<byte[]> _blocks = new();
 
-        private long _lengthInternal;
-
         private readonly long blockSize = 65536;
+
+        private long _lengthInternal;
 
         public CoalesceStream()
         {
@@ -73,7 +73,8 @@ namespace K9.IO
 
             if (readCount < 0)
             {
-                throw new ArgumentOutOfRangeException(nameof(count), readCount, "Number of bytes to copy cannot be negative.");
+                throw new ArgumentOutOfRangeException(nameof(count), readCount,
+                    "Number of bytes to copy cannot be negative.");
             }
 
             long remaining = _lengthInternal - Position;

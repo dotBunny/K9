@@ -75,7 +75,7 @@ namespace K9.Unity.Verbs
             }
 
             Log.WriteLine($"Reading {fullPath}", ConsoleCategory);
-            XmlSerializer xml = new XmlSerializer(typeof(TestRun), new XmlRootAttribute("test-run"));
+            XmlSerializer xml = new(typeof(TestRun), new XmlRootAttribute("test-run"));
 
             MemoryStream stream = fullPath.GetMemoryStream();
             stream.Seek(0, SeekOrigin.Begin);
@@ -87,7 +87,7 @@ namespace K9.Unity.Verbs
 
 
                 // Output Report
-                StringBuilder report = new StringBuilder();
+                StringBuilder report = new();
                 foreach (IResult r in results)
                 {
                     report.AppendLine(r.ToString());

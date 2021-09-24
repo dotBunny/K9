@@ -63,7 +63,7 @@ namespace K9.Setup.Verbs
                     if (Extract && upperCaseFilePath.EndsWith(".ZIP"))
                     {
                         Log.WriteLine("Extracting ZIP ...", Program.Instance.DefaultLogCategory);
-                        ZipFile archive = new ZipFile(stream, false);
+                        ZipFile archive = new(stream, false);
                         try
                         {
                             foreach (ZipEntry zipEntry in archive)
@@ -98,14 +98,14 @@ namespace K9.Setup.Verbs
                     {
                         if (File.Exists(OutputPath))
                         {
-                            using FileStream file = new FileStream(OutputPath, FileMode.Truncate, FileAccess.Write);
+                            using FileStream file = new(OutputPath, FileMode.Truncate, FileAccess.Write);
                             byte[] bytes = new byte[stream.Length];
                             stream.Read(bytes, 0, (int)stream.Length);
                             file.Write(bytes, 0, bytes.Length);
                         }
                         else
                         {
-                            using FileStream file = new FileStream(OutputPath, FileMode.Create, FileAccess.Write);
+                            using FileStream file = new(OutputPath, FileMode.Create, FileAccess.Write);
                             byte[] bytes = new byte[stream.Length];
                             stream.Read(bytes, 0, (int)stream.Length);
                             file.Write(bytes, 0, bytes.Length);

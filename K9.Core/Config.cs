@@ -15,7 +15,7 @@ namespace K9
             if (File.Exists(path))
             {
                 Log.WriteLine("Settings found at " + path, LogCategory);
-                FileIniDataParser parser = new FileIniDataParser();
+                FileIniDataParser parser = new();
                 Data = parser.ReadFile(path);
 
                 Log.WriteLine($"Version: {Data["General"]["Version"]}", LogCategory);

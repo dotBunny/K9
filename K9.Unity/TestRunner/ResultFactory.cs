@@ -64,7 +64,7 @@ namespace K9.Unity.TestRunner
             {
                 string[] parts = sample.Split("Nanosecond");
                 PerformanceResult.PerformanceTestResultSample newSample =
-                    new PerformanceResult.PerformanceTestResultSample();
+                    new();
                 newSample.Name = parts[0].Trim();
 
                 // 0 median | 1 minimum | 2 maximum | 3 average | 4 standard deviation | 5 sample count | 6 sum
@@ -101,7 +101,7 @@ namespace K9.Unity.TestRunner
         {
             float.TryParse(inTestCase.Duration, out float duration);
 
-            UnitTestResult newResult = new UnitTestResult
+            UnitTestResult newResult = new()
             {
                 Timestamp = DateTime.Parse(inTestCase.EndTime),
                 Category = inTestCase.GetCategory(),

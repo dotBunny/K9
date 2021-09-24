@@ -55,7 +55,7 @@ namespace K9.Services.Google
                 return false;
             }
 
-            Dictionary<string, List<IResult>> sortedResults = new Dictionary<string, List<IResult>>();
+            Dictionary<string, List<IResult>> sortedResults = new();
             foreach (IResult r in results)
             {
                 if (r != null)
@@ -73,7 +73,7 @@ namespace K9.Services.Google
             // Build By Sheet
             foreach (KeyValuePair<string, List<IResult>> sheet in sortedResults)
             {
-                Sheets google = new Sheets(configPath, applicationName, sheet.Key);
+                Sheets google = new(configPath, applicationName, sheet.Key);
                 foreach (IResult r in sheet.Value)
                 {
                     switch (r.GetResultType())

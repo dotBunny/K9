@@ -53,7 +53,7 @@ namespace K9.Unreal.Verbs
             JObject source = JObject.Parse(File.ReadAllText(InputPath));
 
             // Create Header
-            XmlDocument doc = new XmlDocument();
+            XmlDocument doc = new();
             XmlDeclaration xmlDeclaration = doc.CreateXmlDeclaration("1.0", "UTF-8", "no");
             XmlElement? root = doc.DocumentElement;
             doc.InsertBefore(xmlDeclaration, root);
@@ -93,7 +93,7 @@ namespace K9.Unreal.Verbs
 
             // Convert to internal format
             IEnumerable<JToken?> tests = source["tests"].Values<JToken>();
-            List<UETestResult> ueTests = new List<UETestResult>(tests.Count());
+            List<UETestResult> ueTests = new(tests.Count());
             foreach (JToken? test in tests)
             {
                 ueTests.Add(new UETestResult(test));

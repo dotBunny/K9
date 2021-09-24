@@ -18,7 +18,7 @@ namespace K9.Unity.Tests
             Assembly assembly = Assembly.GetExecutingAssembly();
             using Stream? stream =
                 assembly.GetManifestResourceStream("K9.Unity.Tests.Content.unityTestResults-Performance.xml");
-            using StreamReader reader = new StreamReader(stream);
+            using StreamReader reader = new(stream);
             byte[] byteArray = Encoding.ASCII.GetBytes(reader.ReadToEnd());
             _testRunPerformanceDataStream = new MemoryStream(byteArray);
             _testRunPerformanceDataStream.Seek(0, SeekOrigin.Begin);
@@ -29,7 +29,7 @@ namespace K9.Unity.Tests
         {
             _testRunPerformanceDataStream.Seek(0, SeekOrigin.Begin);
 
-            XmlSerializer xml = new XmlSerializer(typeof(TestRun), new XmlRootAttribute("test-run"));
+            XmlSerializer xml = new(typeof(TestRun), new XmlRootAttribute("test-run"));
             TestRun testRun = (TestRun)xml.Deserialize(_testRunPerformanceDataStream);
 
             if (testRun == null)
