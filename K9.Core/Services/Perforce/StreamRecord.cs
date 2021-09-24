@@ -12,7 +12,10 @@ namespace K9.Services.Perforce
         {
             Tags.TryGetValue("Stream", out Identifier);
             Tags.TryGetValue("Name", out Name);
-            if (Tags.TryGetValue("Parent", out Parent) && Parent == "none") Parent = null;
+            if (Tags.TryGetValue("Parent", out Parent) && Parent == "none")
+            {
+                Parent = null;
+            }
         }
     }
 }

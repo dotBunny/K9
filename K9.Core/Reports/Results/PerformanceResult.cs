@@ -11,22 +11,60 @@ namespace K9.Reports.Results
 {
     public class PerformanceResult : IResult
     {
-        public List<PerformanceTestResultSample> Samples = new List<PerformanceTestResultSample>();
-        
+        public List<PerformanceTestResultSample> Samples = new();
+
         public DateTime Timestamp { get; set; }
         public string FullName { get; set; }
         public string Category { get; set; }
         public Agent Runner { get; set; }
-        
-        
+
 
         public override string ToString()
         {
-            var sb = new StringBuilder();
+            StringBuilder sb = new StringBuilder();
             sb.Append("==> ");
             sb.AppendLine(FullName);
-            foreach (var s in Samples) sb.AppendLine(s.ToString());
+            foreach (PerformanceTestResultSample s in Samples)
+            {
+                sb.AppendLine(s.ToString());
+            }
+
             return sb.ToString();
+        }
+
+
+        public class PerformanceTestResultSample
+        {
+            public float Average;
+            public float Maximum;
+            public float Median;
+            public float Minimum;
+            public string Name;
+            public int SampleCount;
+            public float StandardDeviation;
+            public float Sum;
+
+            public override string ToString()
+            {
+                return
+                    $"[{Name}] Median: {Median}ns | Minimum: {Minimum}ns | Maximum: {Maximum}ns | Average: {Average}ns | Standard Deviation: {StandardDeviation}ns | Sample Count: {SampleCount} | Total Time: {Sum}ns";
+            }
+
+            public void AddDataRow(DataTable table, PerformanceResult result, bool objectsAsStrings = false)
+            {
+                table.Rows.Add(
+                    objectsAsStrings ? result.Timestamp.ToString(Core.TimeFormat) : result.Timestamp,
+                    result.Runner.Name,
+                    Core.Changelist,
+                    $"{result.GetName()}.{Name}",
+                    Median,
+                    Minimum,
+                    Maximum,
+                    Average,
+                    StandardDeviation,
+                    SampleCount,
+                    Sum);
+            }
         }
 
         #region IResult
@@ -35,6 +73,7 @@ namespace K9.Reports.Results
         {
             return Runner.Name;
         }
+
         public string GetCategory()
         {
             return Category;
@@ -44,16 +83,16 @@ namespace K9.Reports.Results
         {
             return ResultType.Measurement;
         }
-        
+
         public string GetName()
         {
             return FullName;
         }
-        
+
         public DataTable GetTable(bool objectsAsStrings = false)
         {
-            DataTable table = new DataTable();
-            
+            DataTable table = new();
+
             table.Columns.Add("Timestamp", objectsAsStrings ? typeof(string) : typeof(DateTime));
             table.Columns.Add("Agent", typeof(string));
             table.Columns.Add("Changelist", typeof(int));
@@ -66,50 +105,14 @@ namespace K9.Reports.Results
             table.Columns.Add("Sample Count", typeof(int));
             table.Columns.Add("Sum", typeof(float));
 
-            foreach (var s in Samples)
+            foreach (PerformanceTestResultSample s in Samples)
             {
                 s.AddDataRow(table, this, objectsAsStrings);
             }
-            
+
             return table;
         }
 
         #endregion
-        
-
-        public class PerformanceTestResultSample
-        {
-            public string Name;
-            public float Average;
-            public float Maximum;
-            public float Median;
-            public float Minimum;
-            public int SampleCount;
-            public float StandardDeviation;
-            public float Sum;
-            
-            public override string ToString()
-            {
-                return
-                    $"[{Name}] Median: {Median}ns | Minimum: {Minimum}ns | Maximum: {Maximum}ns | Average: {Average}ns | Standard Deviation: {StandardDeviation}ns | Sample Count: {SampleCount} | Total Time: {Sum}ns";
-            }
-
-            public void AddDataRow(DataTable table, PerformanceResult result, bool objectsAsStrings = false)
-            {
-                table.Rows.Add(
-                    objectsAsStrings ? (object) result.Timestamp.ToString(Core.TimeFormat) : result.Timestamp,
-                    result.Runner.Name,
-                    Core.Changelist,
-                    $"{result.GetName()}.{Name}", 
-                    Median,
-                    Minimum,
-                    Maximum,
-                    Average,
-                    StandardDeviation,
-                    SampleCount,
-                    Sum);
-            }
-        }
-
     }
 }

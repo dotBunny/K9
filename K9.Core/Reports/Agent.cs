@@ -4,19 +4,17 @@ namespace K9.Reports
 {
     public class Agent
     {
-        public readonly string Name;
+        private readonly bool _usedDefaultValues;
         public readonly string CPU;
         public readonly string GPU;
         public readonly string Memory;
-        
-
-        private readonly bool _usedDefaultValues;
+        public readonly string Name;
 
         public Agent(string name)
         {
             Name = name;
         }
-        
+
         public Agent(string inputData, Agent defaultAgent = null)
         {
             Name = inputData.MarkedSubstring("DeviceName\":\"", "\"");
@@ -24,7 +22,10 @@ namespace K9.Reports
             GPU = inputData.MarkedSubstring("GraphicsDeviceName\":\"", "\"");
             Memory = inputData.MarkedSubstring("SystemMemorySizeMB\":", ",").TrimEnd('}');
 
-            if (defaultAgent == null) return;
+            if (defaultAgent == null)
+            {
+                return;
+            }
 
             if (Name.Length == 0)
             {
@@ -58,7 +59,7 @@ namespace K9.Reports
 
         public object[] GetObjectArray()
         {
-            return new object[] {Name, CPU, GPU, Memory};
+            return new object[] { Name, CPU, GPU, Memory };
         }
     }
 }

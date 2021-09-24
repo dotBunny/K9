@@ -16,12 +16,15 @@ namespace K9.Services.Google
                 return null;
             }
 
-            using (var stream = new FileStream(TokenPath, FileMode.Open, FileAccess.Read))
+            using (FileStream stream = new FileStream(TokenPath, FileMode.Open, FileAccess.Read))
             {
                 credential = GoogleCredential.FromStream(stream).CreateScoped(Scopes);
             }
 
-            if (credential != null) return credential;
+            if (credential != null)
+            {
+                return credential;
+            }
 
             Log.WriteLine("Google credentials FAILED.", "GOOGLE");
             return null;
@@ -29,10 +32,9 @@ namespace K9.Services.Google
 
         public static SheetsService GetSheetsService(this GoogleCredential Credential, string ApplicationName)
         {
-            var service = new SheetsService(new BaseClientService.Initializer
+            SheetsService service = new SheetsService(new BaseClientService.Initializer
             {
-                HttpClientInitializer = Credential,
-                ApplicationName = ApplicationName
+                HttpClientInitializer = Credential, ApplicationName = ApplicationName
             });
 
             return service;

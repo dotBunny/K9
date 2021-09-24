@@ -10,7 +10,7 @@ namespace K9.Utils
     {
         public static bool SpawnProcess(string FileName, string CommandLine)
         {
-            using (var ChildProcess = new Process())
+            using (Process ChildProcess = new Process())
             {
                 ChildProcess.StartInfo.FileName = FileName;
                 ChildProcess.StartInfo.Arguments = string.IsNullOrEmpty(CommandLine) ? "" : CommandLine;
@@ -21,7 +21,7 @@ namespace K9.Utils
 
         public static bool SpawnHiddenProcess(string FileName, string CommandLine)
         {
-            using (var ChildProcess = new Process())
+            using (Process ChildProcess = new Process())
             {
                 ChildProcess.StartInfo.FileName = FileName;
                 ChildProcess.StartInfo.Arguments = string.IsNullOrEmpty(CommandLine) ? "" : CommandLine;
@@ -42,8 +42,8 @@ namespace K9.Utils
         public static int ExecuteProcess(string FileName, string WorkingDir, string CommandLine, string Input,
             out List<string> OutputLines)
         {
-            var output = new List<string>();
-            var returnValue = ExecuteProcess(FileName, WorkingDir, CommandLine, Input, Line => output.Add(Line));
+            List<string> output = new List<string>();
+            int returnValue = ExecuteProcess(FileName, WorkingDir, CommandLine, Input, Line => output.Add(Line));
             OutputLines = output;
             return returnValue;
         }
@@ -51,17 +51,19 @@ namespace K9.Utils
         public static int ExecuteProcess(string FileName, string WorkingDir, string CommandLine, string Input,
             Action<string> OutputLine)
         {
-            using (var ChildProcess = new Process())
+            using (Process ChildProcess = new Process())
             {
-                var LockObject = new object();
+                object LockObject = new object();
 
                 DataReceivedEventHandler OutputHandler = (x, y) =>
                 {
                     if (y.Data != null)
+                    {
                         lock (LockObject)
                         {
                             OutputLine(y.Data.TrimEnd());
                         }
+                    }
                 };
 
                 ChildProcess.StartInfo.FileName = FileName;
@@ -87,11 +89,13 @@ namespace K9.Utils
                 // Busy wait for the process to exit so we can get a ThreadAbortException if the thread is terminated. It won't wait until we enter managed code
                 // again before it throws otherwise.
                 for (;;)
+                {
                     if (ChildProcess.WaitForExit(20))
                     {
                         ChildProcess.WaitForExit();
                         break;
                     }
+                }
 
                 return ChildProcess.ExitCode;
             }

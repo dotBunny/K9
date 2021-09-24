@@ -1,16 +1,21 @@
-﻿using System;
-using System.Data;
+﻿using System.Data;
 
 namespace K9.Reports.Results
 {
     public class GenericResult : IResult
     {
+        public override string ToString()
+        {
+            return GetName();
+        }
+
         #region IResult
 
         public string GetSheetName()
         {
             return "Default";
         }
+
         public string GetCategory()
         {
             return "None";
@@ -20,7 +25,7 @@ namespace K9.Reports.Results
         {
             return ResultType.Generic;
         }
-        
+
 
         public string GetName()
         {
@@ -33,10 +38,5 @@ namespace K9.Reports.Results
         }
 
         #endregion
-
-        public override string ToString()
-        {
-            return GetName();
-        }
     }
 }

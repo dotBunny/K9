@@ -1,78 +1,93 @@
 ﻿using System;
 using K9.Reports;
 using K9.Reports.Results;
-
 using K9.Unity.TestRunner.Report;
 
 namespace K9.Unity.TestRunner
 {
     public static class ResultFactory
     {
+        private static Agent _lastGoodAgent;
+
         public static IResult CreateResult(this TestCase inTestCase)
         {
-            if (inTestCase.IsPerformanceTestCase()) return CreatePerformanceResult(inTestCase);
-            if (inTestCase.IsUnitTestCase()) return CreateUnitTestResult(inTestCase);
+            if (inTestCase.IsPerformanceTestCase())
+            {
+                return CreatePerformanceResult(inTestCase);
+            }
+
+            if (inTestCase.IsUnitTestCase())
+            {
+                return CreateUnitTestResult(inTestCase);
+            }
+
             return new GenericResult();
         }
-        
+
         public static bool IsPerformanceTestCase(this TestCase inTestCase)
         {
-            if (string.IsNullOrEmpty(inTestCase.Output)) return false;
+            if (string.IsNullOrEmpty(inTestCase.Output))
+            {
+                return false;
+            }
+
             return inTestCase.Output.Contains("##performancetestresult");
         }
-        
+
         public static bool IsUnitTestCase(this TestCase inTestCase)
         {
             return string.IsNullOrEmpty(inTestCase.Output) && !string.IsNullOrEmpty(inTestCase.Result);
         }
 
-        private static Agent _lastGoodAgent;
-        
         private static PerformanceResult CreatePerformanceResult(TestCase inTestCase)
         {
-            PerformanceResult newResult = new PerformanceResult();
-            
+            PerformanceResult newResult = new();
+
             newResult.Category = inTestCase.GetCategory();
             newResult.Timestamp = DateTime.Parse(inTestCase.EndTime);
             newResult.FullName = inTestCase.FullName;
-        
+
             newResult.Runner = new Agent(inTestCase.Output, _lastGoodAgent);
-            
+
             // Cache Agent (Unity doesnt report values with every test)
-            if (newResult.Runner.IsValid()) _lastGoodAgent = newResult.Runner;
-            
-            
+            if (newResult.Runner.IsValid())
+            {
+                _lastGoodAgent = newResult.Runner;
+            }
+
+
             // Get Result Summary Lines
-            var dataStartIndex = inTestCase.Output.IndexOf("##", StringComparison.Ordinal);
-            var samples = inTestCase.Output.Substring(0, dataStartIndex).Trim().Split("\n");
+            int dataStartIndex = inTestCase.Output.IndexOf("##", StringComparison.Ordinal);
+            string[] samples = inTestCase.Output.Substring(0, dataStartIndex).Trim().Split("\n");
 
             foreach (string sample in samples)
             {
-                var parts = sample.Split("Nanosecond");
-                var newSample = new PerformanceResult.PerformanceTestResultSample();
+                string[] parts = sample.Split("Nanosecond");
+                PerformanceResult.PerformanceTestResultSample newSample =
+                    new PerformanceResult.PerformanceTestResultSample();
                 newSample.Name = parts[0].Trim();
-                
+
                 // 0 median | 1 minimum | 2 maximum | 3 average | 4 standard deviation | 5 sample count | 6 sum
-                var measurements = parts[1].Trim().Replace(": ", ":").Split(' ');
-                
+                string[] measurements = parts[1].Trim().Replace(": ", ":").Split(' ');
+
                 float.TryParse(measurements[0].Split(':')[1], out float median);
                 newSample.Median = median;
-                
+
                 float.TryParse(measurements[1].Split(':')[1], out float minimum);
                 newSample.Minimum = minimum;
-                
+
                 float.TryParse(measurements[2].Split(':')[1], out float maximum);
                 newSample.Maximum = maximum;
-                
+
                 float.TryParse(measurements[3].Split(':')[1], out float average);
                 newSample.Average = average;
-                
+
                 float.TryParse(measurements[4].Split(':')[1], out float standardDeviation);
                 newSample.StandardDeviation = standardDeviation;
-                
+
                 int.TryParse(measurements[5].Split(':')[1], out int sampleCount);
                 newSample.SampleCount = sampleCount;
-                
+
                 float.TryParse(measurements[6].Split(':')[1], out float sum);
                 newSample.Sum = sum;
 
@@ -84,17 +99,17 @@ namespace K9.Unity.TestRunner
 
         private static UnitTestResult CreateUnitTestResult(TestCase inTestCase)
         {
-            float.TryParse(inTestCase.Duration, out var duration);
+            float.TryParse(inTestCase.Duration, out float duration);
 
-            var newResult = new UnitTestResult
+            UnitTestResult newResult = new UnitTestResult
             {
                 Timestamp = DateTime.Parse(inTestCase.EndTime),
-                Category = inTestCase.GetCategory(), 
-                FullName = inTestCase.FullName, 
+                Category = inTestCase.GetCategory(),
+                FullName = inTestCase.FullName,
                 Result = inTestCase.Result,
-                Duration =  duration
+                Duration = duration
             };
-            
+
             return newResult;
         }
     }

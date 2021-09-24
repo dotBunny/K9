@@ -21,15 +21,24 @@ namespace K9.Unreal.Verbs
 
         public bool CanExecute()
         {
-            if (string.IsNullOrEmpty(InputPath) || !File.Exists(InputPath)) return false;
+            if (string.IsNullOrEmpty(InputPath) || !File.Exists(InputPath))
+            {
+                return false;
+            }
 
-            if (string.IsNullOrEmpty(OutputPath)) return false;
+            if (string.IsNullOrEmpty(OutputPath))
+            {
+                return false;
+            }
 
             // Best Guess JSON
             try
             {
-                var jsonObject = JObject.Parse(File.ReadAllText(InputPath));
-                if (jsonObject == null) return false;
+                JObject jsonObject = JObject.Parse(File.ReadAllText(InputPath));
+                if (jsonObject == null)
+                {
+                    return false;
+                }
             }
             catch
             {
@@ -41,18 +50,18 @@ namespace K9.Unreal.Verbs
 
         public bool Execute()
         {
-            var source = JObject.Parse(File.ReadAllText(InputPath));
+            JObject source = JObject.Parse(File.ReadAllText(InputPath));
 
             // Create Header
-            var doc = new XmlDocument();
-            var xmlDeclaration = doc.CreateXmlDeclaration("1.0", "UTF-8", "no");
-            var root = doc.DocumentElement;
+            XmlDocument doc = new XmlDocument();
+            XmlDeclaration xmlDeclaration = doc.CreateXmlDeclaration("1.0", "UTF-8", "no");
+            XmlElement? root = doc.DocumentElement;
             doc.InsertBefore(xmlDeclaration, root);
 
             // Create Results Root
-            var rootResults = doc.CreateElement(string.Empty, "test-results", string.Empty);
+            XmlElement rootResults = doc.CreateElement(string.Empty, "test-results", string.Empty);
             rootResults.SetAttribute("name", source["clientDescriptor"].Value<string>());
-            var totalTests = source["succeeded"].Value<int>() +
+            int totalTests = source["succeeded"].Value<int>() +
                              source["succeededWithWarnings"].Value<int>() +
                              source["failed"].Value<int>() +
                              source["notRun"].Value<int>();
@@ -65,39 +74,46 @@ namespace K9.Unreal.Verbs
             rootResults.SetAttribute("skipped", "0");
             rootResults.SetAttribute("invalid", "0");
 
-            var dateSplit = source["reportCreatedOn"].Value<string>().Split("-");
+            string[] dateSplit = source["reportCreatedOn"].Value<string>().Split("-");
             rootResults.SetAttribute("date", dateSplit[0]);
             rootResults.SetAttribute("time", dateSplit[1]);
 
             doc.AppendChild(rootResults);
 
             // Environment
-            var environmentElement = doc.CreateElement(string.Empty, "environment", string.Empty);
+            XmlElement environmentElement = doc.CreateElement(string.Empty, "environment", string.Empty);
             environmentElement.SetAttribute("nunit-version", "2.5.8.0");
             rootResults.AppendChild(environmentElement);
 
             // Culture
-            var cultureElement = doc.CreateElement(string.Empty, "culture-info", string.Empty);
+            XmlElement cultureElement = doc.CreateElement(string.Empty, "culture-info", string.Empty);
             cultureElement.SetAttribute("current-culture", "en-US");
             cultureElement.SetAttribute("current-uiculture", "en-US");
             rootResults.AppendChild(cultureElement);
 
             // Convert to internal format
-            var tests = source["tests"].Values<JToken>();
-            var ueTests = new List<UETestResult>(tests.Count());
-            foreach (var test in tests) ueTests.Add(new UETestResult(test));
+            IEnumerable<JToken?> tests = source["tests"].Values<JToken>();
+            List<UETestResult> ueTests = new List<UETestResult>(tests.Count());
+            foreach (JToken? test in tests)
+            {
+                ueTests.Add(new UETestResult(test));
+            }
 
             // UE does a single run so heres our time
-            var runTime = source["totalDuration"].Value<string>();
+            string? runTime = source["totalDuration"].Value<string>();
 
             // Test Suite
-            var testSuite = doc.CreateElement(string.Empty, "test-suite", string.Empty);
+            XmlElement testSuite = doc.CreateElement(string.Empty, "test-suite", string.Empty);
             testSuite.SetAttribute("type", "Assembly");
 
             if (!string.IsNullOrEmpty(Suite))
+            {
                 testSuite.SetAttribute("name", Suite);
+            }
             else
+            {
                 testSuite.SetAttribute("name", "Tests");
+            }
 
             testSuite.SetAttribute("executed", "True");
 
@@ -118,10 +134,13 @@ namespace K9.Unreal.Verbs
 
             rootResults.AppendChild(testSuite);
 
-            var testResults = doc.CreateElement(string.Empty, "results", string.Empty);
+            XmlElement testResults = doc.CreateElement(string.Empty, "results", string.Empty);
             testSuite.AppendChild(testResults);
 
-            foreach (var r in ueTests) testResults.AppendChild(r.GetElement(doc));
+            foreach (UETestResult r in ueTests)
+            {
+                testResults.AppendChild(r.GetElement(doc));
+            }
 
             doc.Save(OutputPath);
 
@@ -156,7 +175,7 @@ namespace K9.Unreal.Verbs
 
             public XmlElement GetElement(XmlDocument doc)
             {
-                var testCase = doc.CreateElement(string.Empty, "test-case", string.Empty);
+                XmlElement testCase = doc.CreateElement(string.Empty, "test-case", string.Empty);
 
                 testCase.SetAttribute("name", Path);
 

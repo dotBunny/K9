@@ -18,10 +18,16 @@ namespace K9.TeamCity.Verbs
         public bool CanExecute()
         {
             // Have file, but doesnt exist
-            if (!string.IsNullOrEmpty(File) && !System.IO.File.Exists(File)) return false;
+            if (!string.IsNullOrEmpty(File) && !System.IO.File.Exists(File))
+            {
+                return false;
+            }
 
             // A value, but no name
-            if (!string.IsNullOrEmpty(Value) && string.IsNullOrEmpty(Name)) return false;
+            if (!string.IsNullOrEmpty(Value) && string.IsNullOrEmpty(Name))
+            {
+                return false;
+            }
 
             return true;
         }
@@ -31,10 +37,10 @@ namespace K9.TeamCity.Verbs
             // Process File
             if (!string.IsNullOrEmpty(File))
             {
-                var lines = System.IO.File.ReadAllLines(File);
+                string[] lines = System.IO.File.ReadAllLines(File);
                 foreach (string line in lines)
                 {
-                    var split = line.Split('=', 2);
+                    string[] split = line.Split('=', 2);
                     if (split.Length == 2)
                     {
                         Console.WriteLine($"##teamcity[setParameter name='{split[0]}' value='{split[1]}']");

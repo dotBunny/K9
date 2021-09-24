@@ -15,10 +15,11 @@ namespace K9.Unity.Tests
         public void Setup()
         {
             // Get TestRun Performance Data
-            var assembly = Assembly.GetExecutingAssembly();
-            using var stream = assembly.GetManifestResourceStream("K9.Unity.Tests.Content.unityTestResults-Performance.xml");
-            using var reader = new StreamReader(stream);
-            var byteArray = Encoding.ASCII.GetBytes(reader.ReadToEnd());
+            Assembly assembly = Assembly.GetExecutingAssembly();
+            using Stream? stream =
+                assembly.GetManifestResourceStream("K9.Unity.Tests.Content.unityTestResults-Performance.xml");
+            using StreamReader reader = new StreamReader(stream);
+            byte[] byteArray = Encoding.ASCII.GetBytes(reader.ReadToEnd());
             _testRunPerformanceDataStream = new MemoryStream(byteArray);
             _testRunPerformanceDataStream.Seek(0, SeekOrigin.Begin);
         }
@@ -28,10 +29,13 @@ namespace K9.Unity.Tests
         {
             _testRunPerformanceDataStream.Seek(0, SeekOrigin.Begin);
 
-            var xml = new XmlSerializer(typeof(TestRun), new XmlRootAttribute("test-run"));
-            var testRun = (TestRun) xml.Deserialize(_testRunPerformanceDataStream);
+            XmlSerializer xml = new XmlSerializer(typeof(TestRun), new XmlRootAttribute("test-run"));
+            TestRun testRun = (TestRun)xml.Deserialize(_testRunPerformanceDataStream);
 
-            if (testRun == null) Assert.Fail("TestRun object is NULL.");
+            if (testRun == null)
+            {
+                Assert.Fail("TestRun object is NULL.");
+            }
         }
 
         [Test]

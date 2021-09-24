@@ -20,12 +20,14 @@ namespace K9.Services.Perforce
             string ServerDateTime;
             if (Tags.TryGetValue("serverDate", out ServerDateTime))
             {
-                var Fields = ServerDateTime.Split(new[] {' '}, StringSplitOptions.RemoveEmptyEntries);
+                string[] Fields = ServerDateTime.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
                 if (Fields.Length >= 3)
                 {
                     DateTimeOffset Offset;
                     if (DateTimeOffset.TryParse(string.Join(" ", Fields.Take(3)), out Offset))
+                    {
                         ServerTimeZone = Offset.Offset;
+                    }
                 }
             }
         }

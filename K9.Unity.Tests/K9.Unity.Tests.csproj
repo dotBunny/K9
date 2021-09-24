@@ -1,42 +1,42 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
-    <PropertyGroup>
-        <TargetFramework>net5.0</TargetFramework>
+  <PropertyGroup>
+    <TargetFramework>net5.0</TargetFramework>
 
-        <IsPackable>false</IsPackable>
+    <IsPackable>false</IsPackable>
 
-        <RepositoryUrl>https://github.com/dotBunny/K9</RepositoryUrl>
+    <RepositoryUrl>https://github.com/dotBunny/K9</RepositoryUrl>
 
-        <OutputType>Library</OutputType>
-    </PropertyGroup>
+    <OutputType>Library</OutputType>
+  </PropertyGroup>
 
-    <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
-      <OutputPath>..\Build\Debug\</OutputPath>
-    </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
+    <OutputPath>..\Build\Debug\</OutputPath>
+  </PropertyGroup>
 
-    <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
-      <OutputPath>..\Build\Release\</OutputPath>
-    </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
+    <OutputPath>..\Build\Release\</OutputPath>
+  </PropertyGroup>
 
-    <ItemGroup>
-        <PackageReference Include="nunit" Version="3.13.2" />
-        <PackageReference Include="NUnit3TestAdapter" Version="4.0.0" />
-        <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.11.0" />
-    </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="nunit" Version="3.13.2"/>
+    <PackageReference Include="NUnit3TestAdapter" Version="4.0.0"/>
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.11.0"/>
+  </ItemGroup>
 
-    <ItemGroup>
-      <ProjectReference Include="..\K9.Unity\K9.Unity.csproj" />
-    </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\K9.Unity\K9.Unity.csproj"/>
+  </ItemGroup>
 
-    <ItemGroup>
-      <None Remove="Content\testrun-performance.xml" />
-    </ItemGroup>
+  <ItemGroup>
+    <None Remove="Content\testrun-performance.xml"/>
+  </ItemGroup>
 
-    <ItemGroup>
-      <None Remove="Content\unityTestResults-Performance.xml" />
-      <EmbeddedResource Include="Content\unityTestResults-Performance.xml" />
-      <None Remove="Content\unityTestResults-UnitTests.xml" />
-      <EmbeddedResource Include="Content\unityTestResults-UnitTests.xml" />
-    </ItemGroup>
+  <ItemGroup>
+    <None Remove="Content\unityTestResults-Performance.xml"/>
+    <EmbeddedResource Include="Content\unityTestResults-Performance.xml"/>
+    <None Remove="Content\unityTestResults-UnitTests.xml"/>
+    <EmbeddedResource Include="Content\unityTestResults-UnitTests.xml"/>
+  </ItemGroup>
 
 </Project>

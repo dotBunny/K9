@@ -6,7 +6,7 @@ namespace K9.Services.Perforce
     internal class TagRecordParser : IDisposable
     {
         private readonly Action<Dictionary<string, string>> OutputRecord;
-        private Dictionary<string, string> Tags = new Dictionary<string, string>();
+        private Dictionary<string, string> Tags = new();
 
         public TagRecordParser(Action<Dictionary<string, string>> InOutputRecord)
         {
@@ -24,9 +24,9 @@ namespace K9.Services.Perforce
 
         public void OutputLine(string Line)
         {
-            var SpaceIdx = Line.IndexOf(' ');
+            int SpaceIdx = Line.IndexOf(' ');
 
-            var Key = SpaceIdx > 0 ? Line.Substring(0, SpaceIdx) : Line;
+            string Key = SpaceIdx > 0 ? Line.Substring(0, SpaceIdx) : Line;
             if (Tags.ContainsKey(Key))
             {
                 OutputRecord(Tags);

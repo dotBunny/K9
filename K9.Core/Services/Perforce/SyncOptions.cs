@@ -8,7 +8,7 @@
 
         public SyncOptions Clone()
         {
-            return (SyncOptions) MemberwiseClone();
+            return (SyncOptions)MemberwiseClone();
         }
     }
 }

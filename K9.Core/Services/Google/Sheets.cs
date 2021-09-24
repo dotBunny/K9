@@ -4,8 +4,6 @@ using Google.Apis.Auth.OAuth2;
 using Google.Apis.Services;
 using Google.Apis.Sheets.v4;
 using Google.Apis.Sheets.v4.Data;
-using Sheet = Google.Apis.Sheets.v4.Data.Sheet;
-using SheetProperties = Google.Apis.Sheets.v4.Data.SheetProperties;
 
 namespace K9.Services.Google
 {
@@ -16,21 +14,15 @@ namespace K9.Services.Google
 
 
         private readonly Dictionary<string, CachedAddData> _addValueCache;
-        private readonly Dictionary<string, List<CachedUpdateData>> _updateValueCache;
         private readonly Dictionary<string, IList<IList<object>>> _existingDataCache;
-
-
-        private string _applicationName;
 
         private readonly ServiceAccountCredential _googleCredential;
         private readonly SheetsService _sheetService;
         private readonly string _spreadsheetID;
+        private readonly Dictionary<string, List<CachedUpdateData>> _updateValueCache;
 
-        public Spreadsheet GetSpreadsheet()
-        {
-            var request = _sheetService.Spreadsheets.Get(_spreadsheetID);
-            return request.Execute();
-        }
+
+        private string _applicationName;
 
         public Sheets(string credentialsPath, string ApplicationName, string SpreadsheetID)
         {
@@ -41,7 +33,7 @@ namespace K9.Services.Google
             _existingDataCache = new Dictionary<string, IList<IList<object>>>();
 
             // Get Credentials
-            using var stream = new FileStream(credentialsPath, FileMode.Open, FileAccess.Read);
+            using FileStream stream = new FileStream(credentialsPath, FileMode.Open, FileAccess.Read);
             _googleCredential = GoogleCredential.FromStream(stream)
                 .CreateScoped(SheetsService.Scope.Spreadsheets)
                 .UnderlyingCredential as ServiceAccountCredential;
@@ -57,18 +49,27 @@ namespace K9.Services.Google
             // Setup Service
             _sheetService = new SheetsService(new BaseClientService.Initializer
             {
-                HttpClientInitializer = _googleCredential,
-                ApplicationName = ApplicationName
+                HttpClientInitializer = _googleCredential, ApplicationName = ApplicationName
             });
             HasService = _sheetService != null;
-            if (HasService) return;
+            if (HasService)
+            {
+                return;
+            }
+
             Log.WriteLine("Failed to create service.", LogChannel);
         }
 
         public bool HasCredential { get; }
         public bool HasService { get; }
 
-       
+        public Spreadsheet GetSpreadsheet()
+        {
+            SpreadsheetsResource.GetRequest request = _sheetService.Spreadsheets.Get(_spreadsheetID);
+            return request.Execute();
+        }
+
+
         public void AddRow(string sheetName, List<object> rowData)
         {
             if (!_addValueCache.ContainsKey(sheetName))
@@ -78,19 +79,22 @@ namespace K9.Services.Google
                 _addValueCache[sheetName].Data.Values = new List<IList<object>>();
             }
 
-            if (rowData.Count > _addValueCache[sheetName].MaxColumns) _addValueCache[sheetName].MaxColumns = rowData.Count;
+            if (rowData.Count > _addValueCache[sheetName].MaxColumns)
+            {
+                _addValueCache[sheetName].MaxColumns = rowData.Count;
+            }
 
             _addValueCache[sheetName].Data.Values.Add(rowData);
         }
 
         public bool RemoveRowImmediately(int startRowIndex, int numberOfRows)
         {
-            var batchUpdateSpreadsheetRequest = new BatchUpdateSpreadsheetRequest();
+            BatchUpdateSpreadsheetRequest batchUpdateSpreadsheetRequest = new BatchUpdateSpreadsheetRequest();
             batchUpdateSpreadsheetRequest.Requests = new List<Request>();
 
-           
-            var request = new Request();
-            
+
+            Request request = new Request();
+
             // request.DeleteDimension = new DeleteDimensionRequest
             // {
             //     Range = new DimensionRange
@@ -100,38 +104,37 @@ namespace K9.Services.Google
             //         EndIndex = startRowIndex + numberOfRows
             //     }
             // };
-            
+
             request.DeleteDimensionGroup = new DeleteDimensionGroupRequest
             {
                 Range = new DimensionRange
                 {
-                    Dimension = "ROWS", 
-                    StartIndex = startRowIndex, 
-                    EndIndex = startRowIndex + numberOfRows
+                    Dimension = "ROWS", StartIndex = startRowIndex, EndIndex = startRowIndex + numberOfRows
                 }
             };
 
             batchUpdateSpreadsheetRequest.Requests.Add(request);
-            
-            var result = _sheetService.Spreadsheets.BatchUpdate(batchUpdateSpreadsheetRequest, _spreadsheetID).Execute();
-            return result.Replies.Count == 1 && 
+
+            BatchUpdateSpreadsheetResponse result = _sheetService.Spreadsheets
+                .BatchUpdate(batchUpdateSpreadsheetRequest, _spreadsheetID).Execute();
+            return result.Replies.Count == 1 &&
                    result.Replies[0].DeleteDimensionGroup != null;
         }
-        
+
         public void UpdateRow(string sheetName, string keyColumn, string identifier, List<object> rowData)
         {
             if (!_updateValueCache.ContainsKey(sheetName))
             {
                 _updateValueCache.Add(sheetName, new List<CachedUpdateData>());
             }
-            
+
             string column = keyColumn.ToUpper();
             char[] charValue = column.ToCharArray(0, 1);
-            
-            _updateValueCache[sheetName].Add(new CachedUpdateData()
+
+            _updateValueCache[sheetName].Add(new CachedUpdateData
             {
                 Column = column,
-                ColumnInteger =  (int) charValue[0] - 65,
+                ColumnInteger = charValue[0] - 65,
                 Key = identifier,
                 Data = rowData,
                 MaxColumns = rowData.Count
@@ -141,35 +144,38 @@ namespace K9.Services.Google
 
         public List<string> GetExistingSheetNames()
         {
-            List<string> returnList = new List<string>();
-            foreach(Sheet sheet in GetSpreadsheet().Sheets)
+            List<string> returnList = new();
+            foreach (Sheet sheet in GetSpreadsheet().Sheets)
             {
                 returnList.Add(sheet.Properties.Title);
             }
+
             return returnList;
         }
 
-        
+
         public bool CreateSheetImmediately(string name)
         {
-            var batchUpdateSpreadsheetRequest = new BatchUpdateSpreadsheetRequest();
+            BatchUpdateSpreadsheetRequest batchUpdateSpreadsheetRequest = new BatchUpdateSpreadsheetRequest();
             batchUpdateSpreadsheetRequest.Requests = new List<Request>();
-            
-            var addSheetRequest = new AddSheetRequest();
-            addSheetRequest.Properties = new SheetProperties {Title = name};
 
-            var request = new Request {AddSheet = addSheetRequest};
+            AddSheetRequest addSheetRequest = new AddSheetRequest();
+            addSheetRequest.Properties = new SheetProperties { Title = name };
+
+            Request request = new Request { AddSheet = addSheetRequest };
             batchUpdateSpreadsheetRequest.Requests.Add(request);
 
-            var result = _sheetService.Spreadsheets.BatchUpdate(batchUpdateSpreadsheetRequest, _spreadsheetID).Execute();
+            BatchUpdateSpreadsheetResponse result = _sheetService.Spreadsheets
+                .BatchUpdate(batchUpdateSpreadsheetRequest, _spreadsheetID).Execute();
             return result.Replies.Count == 1 && result.Replies[0].AddSheet != null &&
                    result.Replies[0].AddSheet.Properties.Title == name;
         }
 
         public IList<IList<object>> GetSheetData(string sheetName)
         {
-            var request = _sheetService.Spreadsheets.Values.Get(_spreadsheetID, $"{sheetName}!1:{GetRowCount(sheetName)}");
-            var response = request.Execute();
+            SpreadsheetsResource.ValuesResource.GetRequest request =
+                _sheetService.Spreadsheets.Values.Get(_spreadsheetID, $"{sheetName}!1:{GetRowCount(sheetName)}");
+            ValueRange response = request.Execute();
             return response.Values;
         }
 
@@ -177,11 +183,13 @@ namespace K9.Services.Google
         {
             foreach (Sheet sheet in GetSpreadsheet().Sheets)
             {
-                if (sheet != null && sheet.Properties.Title == sheetName && sheet.Properties.GridProperties.RowCount != null)
+                if (sheet != null && sheet.Properties.Title == sheetName &&
+                    sheet.Properties.GridProperties.RowCount != null)
                 {
                     return (int)sheet.Properties.GridProperties.RowCount;
                 }
             }
+
             return 0;
         }
 
@@ -201,20 +209,25 @@ namespace K9.Services.Google
             if (_addValueCache.Count > 0)
             {
                 Log.WriteLine($"Adding {_addValueCache.Count} Rows.", LogChannel);
-                foreach (var entry in _addValueCache)
+                foreach (KeyValuePair<string, CachedAddData> entry in _addValueCache)
                 {
                     if (!existingSheets.Contains(entry.Key))
                     {
                         Log.WriteLine($"Creating Sheet {entry.Key}.", LogChannel);
-                        if (CreateSheetImmediately(entry.Key)) existingSheets.Add(entry.Key);
+                        if (CreateSheetImmediately(entry.Key))
+                        {
+                            existingSheets.Add(entry.Key);
+                        }
                     }
 
-                    var appendRequest = _sheetService.Spreadsheets.Values.Append(entry.Value.Data, _spreadsheetID,
-                        $"{entry.Key}!A:{char.ConvertFromUtf32(64 + entry.Value.MaxColumns)}");
+                    SpreadsheetsResource.ValuesResource.AppendRequest appendRequest =
+                        _sheetService.Spreadsheets.Values.Append(entry.Value.Data, _spreadsheetID,
+                            $"{entry.Key}!A:{char.ConvertFromUtf32(64 + entry.Value.MaxColumns)}");
                     appendRequest.ValueInputOption = SpreadsheetsResource.ValuesResource.AppendRequest
                         .ValueInputOptionEnum.USERENTERED;
                     appendRequest.Execute();
                 }
+
                 _addValueCache.Clear();
             }
 
@@ -222,35 +235,38 @@ namespace K9.Services.Google
             if (_updateValueCache.Count > 0)
             {
                 // Get Copies Of Existing DataTables (sigh)
-                foreach (var entry in _updateValueCache)
+                foreach (KeyValuePair<string, List<CachedUpdateData>> entry in _updateValueCache)
                 {
                     if (!existingSheets.Contains(entry.Key))
                     {
                         Log.WriteLine($"Creating Sheet {entry.Key}.", LogChannel);
-                        if (CreateSheetImmediately(entry.Key)) existingSheets.Add(entry.Key);
+                        if (CreateSheetImmediately(entry.Key))
+                        {
+                            existingSheets.Add(entry.Key);
+                        }
                     }
-                    
+
                     if (!_existingDataCache.ContainsKey(entry.Key))
                     {
                         _existingDataCache.Add(entry.Key, GetSheetData(entry.Key));
                     }
 
-                    var batchUpdateRequest = new BatchUpdateValuesRequest();
+                    BatchUpdateValuesRequest batchUpdateRequest = new BatchUpdateValuesRequest();
                     batchUpdateRequest.Data = new List<ValueRange>();
                     batchUpdateRequest.ValueInputOption = "USER_ENTERED";
 
                     // Find Rows For Updates
                     for (int i = 0; i < _updateValueCache[entry.Key].Count; i++)
                     {
-                        var lookingForID = _updateValueCache[entry.Key][i].Key;
+                        string lookingForID = _updateValueCache[entry.Key][i].Key;
 
                         if (_existingDataCache.ContainsKey(entry.Key) && _existingDataCache[entry.Key] != null)
                         {
                             for (int rowID = 0; rowID < _existingDataCache[entry.Key].Count; rowID++)
                             {
-                                var row = _existingDataCache[entry.Key][rowID][
+                                object row = _existingDataCache[entry.Key][rowID][
                                     _updateValueCache[entry.Key][i].ColumnInteger];
-                                if ((string) row == lookingForID)
+                                if ((string)row == lookingForID)
                                 {
                                     _updateValueCache[entry.Key][i].RowNumber = rowID + 1;
                                 }
@@ -258,11 +274,11 @@ namespace K9.Services.Google
                         }
 
                         // We need to add a row instead
-                        ValueRange valueRange = new ValueRange()
+                        ValueRange valueRange = new()
                         {
                             Values = new List<IList<object>> { _updateValueCache[entry.Key][i].Data }
                         };
-                        
+
                         // Found Existing
                         if (_updateValueCache[entry.Key][i].RowNumber != -1)
                         {
@@ -275,9 +291,10 @@ namespace K9.Services.Google
                         }
                         else
                         {
-                            var appendRequest = _sheetService.Spreadsheets.Values.Append(valueRange, _spreadsheetID,
-                                $"{entry.Key}!A:{char.ConvertFromUtf32(64 + _updateValueCache[entry.Key][i].MaxColumns)}");
-                            
+                            SpreadsheetsResource.ValuesResource.AppendRequest appendRequest =
+                                _sheetService.Spreadsheets.Values.Append(valueRange, _spreadsheetID,
+                                    $"{entry.Key}!A:{char.ConvertFromUtf32(64 + _updateValueCache[entry.Key][i].MaxColumns)}");
+
                             appendRequest.ValueInputOption = SpreadsheetsResource.ValuesResource.AppendRequest
                                 .ValueInputOptionEnum.USERENTERED;
                             appendRequest.Execute();
@@ -287,11 +304,13 @@ namespace K9.Services.Google
                     // Batch Update
                     if (batchUpdateRequest.Data.Count > 0)
                     {
-                        var batchRequest = _sheetService.Spreadsheets.Values.BatchUpdate(batchUpdateRequest, _spreadsheetID);
+                        SpreadsheetsResource.ValuesResource.BatchUpdateRequest batchRequest =
+                            _sheetService.Spreadsheets.Values.BatchUpdate(batchUpdateRequest, _spreadsheetID);
                         batchRequest.Execute();
                     }
                 }
             }
+
             return true;
         }
 
@@ -303,18 +322,17 @@ namespace K9.Services.Google
 
         private class CachedUpdateData
         {
-            public string Key;
-            
             public string Column;
-            
+
             public int ColumnInteger;
-           
-            public int RowNumber = -1; // Not Found
             //public string LastGood;
 
             public List<object> Data;
-            
+            public string Key;
+
             public int MaxColumns;
+
+            public int RowNumber = -1; // Not Found
         }
     }
 }

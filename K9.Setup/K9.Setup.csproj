@@ -1,36 +1,40 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-    <PropertyGroup>
-        <OutputType>Exe</OutputType>
-        <TargetFramework>net5.0</TargetFramework>
-        <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
-        <AppendRuntimeIdentifierToOutputPath>false</AppendRuntimeIdentifierToOutputPath>
-        <Authors>dotBunny</Authors>        
-        <Company>dotBunny Inc.</Company>        
-        <RepositoryUrl>https://github.com/dotBunny/K9</RepositoryUrl>
-        <ProduceReferenceAssembly>False</ProduceReferenceAssembly>
-    </PropertyGroup>
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net5.0</TargetFramework>
+    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+    <AppendRuntimeIdentifierToOutputPath>false</AppendRuntimeIdentifierToOutputPath>
+    <Authors>dotBunny</Authors>
+    <Company>dotBunny Inc.</Company>
+    <RepositoryUrl>https://github.com/dotBunny/K9</RepositoryUrl>
+    <ProduceReferenceAssembly>False</ProduceReferenceAssembly>
+  </PropertyGroup>
 
-<!--    <Target Name="OrganizeFiles" AfterTargets="Build">-->
-<!--        <ItemGroup>-->
-<!--            <AllFiles Include="..\Build\$(Configuration)\*.*"/>-->
-<!--            <ReferencesFiles Include="@(AllFiles)"-->
-<!--                             Condition="!$([System.String]::Copy(%(Filename)).StartsWith('K9'))" />-->
-<!--        </ItemGroup>-->
-<!--        <Move SourceFiles="@(ReferencesFiles)" DestinationFolder="..\Build\$(Configuration)\ref" />-->
-<!--    </Target>-->
+  <!--    <Target Name="OrganizeFiles" AfterTargets="Build">-->
+  <!--        <ItemGroup>-->
+  <!--            <AllFiles Include="..\Build\$(Configuration)\*.*"/>-->
+  <!--            <ReferencesFiles Include="@(AllFiles)"-->
+  <!--                             Condition="!$([System.String]::Copy(%(Filename)).StartsWith('K9'))" />-->
+  <!--        </ItemGroup>-->
+  <!--        <Move SourceFiles="@(ReferencesFiles)" DestinationFolder="..\Build\$(Configuration)\ref" />-->
+  <!--    </Target>-->
 
-    <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
-        <OutputPath>..\Build\Release\</OutputPath>
-        <DebugType>none</DebugType>
-    </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
+    <OutputPath>..\Build\Release\</OutputPath>
+    <DebugType>none</DebugType>
+  </PropertyGroup>
 
-    <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
-        <OutputPath>..\Build\Debug\</OutputPath>
-    </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
+    <OutputPath>..\Build\Debug\</OutputPath>
+  </PropertyGroup>
 
-    <ItemGroup>
-        <ProjectReference Include="..\K9.Core\K9.Core.csproj" />
-    </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\K9.Core\K9.Core.csproj"/>
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="SharpZipLib" Version="1.3.3"/>
+  </ItemGroup>
 
 </Project>

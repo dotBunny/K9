@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Data;
 using System.IO;
 using System.Linq;
@@ -11,30 +10,32 @@ namespace K9.Services.Google
     {
         public static void AddRows(this Sheets sheet, IResult result)
         {
-            var table = result.GetTable(true);
+            DataTable table = result.GetTable(true);
             foreach (DataRow tableRow in table.Rows)
             {
                 sheet.AddRow(result.GetSheetName(), tableRow.ItemArray.ToList());
             }
         }
-        
+
         public static void UpdateRows(this Sheets sheet, IUpdateableResult result)
         {
-            var table = result.GetTable(true);
+            DataTable table = result.GetTable(true);
             foreach (DataRow tableRow in table.Rows)
             {
-                sheet.UpdateRow(result.GetSheetName(), result.GetKeyColumn(), result.GetKey(), tableRow.ItemArray.ToList());
+                sheet.UpdateRow(result.GetSheetName(), result.GetKeyColumn(), result.GetKey(),
+                    tableRow.ItemArray.ToList());
             }
         }
 
         public static string GetGoogleSheetID(this IResult result)
         {
             string category = result.GetCategory();
-            
+
             if (Core.Settings.Data["GoogleSheets"].ContainsKey(category))
             {
                 return Core.Settings.Data["GoogleSheets"][category];
             }
+
             Log.WriteLine($"Unable to find category: {category} in K9.ini");
             return Core.Settings.Data["GoogleSheets"]["Default"];
         }
@@ -54,12 +55,12 @@ namespace K9.Services.Google
                 return false;
             }
 
-            var sortedResults = new Dictionary<string, List<IResult>>();
-            foreach (var r in results)
+            Dictionary<string, List<IResult>> sortedResults = new Dictionary<string, List<IResult>>();
+            foreach (IResult r in results)
             {
                 if (r != null)
                 {
-                    var sheetID = r.GetGoogleSheetID();
+                    string sheetID = r.GetGoogleSheetID();
                     if (!sortedResults.ContainsKey(sheetID))
                     {
                         sortedResults.Add(sheetID, new List<IResult>());
@@ -70,17 +71,17 @@ namespace K9.Services.Google
             }
 
             // Build By Sheet
-            foreach (var sheet in sortedResults)
+            foreach (KeyValuePair<string, List<IResult>> sheet in sortedResults)
             {
-                var google = new Sheets(configPath, applicationName, sheet.Key);
-                foreach (var r in sheet.Value)
+                Sheets google = new Sheets(configPath, applicationName, sheet.Key);
+                foreach (IResult r in sheet.Value)
                 {
                     switch (r.GetResultType())
                     {
                         case ResultType.Updateable:
                             google.UpdateRows((IUpdateableResult)r);
                             break;
-                        
+
                         // By default we are just going to add rows of data
                         default:
                             google.AddRows(r);

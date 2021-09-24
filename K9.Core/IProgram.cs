@@ -1,6 +1,4 @@
-﻿using CommandLine;
-
-namespace K9
+﻿namespace K9
 {
     public interface IProgram
     {

@@ -1,4 +1,6 @@
-﻿using CommandLine;
+﻿#nullable enable
+using System.IO;
+using CommandLine;
 
 namespace K9.Setup.Verbs
 {
@@ -6,10 +8,10 @@ namespace K9.Setup.Verbs
     public class WriteFile : IVerb
     {
         [Option('f', "file", Required = false, HelpText = "Path to file to write too.")]
-        public string File { get; set; }
-        
+        public string? File { get; set; }
+
         [Option('c', "content", Required = false, HelpText = "The content of the file to be written")]
-        public string Content { get; set; }
+        public string? Content { get; set; }
 
         public bool CanExecute()
         {
@@ -18,16 +20,25 @@ namespace K9.Setup.Verbs
 
         public bool Execute()
         {
-            var folder = System.IO.Path.GetDirectoryName(File);
-            if (!System.IO.Directory.Exists(folder))
+            string folder = Path.GetDirectoryName(File) ?? string.Empty;
+            if (folder != string.Empty && !Directory.Exists(folder))
             {
-                System.IO.Directory.CreateDirectory(folder);
+                Directory.CreateDirectory(folder);
             }
 
+            if (string.IsNullOrEmpty(File)) return false;
+
             // Some single line fixes
-            Content = Content.Replace("___SPACE___", " ");
-            
-            System.IO.File.WriteAllLines(File, Content.Split("___NEWLINE___"));
+            if (!string.IsNullOrEmpty(Content))
+            {
+                Content = Content.Replace("___SPACE___", " ");
+                System.IO.File.WriteAllLines(File, Content.Split("___NEWLINE___"));
+            }
+            else
+            {
+                System.IO.File.WriteAllText(File, string.Empty);
+            }
+
             return true;
         }
     }

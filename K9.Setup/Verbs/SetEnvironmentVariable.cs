@@ -1,8 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 using CommandLine;
-using K9.Utils;
 
 namespace K9.Setup.Verbs
 {
@@ -21,10 +18,16 @@ namespace K9.Setup.Verbs
         public bool CanExecute()
         {
             // Have file, but doesnt exist
-            if (!string.IsNullOrEmpty(File) && !System.IO.File.Exists(File)) return false;
+            if (!string.IsNullOrEmpty(File) && !System.IO.File.Exists(File))
+            {
+                return false;
+            }
 
             // A value, but no name
-            if (!string.IsNullOrEmpty(Value) && string.IsNullOrEmpty(Name)) return false;
+            if (!string.IsNullOrEmpty(Value) && string.IsNullOrEmpty(Name))
+            {
+                return false;
+            }
 
             return true;
         }
@@ -34,13 +37,14 @@ namespace K9.Setup.Verbs
             // Process File
             if (!string.IsNullOrEmpty(File))
             {
-                var lines = System.IO.File.ReadAllLines(File);
+                string[] lines = System.IO.File.ReadAllLines(File);
                 foreach (string line in lines)
                 {
-                    var split = line.Split('=', 2);
+                    string[] split = line.Split('=', 2);
                     if (split.Length == 2)
                     {
-                        Log.WriteLine($"SET User Environment Variable {split[0]}={split[1]} (", Program.Instance.DefaultLogCategory);
+                        Log.WriteLine($"SET User Environment Variable {split[0]}={split[1]} (",
+                            Program.Instance.DefaultLogCategory);
                         Environment.SetEnvironmentVariable(split[0], split[1], EnvironmentVariableTarget.User);
                     }
                 }

@@ -45,8 +45,8 @@ namespace K9.Unity.TestRunner.Report
 
         public string GetCategory()
         {
-            var foundProperty = "Default";
-            foreach (var p in Properties.Property)
+            string foundProperty = "Default";
+            foreach (Property p in Properties.Property)
             {
                 if (p.Name == "Category" && p.Value != "Performance")
                 {

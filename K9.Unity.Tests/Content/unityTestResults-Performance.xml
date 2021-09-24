@@ -1,25 +1,52 @@
 <?xml version="1.0" encoding="utf-8"?>
-<test-run id="2" testcasecount="4" result="Passed" total="4" passed="4" failed="0" inconclusive="0" skipped="0" asserts="0" engine-version="3.5.0.0" clr-version="4.0.30319.42000" start-time="2020-05-20 22:59:25Z" end-time="2020-05-20 22:59:25Z" duration="0.2550044">
-    <test-suite type="TestSuite" id="1022" name="NightOwl" fullname="NightOwl" runstate="Runnable" testcasecount="12" result="Passed" start-time="2020-05-20 22:59:25Z" end-time="2020-05-20 22:59:25Z" duration="0.255004" total="4" passed="4" failed="0" inconclusive="0" skipped="0" asserts="0">
-        <properties />
-        <test-suite type="Assembly" id="1036" name="dotBunny.Hydrogen.Tests.Editor.dll" fullname="D:/BuildAgent/work/NO-Main-Tests/Projects/NightOwl/Library/ScriptAssemblies/dotBunny.Hydrogen.Tests.Editor.dll" runstate="Runnable" testcasecount="12" result="Passed" start-time="2020-05-20 22:59:25Z" end-time="2020-05-20 22:59:25Z" duration="0.224136" total="4" passed="4" failed="0" inconclusive="0" skipped="0" asserts="0">
+<test-run id="2" testcasecount="4" result="Passed" total="4" passed="4" failed="0" inconclusive="0" skipped="0"
+          asserts="0" engine-version="3.5.0.0" clr-version="4.0.30319.42000" start-time="2020-05-20 22:59:25Z"
+          end-time="2020-05-20 22:59:25Z" duration="0.2550044">
+    <test-suite type="TestSuite" id="1022" name="NightOwl" fullname="NightOwl" runstate="Runnable" testcasecount="12"
+                result="Passed" start-time="2020-05-20 22:59:25Z" end-time="2020-05-20 22:59:25Z" duration="0.255004"
+                total="4" passed="4" failed="0" inconclusive="0" skipped="0" asserts="0">
+        <properties/>
+        <test-suite type="Assembly" id="1036" name="dotBunny.Hydrogen.Tests.Editor.dll"
+                    fullname="D:/BuildAgent/work/NO-Main-Tests/Projects/NightOwl/Library/ScriptAssemblies/dotBunny.Hydrogen.Tests.Editor.dll"
+                    runstate="Runnable" testcasecount="12" result="Passed" start-time="2020-05-20 22:59:25Z"
+                    end-time="2020-05-20 22:59:25Z" duration="0.224136" total="4" passed="4" failed="0" inconclusive="0"
+                    skipped="0" asserts="0">
             <properties>
-                <property name="_PID" value="6300" />
-                <property name="_APPDOMAIN" value="Unity Child Domain" />
-                <property name="platform" value="EditMode" />
+                <property name="_PID" value="6300"/>
+                <property name="_APPDOMAIN" value="Unity Child Domain"/>
+                <property name="platform" value="EditMode"/>
             </properties>
-            <test-suite type="TestSuite" id="1037" name="Hydrogen" fullname="Hydrogen" runstate="Runnable" testcasecount="12" result="Passed" start-time="2020-05-20 22:59:25Z" end-time="2020-05-20 22:59:25Z" duration="0.211989" total="4" passed="4" failed="0" inconclusive="0" skipped="0" asserts="0">
-                <properties />
-                <test-suite type="TestSuite" id="1038" name="Tests" fullname="Hydrogen.Tests" runstate="Runnable" testcasecount="12" result="Passed" start-time="2020-05-20 22:59:25Z" end-time="2020-05-20 22:59:25Z" duration="0.199977" total="4" passed="4" failed="0" inconclusive="0" skipped="0" asserts="0">
-                    <properties />
-                    <test-suite type="TestSuite" id="1039" name="Editor" fullname="Hydrogen.Tests.Editor" runstate="Runnable" testcasecount="12" result="Passed" start-time="2020-05-20 22:59:25Z" end-time="2020-05-20 22:59:25Z" duration="0.186803" total="4" passed="4" failed="0" inconclusive="0" skipped="0" asserts="0">
-                        <properties />
-                        <test-suite type="TestFixture" id="1023" name="StringsTests" fullname="Hydrogen.Tests.Editor.StringsTests" classname="Hydrogen.Tests.Editor.StringsTests" runstate="Runnable" testcasecount="12" result="Passed" start-time="2020-05-20 22:59:25Z" end-time="2020-05-20 22:59:25Z" duration="0.172664" total="4" passed="4" failed="0" inconclusive="0" skipped="0" asserts="0">
-                            <properties />
-                            <test-case id="1029" name="Measure_GetLowerCaseHashCode" fullname="Hydrogen.Tests.Editor.StringsTests.Measure_GetLowerCaseHashCode" methodname="Measure_GetLowerCaseHashCode" classname="Hydrogen.Tests.Editor.StringsTests" runstate="Runnable" seed="999474938" result="Passed" start-time="2020-05-20 22:59:25Z" end-time="2020-05-20 22:59:25Z" duration="0.088222" asserts="0">
+            <test-suite type="TestSuite" id="1037" name="Hydrogen" fullname="Hydrogen" runstate="Runnable"
+                        testcasecount="12" result="Passed" start-time="2020-05-20 22:59:25Z"
+                        end-time="2020-05-20 22:59:25Z" duration="0.211989" total="4" passed="4" failed="0"
+                        inconclusive="0" skipped="0" asserts="0">
+                <properties/>
+                <test-suite type="TestSuite" id="1038" name="Tests" fullname="Hydrogen.Tests" runstate="Runnable"
+                            testcasecount="12" result="Passed" start-time="2020-05-20 22:59:25Z"
+                            end-time="2020-05-20 22:59:25Z" duration="0.199977" total="4" passed="4" failed="0"
+                            inconclusive="0" skipped="0" asserts="0">
+                    <properties/>
+                    <test-suite type="TestSuite" id="1039" name="Editor" fullname="Hydrogen.Tests.Editor"
+                                runstate="Runnable" testcasecount="12" result="Passed" start-time="2020-05-20 22:59:25Z"
+                                end-time="2020-05-20 22:59:25Z" duration="0.186803" total="4" passed="4" failed="0"
+                                inconclusive="0" skipped="0" asserts="0">
+                        <properties/>
+                        <test-suite type="TestFixture" id="1023" name="StringsTests"
+                                    fullname="Hydrogen.Tests.Editor.StringsTests"
+                                    classname="Hydrogen.Tests.Editor.StringsTests" runstate="Runnable"
+                                    testcasecount="12" result="Passed" start-time="2020-05-20 22:59:25Z"
+                                    end-time="2020-05-20 22:59:25Z" duration="0.172664" total="4" passed="4" failed="0"
+                                    inconclusive="0" skipped="0" asserts="0">
+                            <properties/>
+                            <test-case id="1029" name="Measure_GetLowerCaseHashCode"
+                                       fullname="Hydrogen.Tests.Editor.StringsTests.Measure_GetLowerCaseHashCode"
+                                       methodname="Measure_GetLowerCaseHashCode"
+                                       classname="Hydrogen.Tests.Editor.StringsTests" runstate="Runnable"
+                                       seed="999474938" result="Passed" start-time="2020-05-20 22:59:25Z"
+                                       end-time="2020-05-20 22:59:25Z" duration="0.088222" asserts="0">
                                 <properties>
-                                    <property name="Category" value="Performance" />
-                                    <property name="Category" value="Hydrogen.Performance" />
+                                    <property name="Category" value="Performance"/>
+                                    <property name="Category" value="Hydrogen.Performance"/>
                                 </properties>
                                 <output><![CDATA[Simple Nanosecond Median:16.00 Min:15.00 Max:46.00 Avg:17.80 Std:6.55 SampleCount: 20 Sum: 356.00
 LowerCase Nanosecond Median:24.00 Min:23.00 Max:184.00 Avg:32.70 Std:34.74 SampleCount: 20 Sum: 654.00
@@ -30,10 +57,15 @@ Complex Nanosecond Median:33.00 Min:32.00 Max:38.00 Avg:32.80 Std:1.29 SampleCou
 ##performancetestruninfo2:{"TestSuite":"Editmode","Date":1590015565252,"Player":{"Development":true,"ScreenWidth":1024,"ScreenHeight":768,"ScreenRefreshRate":60,"Fullscreen":false,"Vsync":1,"AntiAliasing":2,"Batchmode":true,"RenderThreadingMode":"GraphicsJobs","GpuSkinning":false,"Platform":"WindowsEditor","ColorSpace":"Linear","AnisotropicFiltering":"ForceEnable","BlendWeights":"FourBones","GraphicsApi":"Direct3D11","ScriptingBackend":"IL2CPP","AndroidTargetSdkVersion":"AndroidApiLevelAuto","AndroidBuildSystem":"Gradle","BuildTarget":"StandaloneWindows64","StereoRenderingPath":"MultiPass"},"Hardware":{"OperatingSystem":"Windows 10  (10.0.0) 64bit","DeviceModel":"NUC8i7HVK (Intel(R) Client Systems)","DeviceName":"POND","ProcessorType":"Intel(R) Core(TM) i7-8809G CPU @ 3.10GHz","ProcessorCount":8,"GraphicsDeviceName":"Intel(R) HD Graphics 630","SystemMemorySizeMB":32686},"Editor":{"Version":"2020.1.0b9","Branch":"2020.1/release","Changeset":"9c0aec301c8d","Date":1589291438},"Dependencies":["com.unity.2d.sprite@1.0.0","com.unity.addressables@1.8.3","com.unity.analytics@3.3.5","com.unity.build-report-inspector@0.1.2-preview","com.unity.burst@1.3.0-preview.13","com.unity.collab-proxy@2.1.0-preview.3","com.unity.collections@0.8.0-preview.5","com.unity.dots.editor@0.6.0-preview","com.unity.entities@0.10.0-preview.6","com.unity.ide.rider@2.0.3","com.unity.ide.visualstudio@2.0.1","com.unity.ide.vscode@1.2.0","com.unity.inputsystem@1.0.0","com.unity.jobs@0.2.9-preview.15","com.unity.kinematica@0.5.0-preview.1","com.unity.memoryprofiler@0.2.3-preview.2","com.unity.performance.profile-analyzer@0.6.0-preview.1","com.unity.physics@0.3.2-preview","com.unity.platforms@0.4.0-preview.3","com.unity.platforms.desktop@0.4.0-preview.3","com.unity.platforms.linux@0.4.0-preview.3","com.unity.platforms.macos@0.4.0-preview.3","com.unity.platforms.windows@0.4.0-preview.3","com.unity.postprocessing@2.3.0","com.unity.probuilder@4.3.0-preview.9","com.unity.progrids@3.0.3-preview.6","com.unity.properties.ui@1.2.0-preview","com.unity.quicksearch@1.6.0-preview.8","com.unity.remote-config@1.3.1-preview.4","com.unity.rendering.hybrid@0.5.0-preview.6","com.unity.scriptablebuildpipeline@1.7.2","com.unity.searcher@4.2.0","com.unity.serialization@1.2.0-preview","com.unity.settings-manager@1.0.2","com.unity.shadergraph@8.0.1","com.unity.test-framework@1.1.14","com.unity.test-framework.performance@2.1.0-preview","com.unity.textmeshpro@3.0.0-preview.13","com.unity.timeline@1.4.0-preview.5","com.unity.ugui@1.0.0","com.unity.ui.builder@0.11.2-preview","nuget.mono-cecil@0.1.6-preview","com.unity.modules.ai@1.0.0","com.unity.modules.androidjni@1.0.0","com.unity.modules.animation@1.0.0","com.unity.modules.assetbundle@1.0.0","com.unity.modules.audio@1.0.0","com.unity.modules.cloth@1.0.0","com.unity.modules.director@1.0.0","com.unity.modules.imageconversion@1.0.0","com.unity.modules.imgui@1.0.0","com.unity.modules.jsonserialize@1.0.0","com.unity.modules.particlesystem@1.0.0","com.unity.modules.physics@1.0.0","com.unity.modules.physics2d@1.0.0","com.unity.modules.screencapture@1.0.0","com.unity.modules.terrain@1.0.0","com.unity.modules.terrainphysics@1.0.0","com.unity.modules.tilemap@1.0.0","com.unity.modules.ui@1.0.0","com.unity.modules.uielements@1.0.0","com.unity.modules.umbra@1.0.0","com.unity.modules.unityanalytics@1.0.0","com.unity.modules.unitywebrequest@1.0.0","com.unity.modules.unitywebrequestassetbundle@1.0.0","com.unity.modules.unitywebrequestaudio@1.0.0","com.unity.modules.unitywebrequesttexture@1.0.0","com.unity.modules.unitywebrequestwww@1.0.0","com.unity.modules.vehicles@1.0.0","com.unity.modules.video@1.0.0","com.unity.modules.vr@1.0.0","com.unity.modules.wind@1.0.0","com.unity.modules.xr@1.0.0"],"Results":[]}
 ]]></output>
                             </test-case>
-                            <test-case id="1035" name="Measure_GetUpperCaseHashCode" fullname="Hydrogen.Tests.Editor.StringsTests.Measure_GetUpperCaseHashCode" methodname="Measure_GetUpperCaseHashCode" classname="Hydrogen.Tests.Editor.StringsTests" runstate="Runnable" seed="1371824754" result="Passed" start-time="2020-05-20 22:59:25Z" end-time="2020-05-20 22:59:25Z" duration="0.015651" asserts="0">
+                            <test-case id="1035" name="Measure_GetUpperCaseHashCode"
+                                       fullname="Hydrogen.Tests.Editor.StringsTests.Measure_GetUpperCaseHashCode"
+                                       methodname="Measure_GetUpperCaseHashCode"
+                                       classname="Hydrogen.Tests.Editor.StringsTests" runstate="Runnable"
+                                       seed="1371824754" result="Passed" start-time="2020-05-20 22:59:25Z"
+                                       end-time="2020-05-20 22:59:25Z" duration="0.015651" asserts="0">
                                 <properties>
-                                    <property name="Category" value="Performance" />
-                                    <property name="Category" value="Hydrogen.Performance" />
+                                    <property name="Category" value="Performance"/>
+                                    <property name="Category" value="Hydrogen.Performance"/>
                                 </properties>
                                 <output><![CDATA[Simple Nanosecond Median:15.00 Min:14.00 Max:17.00 Avg:14.95 Std:0.59 SampleCount: 20 Sum: 299.00
 LowerCase Nanosecond Median:24.00 Min:23.00 Max:24.00 Avg:23.70 Std:0.46 SampleCount: 20 Sum: 474.00
@@ -43,10 +75,15 @@ Complex Nanosecond Median:30.00 Min:29.00 Max:31.00 Avg:29.65 Std:0.65 SampleCou
 ##performancetestresult2:{"SampleGroups":[{"Name":"Simple","Unit":2,"IncreaseIsBetter":false,"Samples":[1.6999999999999932E-05,1.5000000000000014E-05,1.5000000000000014E-05,1.5000000000000014E-05,1.5000000000000014E-05,1.4999999999999875E-05,1.5000000000000014E-05,1.5000000000000014E-05,1.5000000000000014E-05,1.3999999999999985E-05,1.4000000000000123E-05,1.3999999999999985E-05,1.5000000000000014E-05,1.5000000000000014E-05,1.5000000000000014E-05,1.5000000000000014E-05,1.4999999999999875E-05,1.5000000000000014E-05,1.5000000000000014E-05,1.5000000000000014E-05],"Min":1.3999999999999985E-05,"Max":1.6999999999999932E-05,"Median":1.5000000000000014E-05,"Average":1.4950000000000003E-05,"StandardDeviation":5.8949130612756035E-07,"Sum":0.00029900000000000006},{"Name":"LowerCase","Unit":2,"IncreaseIsBetter":false,"Samples":[2.3999999999999994E-05,2.3000000000000034E-05,2.3999999999999994E-05,2.4000000000000062E-05,2.2999999999999966E-05,2.4000000000000062E-05,2.3999999999999994E-05,2.3999999999999994E-05,2.4000000000000062E-05,2.3999999999999994E-05,2.3999999999999994E-05,2.3999999999999994E-05,2.3999999999999994E-05,2.3999999999999994E-05,2.3999999999999994E-05,2.2999999999999966E-05,2.2999999999999966E-05,2.2999999999999966E-05,2.2999999999999966E-05,2.3999999999999994E-05],"Min":2.2999999999999966E-05,"Max":2.4000000000000062E-05,"Median":2.3999999999999994E-05,"Average":2.3699999999999997E-05,"StandardDeviation":4.5825756949559808E-07,"Sum":0.00047399999999999992},{"Name":"UpperCase","Unit":2,"IncreaseIsBetter":false,"Samples":[2.2000000000000006E-05,2.1000000000000012E-05,2.2000000000000006E-05,2.2000000000000006E-05,2.2000000000000006E-05,2.2000000000000006E-05,2.0999999999999979E-05,2.2000000000000006E-05,2.2000000000000006E-05,2.3999999999999994E-05,2.0999999999999979E-05,2.1999999999999935E-05,2.2000000000000006E-05,2.2000000000000006E-05,2.2000000000000006E-05,2.0999999999999979E-05,2.2000000000000006E-05,2.6999999999999941E-05,2.6999999999999941E-05,2.6999999999999941E-05],"Min":2.0999999999999979E-05,"Max":2.6999999999999941E-05,"Median":2.2000000000000006E-05,"Average":2.2649999999999985E-05,"StandardDeviation":1.9306734576307644E-06,"Sum":0.00045299999999999968},{"Name":"Complex","Unit":2,"IncreaseIsBetter":false,"Samples":[3.0000000000000028E-05,2.9999999999999991E-05,2.8999999999999997E-05,2.9999999999999957E-05,2.8999999999999997E-05,3.0999999999999988E-05,2.8999999999999997E-05,2.8999999999999997E-05,2.9999999999999957E-05,3.0999999999999988E-05,3.0000000000000028E-05,3.0000000000000028E-05,2.8999999999999929E-05,2.8999999999999997E-05,2.8999999999999997E-05,3.0000000000000028E-05,3.0000000000000028E-05,2.9000000000000136E-05,3.0000000000000028E-05,2.8999999999999997E-05],"Min":2.8999999999999929E-05,"Max":3.0999999999999988E-05,"Median":2.9999999999999957E-05,"Average":2.9650000000000009E-05,"StandardDeviation":6.538348415310984E-07,"Sum":0.00059300000000000021}],"Name":"Hydrogen.Tests.Editor.StringsTests.Measure_GetUpperCaseHashCode","Version":"1","Categories":["Performance","Hydrogen.Performance"]}
 ]]></output>
                             </test-case>
-                            <test-case id="1028" name="Measure_ToLower_GetHashCode" fullname="Hydrogen.Tests.Editor.StringsTests.Measure_ToLower_GetHashCode" methodname="Measure_ToLower_GetHashCode" classname="Hydrogen.Tests.Editor.StringsTests" runstate="Runnable" seed="1074448659" result="Passed" start-time="2020-05-20 22:59:25Z" end-time="2020-05-20 22:59:25Z" duration="0.021554" asserts="0">
+                            <test-case id="1028" name="Measure_ToLower_GetHashCode"
+                                       fullname="Hydrogen.Tests.Editor.StringsTests.Measure_ToLower_GetHashCode"
+                                       methodname="Measure_ToLower_GetHashCode"
+                                       classname="Hydrogen.Tests.Editor.StringsTests" runstate="Runnable"
+                                       seed="1074448659" result="Passed" start-time="2020-05-20 22:59:25Z"
+                                       end-time="2020-05-20 22:59:25Z" duration="0.021554" asserts="0">
                                 <properties>
-                                    <property name="Category" value="Performance" />
-                                    <property name="Category" value="Hydrogen.Performance" />
+                                    <property name="Category" value="Performance"/>
+                                    <property name="Category" value="Hydrogen.Performance"/>
                                 </properties>
                                 <output><![CDATA[Simple Nanosecond Median:211.00 Min:205.00 Max:438.00 Avg:230.55 Std:61.55 SampleCount: 20 Sum: 4611.00
 LowerCase Nanosecond Median:332.00 Min:324.00 Max:723.00 Avg:364.00 Std:100.32 SampleCount: 20 Sum: 7280.00
@@ -56,10 +93,15 @@ Complex Nanosecond Median:499.00 Min:493.00 Max:1106.00 Avg:554.55 Std:142.21 Sa
 ##performancetestresult2:{"SampleGroups":[{"Name":"Simple","Unit":2,"IncreaseIsBetter":false,"Samples":[0.00043800000000000008,0.00038899999999999991,0.00020600000000000007,0.00021200000000000025,0.000209,0.00021400000000000002,0.0002099999999999999,0.00021199999999999998,0.00020899999999999974,0.00020600000000000007,0.00020899999999999974,0.00021799999999999985,0.00021100000000000009,0.00021299999999999986,0.00020799999999999985,0.00021300000000000041,0.00020600000000000007,0.00021199999999999998,0.00020500000000000019,0.00021100000000000009],"Min":0.00020500000000000019,"Max":0.00043800000000000008,"Median":0.00021100000000000009,"Average":0.00023055000000000007,"StandardDeviation":6.1551177892872207E-05,"Sum":0.0046110000000000014},{"Name":"LowerCase","Unit":2,"IncreaseIsBetter":false,"Samples":[0.000333,0.00033300000000000013,0.000329,0.00033700000000000006,0.00032900000000000014,0.00033700000000000006,0.00033299999999999996,0.0003360000000000002,0.00032900000000000041,0.00032899999999999987,0.00032799999999999995,0.00033499999999999974,0.00032900000000000041,0.0003319999999999995,0.00059399999999999893,0.00072300000000000034,0.00033099999999999905,0.00033000000000000027,0.00032399999999999985,0.00032900000000000041],"Min":0.00032399999999999985,"Max":0.00072300000000000034,"Median":0.0003319999999999995,"Average":0.00036399999999999996,"StandardDeviation":0.00010031500386283195,"Sum":0.0072799999999999991},{"Name":"UpperCase","Unit":2,"IncreaseIsBetter":false,"Samples":[0.00038299999999999993,0.00038099999999999994,0.0003810000000000001,0.00038100000000000021,0.000378,0.000383,0.00038599999999999968,0.00038100000000000021,0.00038200000000000012,0.00038100000000000021,0.00038200000000000012,0.00038200000000000012,0.0003839999999999999,0.0003850000000000009,0.00038599999999999968,0.000383,0.00038100000000000021,0.00038200000000000012,0.00083799999999999988,0.00072699999999999989],"Min":0.000378,"Max":0.00083799999999999988,"Median":0.00038200000000000012,"Average":0.00042235000000000005,"StandardDeviation":0.00012134013144875024,"Sum":0.0084470000000000014},{"Name":"Complex","Unit":2,"IncreaseIsBetter":false,"Samples":[0.00050200000000000006,0.00049699999999999994,0.000506,0.000499,0.00049299999999999984,0.00049699999999999961,0.00049300000000000006,0.000499,0.00049300000000000006,0.00049300000000000006,0.0004970000000000008,0.00070599999999999992,0.0006559999999999999,0.00050000000000000044,0.00049300000000000006,0.0011060000000000002,0.00067199999999999931,0.000492999999999999,0.00050100000000000036,0.000495000000000001],"Min":0.000492999999999999,"Max":0.0011060000000000002,"Median":0.000499,"Average":0.0005545499999999999,"StandardDeviation":0.00014220881653399692,"Sum":0.011090999999999998}],"Name":"Hydrogen.Tests.Editor.StringsTests.Measure_ToLower_GetHashCode","Version":"1","Categories":["Performance","Hydrogen.Performance"]}
 ]]></output>
                             </test-case>
-                            <test-case id="1034" name="Measure_ToUpper_GetHashCode" fullname="Hydrogen.Tests.Editor.StringsTests.Measure_ToUpper_GetHashCode" methodname="Measure_ToUpper_GetHashCode" classname="Hydrogen.Tests.Editor.StringsTests" runstate="Runnable" seed="1575875011" result="Passed" start-time="2020-05-20 22:59:25Z" end-time="2020-05-20 22:59:25Z" duration="0.021845" asserts="0">
+                            <test-case id="1034" name="Measure_ToUpper_GetHashCode"
+                                       fullname="Hydrogen.Tests.Editor.StringsTests.Measure_ToUpper_GetHashCode"
+                                       methodname="Measure_ToUpper_GetHashCode"
+                                       classname="Hydrogen.Tests.Editor.StringsTests" runstate="Runnable"
+                                       seed="1575875011" result="Passed" start-time="2020-05-20 22:59:25Z"
+                                       end-time="2020-05-20 22:59:25Z" duration="0.021845" asserts="0">
                                 <properties>
-                                    <property name="Category" value="Performance" />
-                                    <property name="Category" value="Hydrogen.Performance" />
+                                    <property name="Category" value="Performance"/>
+                                    <property name="Category" value="Hydrogen.Performance"/>
                                 </properties>
                                 <output><![CDATA[Simple Nanosecond Median:205.00 Min:200.00 Max:371.00 Avg:212.85 Std:36.36 SampleCount: 20 Sum: 4257.00
 LowerCase Nanosecond Median:322.00 Min:319.00 Max:900.00 Avg:377.95 Std:145.90 SampleCount: 20 Sum: 7559.00

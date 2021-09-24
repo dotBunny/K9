@@ -1,5 +1,6 @@
 ﻿using System.IO;
 using IniParser;
+using IniParser.Model;
 
 namespace K9.Services.Perforce
 {
@@ -19,8 +20,8 @@ namespace K9.Services.Perforce
             if (File.Exists(path))
             {
                 Log.WriteLine("P4Config found at " + path, Core.LogCategory);
-                var parser = new FileIniDataParser();
-                var data = parser.ReadFile(path);
+                FileIniDataParser parser = new FileIniDataParser();
+                IniData data = parser.ReadFile(path);
 
                 // Assign to our data structure
                 data.TryGetKey("P4USER", out _username);
@@ -42,10 +43,25 @@ namespace K9.Services.Perforce
 
         private void Output()
         {
-            if (!string.IsNullOrEmpty(Username)) Log.WriteLine("\tP4USER: " + Username, Core.LogCategory);
-            if (!string.IsNullOrEmpty(Password)) Log.WriteLine("\tP4PASSWD: <REDACTED>", Core.LogCategory);
-            if (!string.IsNullOrEmpty(Port)) Log.WriteLine("\tP4PORT: " + Port, Core.LogCategory);
-            if (!string.IsNullOrEmpty(Client)) Log.WriteLine("\tP4CLIENT: " + Client, Core.LogCategory);
+            if (!string.IsNullOrEmpty(Username))
+            {
+                Log.WriteLine("\tP4USER: " + Username, Core.LogCategory);
+            }
+
+            if (!string.IsNullOrEmpty(Password))
+            {
+                Log.WriteLine("\tP4PASSWD: <REDACTED>", Core.LogCategory);
+            }
+
+            if (!string.IsNullOrEmpty(Port))
+            {
+                Log.WriteLine("\tP4PORT: " + Port, Core.LogCategory);
+            }
+
+            if (!string.IsNullOrEmpty(Client))
+            {
+                Log.WriteLine("\tP4CLIENT: " + Client, Core.LogCategory);
+            }
         }
     }
 }

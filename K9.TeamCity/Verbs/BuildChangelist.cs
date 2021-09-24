@@ -10,45 +10,55 @@ namespace K9.TeamCity.Verbs
     [Verb("BuildChangelist")]
     public class BuildChangelist : IVerb
     {
+        private BuildChangelistMarkdown _markdown;
+
         [Option('h', "host", Required = false, HelpText = "TeamCity Host:Port", Default = "dotbunny.dyndns.org:2018")]
         public string Host { get; set; }
-        
+
         [Option('u', "username", Required = false, HelpText = "TeamCity Username")]
         public string Username { get; set; }
-        
+
         [Option('p', "password", Required = false, HelpText = "TeamCity Password")]
         public string Password { get; set; }
-        
+
         [Option('t', "token", Required = false, HelpText = "TeamCity Token")]
         public string Token { get; set; }
-        
+
         [Option('b', "build", Required = false, HelpText = "Target Build ID")]
         public string BuildID { get; set; }
-        
+
         [Option('c', "count", Required = false, Default = 0, HelpText = "How many builds back should the history go?")]
         public int History { get; set; }
-        
+
         [Option('f', "full", Required = false, HelpText = "Where to output full processed report.")]
         public string FullPath { get; set; }
-        
+
         [Option('m', "mini", Required = false, HelpText = "Where to output mini processed report.")]
         public string MiniPath { get; set; }
-        
-        private BuildChangelistMarkdown _markdown;
-        
+
         public bool CanExecute()
         {
-            if (!string.IsNullOrEmpty(Token)) return true;
-            
-            if (string.IsNullOrEmpty(Username)) return false;
-            if (string.IsNullOrEmpty(Password)) return false;
+            if (!string.IsNullOrEmpty(Token))
+            {
+                return true;
+            }
+
+            if (string.IsNullOrEmpty(Username))
+            {
+                return false;
+            }
+
+            if (string.IsNullOrEmpty(Password))
+            {
+                return false;
+            }
 
             return true;
         }
 
         public bool Execute()
         {
-            var client = new TeamCityClient(Host);
+            TeamCityClient client = new TeamCityClient(Host);
             if (!string.IsNullOrEmpty(Token))
             {
                 client.ConnectWithAccessToken(Token);
@@ -66,21 +76,21 @@ namespace K9.TeamCity.Verbs
             }
 
             Log.Write(_markdown.ToString());
-            
+
             if (!string.IsNullOrEmpty(FullPath))
             {
-                var outputPath = Path.GetFullPath(FullPath.FixDirectorySeparator());
+                string outputPath = Path.GetFullPath(FullPath.FixDirectorySeparator());
                 outputPath.MakeWritable();
                 File.WriteAllText(outputPath, _markdown.GetFullReport());
             }
-            
+
             if (!string.IsNullOrEmpty(MiniPath))
             {
-                var outputPath = Path.GetFullPath(MiniPath.FixDirectorySeparator());
+                string outputPath = Path.GetFullPath(MiniPath.FixDirectorySeparator());
                 outputPath.MakeWritable();
                 File.WriteAllText(outputPath, _markdown.GetMiniReport());
             }
-            
+
             return true;
         }
     }

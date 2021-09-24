@@ -23,10 +23,12 @@ namespace K9.Utils
         {
             if (File.Exists(FilePath))
             {
-                var attributes = File.GetAttributes(FilePath);
+                FileAttributes attributes = File.GetAttributes(FilePath);
                 if ((attributes & FileAttributes.ReadOnly) == FileAttributes.ReadOnly ||
                     (attributes & FileAttributes.Offline) == FileAttributes.Offline)
+                {
                     return false;
+                }
             }
 
             return true;
@@ -34,14 +36,21 @@ namespace K9.Utils
 
         public static void MakeWritable(this string absolutePath)
         {
-            var fileName = Path.GetFileName(absolutePath);
-            var directoryPath = absolutePath.TrimEnd(fileName.ToCharArray());
-
-            if (!Directory.Exists(directoryPath)) Directory.CreateDirectory(directoryPath);
+            string fileName = Path.GetFileName(absolutePath);
+            if (fileName != null)
+            {
+                string directoryPath = absolutePath.TrimEnd(fileName.ToCharArray());
+                if (!Directory.Exists(directoryPath))
+                {
+                    Directory.CreateDirectory(directoryPath);
+                }
+            }
 
             if (File.Exists(absolutePath))
+            {
                 File.SetAttributes(absolutePath,
                     File.GetAttributes(absolutePath).RemoveAttribute(FileAttributes.ReadOnly));
+            }
         }
 
         private static FileAttributes RemoveAttribute(this FileAttributes attributes, FileAttributes attributesToRemove)
@@ -51,21 +60,15 @@ namespace K9.Utils
 
         public static string GetPathWithCorrectCase(this FileInfo InInfo)
         {
-            var ParentInfo = InInfo.Directory;
-            if (InInfo.Exists)
-                return Path.Combine(GetPathWithCorrectCase(ParentInfo), ParentInfo.GetFiles(InInfo.Name)[0].Name);
-            return Path.Combine(GetPathWithCorrectCase(ParentInfo), InInfo.Name);
+            DirectoryInfo parentInfo = InInfo.Directory;
+            return parentInfo != null ? Path.Combine(GetPathWithCorrectCase(parentInfo),
+                InInfo.Exists ? parentInfo.GetFiles(InInfo.Name)[0].Name : InInfo.Name) : null;
         }
 
         public static string GetPathWithCorrectCase(this DirectoryInfo InInfo)
         {
-            var ParentInfo = InInfo.Parent;
-            if (ParentInfo == null) return InInfo.FullName.ToUpperInvariant();
-
-            if (InInfo.Exists)
-                return Path.Combine(GetPathWithCorrectCase(ParentInfo), ParentInfo.GetDirectories(InInfo.Name)[0].Name);
-
-            return Path.Combine(GetPathWithCorrectCase(ParentInfo), InInfo.Name);
+            DirectoryInfo parentInfo = InInfo.Parent;
+            return parentInfo == null ? InInfo.FullName.ToUpperInvariant() : Path.Combine(GetPathWithCorrectCase(parentInfo), InInfo.Exists ? parentInfo.GetDirectories(InInfo.Name)[0].Name : InInfo.Name);
         }
 
         public static MemoryStream GetMemoryStream(this string FilePath)

@@ -1,4 +1,5 @@
-﻿using CommandLine;
+﻿using System.IO;
+using CommandLine;
 
 namespace K9.Setup.Verbs
 {
@@ -15,10 +16,11 @@ namespace K9.Setup.Verbs
 
         public bool Execute()
         {
-            if (System.IO.Directory.Exists(Folder))
+            if (Directory.Exists(Folder))
             {
-                System.IO.Directory.Delete(Folder, true);
+                Directory.Delete(Folder, true);
             }
+
             return true;
         }
     }

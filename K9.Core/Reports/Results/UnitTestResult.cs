@@ -10,7 +10,7 @@ namespace K9.Reports.Results
         public string FullName { get; set; }
         public string Result { get; set; }
         public float Duration { get; set; }
-        
+
 
         public override string ToString()
         {
@@ -33,7 +33,7 @@ namespace K9.Reports.Results
         {
             return ResultType.Updateable;
         }
-        
+
         public string GetName()
         {
             return FullName;
@@ -41,7 +41,7 @@ namespace K9.Reports.Results
 
         public DataTable GetTable(bool objectsAsStrings = false)
         {
-            DataTable table = new DataTable();
+            DataTable table = new();
 
             table.Columns.Add("Timestamp", objectsAsStrings ? typeof(string) : typeof(DateTime));
 
@@ -50,23 +50,23 @@ namespace K9.Reports.Results
             table.Columns.Add("Result", typeof(string));
             table.Columns.Add("Duration", typeof(float));
             // LAST GOOD
-            
+
             if (objectsAsStrings)
             {
                 table.Rows.Add(Timestamp.ToString(Core.TimeFormat), Core.Changelist, FullName, Result, Duration);
             }
             else
             {
-                table.Rows.Add(Timestamp, Core.Changelist, FullName, Result, Duration);    
+                table.Rows.Add(Timestamp, Core.Changelist, FullName, Result, Duration);
             }
-            
+
             return table;
         }
 
         #endregion
 
         #region IPassFailResult
-        
+
         public string GetKey()
         {
             return FullName;
@@ -76,7 +76,7 @@ namespace K9.Reports.Results
         {
             return "C";
         }
-        
+
         #endregion
     }
 }

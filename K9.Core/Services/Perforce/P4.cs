@@ -70,14 +70,17 @@ namespace K9.Services.Perforce
 
         public bool GetLoggedInState(out bool bIsLoggedIn)
         {
-            var Lines = new List<OutputLine>();
-            var bResult = RunCommand("login -s", null, Line =>
+            List<OutputLine> Lines = new List<OutputLine>();
+            bool bResult = RunCommand("login -s", null, Line =>
             {
                 Lines.Add(Line);
                 return true;
             }, CommandOptions.None);
 
-            foreach (var Line in Lines) Log.WriteLine(Line.Text, "P4");
+            foreach (OutputLine Line in Lines)
+            {
+                Log.WriteLine(Line.Text, "P4");
+            }
 
             if (bResult)
             {
@@ -98,8 +101,8 @@ namespace K9.Services.Perforce
 
         public LoginResult Login(out string ErrorMessage)
         {
-            var Lines = new List<OutputLine>();
-            var bResult = RunCommand("login", Password, Line =>
+            List<OutputLine> Lines = new List<OutputLine>();
+            bool bResult = RunCommand("login", Password, Line =>
             {
                 Lines.Add(Line);
                 return true;
@@ -115,12 +118,16 @@ namespace K9.Services.Perforce
             if (string.IsNullOrEmpty(Password))
             {
                 if (Lines.Any(x => x.Channel == OutputChannel.Error && x.Text.Contains("EOF")))
+                {
                     return LoginResult.MissingPassword;
+                }
             }
             else
             {
                 if (Lines.Any(x => x.Channel == OutputChannel.Error && x.Text.Contains("Authentication failed")))
+                {
                     return LoginResult.IncorrectPassword;
+                }
             }
 
             return LoginResult.Failed;
@@ -162,8 +169,12 @@ namespace K9.Services.Perforce
 
             Value = Lines[0].Substring(Name.Length + 1);
 
-            var EndIdx = Value.IndexOf(" (");
-            if (EndIdx != -1) Value = Value.Substring(0, EndIdx).Trim();
+            int EndIdx = Value.IndexOf(" (");
+            if (EndIdx != -1)
+            {
+                Value = Value.Substring(0, EndIdx).Trim();
+            }
+
             return true;
         }
 
@@ -187,13 +198,17 @@ namespace K9.Services.Perforce
             }
 
             ClientNames = new List<string>();
-            foreach (var Line in Lines)
+            foreach (string Line in Lines)
             {
-                var Tokens = Line.Split(new[] {' '}, StringSplitOptions.RemoveEmptyEntries);
+                string[] Tokens = Line.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
                 if (Tokens.Length < 5 || Tokens[0] != "Client" || Tokens[3] != "root")
+                {
                     Log.WriteLine(string.Format("Couldn't parse client from line '{0}'", Line), "P4");
+                }
                 else
+                {
                     ClientNames.Add(Tokens[1]);
+                }
             }
 
             return true;
@@ -201,8 +216,8 @@ namespace K9.Services.Perforce
 
         public bool CreateClient(Spec Client, out string ErrorMessage)
         {
-            var Lines = new List<string>();
-            var bResult = RunCommand("client -i", Client.ToString(), Line =>
+            List<string> Lines = new List<string>();
+            bool bResult = RunCommand("client -i", Client.ToString(), Line =>
             {
                 Lines.Add(Line.Text);
                 return Line.Channel == OutputChannel.Info;
@@ -263,14 +278,18 @@ namespace K9.Services.Perforce
 
         public bool FindFiles(string Filter, out List<FileRecord> FileRecords)
         {
-            var bResult = RunCommand(string.Format("fstat \"{0}\"", Filter), out FileRecords, CommandOptions.None);
-            if (bResult) FileRecords.RemoveAll(x => x.Action != null && x.Action.Contains("delete"));
+            bool bResult = RunCommand(string.Format("fstat \"{0}\"", Filter), out FileRecords, CommandOptions.None);
+            if (bResult)
+            {
+                FileRecords.RemoveAll(x => x.Action != null && x.Action.Contains("delete"));
+            }
+
             return bResult;
         }
 
         public bool Print(string DepotPath, out List<string> Lines)
         {
-            var TempFileName = Path.GetTempFileName();
+            string TempFileName = Path.GetTempFileName();
             try
             {
                 if (!PrintToFile(DepotPath, TempFileName))
@@ -326,14 +345,21 @@ namespace K9.Services.Perforce
 
         public bool FindChanges(string Filter, int MaxResults, out List<ChangeSummary> Changes)
         {
-            return FindChanges(new[] {Filter}, MaxResults, out Changes);
+            return FindChanges(new[] { Filter }, MaxResults, out Changes);
         }
 
         public bool FindChanges(IEnumerable<string> Filters, int MaxResults, out List<ChangeSummary> Changes)
         {
-            var Arguments = "changes -s submitted -t -L";
-            if (MaxResults > 0) Arguments += string.Format(" -m {0}", MaxResults);
-            foreach (var Filter in Filters) Arguments += string.Format(" \"{0}\"", Filter);
+            string Arguments = "changes -s submitted -t -L";
+            if (MaxResults > 0)
+            {
+                Arguments += string.Format(" -m {0}", MaxResults);
+            }
+
+            foreach (string Filter in Filters)
+            {
+                Arguments += string.Format(" \"{0}\"", Filter);
+            }
 
             List<string> Lines;
             if (!RunCommand(Arguments, out Lines, CommandOptions.None))
@@ -343,23 +369,32 @@ namespace K9.Services.Perforce
             }
 
             Changes = new List<ChangeSummary>();
-            for (var Idx = 0; Idx < Lines.Count; Idx++)
+            for (int Idx = 0; Idx < Lines.Count; Idx++)
             {
-                var Change = TryParseChangeSummary(Lines[Idx]);
+                ChangeSummary Change = TryParseChangeSummary(Lines[Idx]);
                 if (Change == null)
                 {
                     Log.WriteLine(string.Format("Couldn't parse description from '{0}'", Lines[Idx]), "P4");
                 }
                 else
                 {
-                    var Description = new StringBuilder();
+                    StringBuilder Description = new StringBuilder();
                     for (; Idx + 1 < Lines.Count; Idx++)
+                    {
                         if (Lines[Idx + 1].Length == 0)
+                        {
                             Description.AppendLine();
+                        }
                         else if (Lines[Idx + 1].StartsWith("\t"))
+                        {
                             Description.AppendLine(Lines[Idx + 1].Substring(1));
+                        }
                         else
+                        {
                             break;
+                        }
+                    }
+
                     Change.Description = Description.ToString().Trim();
 
                     Changes.Add(Change);
@@ -369,21 +404,23 @@ namespace K9.Services.Perforce
             Changes = Changes.GroupBy(x => x.Number).Select(x => x.First()).OrderByDescending(x => x.Number).ToList();
 
             if (MaxResults >= 0 && MaxResults < Changes.Count)
+            {
                 Changes.RemoveRange(MaxResults, Changes.Count - MaxResults);
+            }
 
             return true;
         }
 
         private ChangeSummary TryParseChangeSummary(string Line)
         {
-            var Tokens = Line.Split(new[] {' '}, StringSplitOptions.RemoveEmptyEntries);
+            string[] Tokens = Line.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
             if (Tokens.Length == 7 && Tokens[0] == "Change" && Tokens[2] == "on" && Tokens[5] == "by")
             {
-                var Change = new ChangeSummary();
+                ChangeSummary Change = new ChangeSummary();
                 if (int.TryParse(Tokens[1], out Change.Number) &&
                     DateTime.TryParse(Tokens[3] + " " + Tokens[4], out Change.Date))
                 {
-                    var UserClientIdx = Tokens[6].IndexOf('@');
+                    int UserClientIdx = Tokens[6].IndexOf('@');
                     if (UserClientIdx != -1)
                     {
                         Change.User = Tokens[6].Substring(0, UserClientIdx);
@@ -398,8 +435,12 @@ namespace K9.Services.Perforce
 
         public bool FindFileChanges(string FilePath, int MaxResults, out List<FileChangeSummary> Changes)
         {
-            var Arguments = "filelog -L -t";
-            if (MaxResults > 0) Arguments += string.Format(" -m {0}", MaxResults);
+            string Arguments = "filelog -L -t";
+            if (MaxResults > 0)
+            {
+                Arguments += string.Format(" -m {0}", MaxResults);
+            }
+
             Arguments += string.Format(" \"{0}\"", FilePath);
 
             List<string> Lines;
@@ -410,13 +451,17 @@ namespace K9.Services.Perforce
             }
 
             Changes = new List<FileChangeSummary>();
-            for (var Idx = 0; Idx < Lines.Count; Idx++)
+            for (int Idx = 0; Idx < Lines.Count; Idx++)
             {
                 FileChangeSummary Change;
                 if (!TryParseFileChangeSummary(Lines, ref Idx, out Change))
+                {
                     Log.WriteLine(string.Format("Couldn't parse description from '{0}'", Lines[Idx]), "P4");
+                }
                 else
+                {
                     Changes.Add(Change);
+                }
             }
 
             return true;
@@ -424,7 +469,7 @@ namespace K9.Services.Perforce
 
         private bool TryParseFileChangeSummary(List<string> Lines, ref int LineIdx, out FileChangeSummary OutChange)
         {
-            var Tokens = Lines[LineIdx].Split(new[] {' '}, StringSplitOptions.RemoveEmptyEntries);
+            string[] Tokens = Lines[LineIdx].Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
             if (Tokens.Length != 10 || !Tokens[0].StartsWith("#") || Tokens[1] != "change" || Tokens[4] != "on" ||
                 Tokens[7] != "by")
             {
@@ -432,7 +477,7 @@ namespace K9.Services.Perforce
                 return false;
             }
 
-            var Change = new FileChangeSummary();
+            FileChangeSummary Change = new FileChangeSummary();
             if (!int.TryParse(Tokens[0].Substring(1), out Change.Revision) ||
                 !int.TryParse(Tokens[2], out Change.ChangeNumber) ||
                 !DateTime.TryParse(Tokens[5] + " " + Tokens[6], out Change.Date))
@@ -441,7 +486,7 @@ namespace K9.Services.Perforce
                 return false;
             }
 
-            var UserClientIdx = Tokens[8].IndexOf('@');
+            int UserClientIdx = Tokens[8].IndexOf('@');
             if (UserClientIdx == -1)
             {
                 OutChange = null;
@@ -453,14 +498,23 @@ namespace K9.Services.Perforce
             Change.User = Tokens[8].Substring(0, UserClientIdx);
             Change.Client = Tokens[8].Substring(UserClientIdx + 1);
 
-            var Description = new StringBuilder();
+            StringBuilder Description = new StringBuilder();
             for (; LineIdx + 1 < Lines.Count; LineIdx++)
+            {
                 if (Lines[LineIdx + 1].Length == 0)
+                {
                     Description.AppendLine();
+                }
                 else if (Lines[LineIdx + 1].StartsWith("\t"))
+                {
                     Description.AppendLine(Lines[LineIdx + 1].Substring(1));
+                }
                 else
+                {
                     break;
+                }
+            }
+
             Change.Description = Description.ToString().Trim();
 
             OutChange = Change;
@@ -498,7 +552,7 @@ namespace K9.Services.Perforce
             WhereRecord WhereRecord;
             if (Where(FileName, out WhereRecord))
             {
-                LocalFileName = FileUtil.GetPathWithCorrectCase(new FileInfo(WhereRecord.LocalPath));
+                LocalFileName = new FileInfo(WhereRecord.LocalPath).GetPathWithCorrectCase();
                 return true;
             }
 
@@ -508,7 +562,7 @@ namespace K9.Services.Perforce
 
         public bool FindStreams(out List<StreamRecord> OutStreams)
         {
-            var Records = new List<Dictionary<string, string>>();
+            List<Dictionary<string, string>> Records = new List<Dictionary<string, string>>();
             if (RunCommandWithBinaryOutput("streams", Records, CommandOptions.None))
             {
                 OutStreams = Records.Select(x => new StreamRecord(x)).ToList();
@@ -528,10 +582,10 @@ namespace K9.Services.Perforce
                 return false;
             }
 
-            var StreamNames = new List<string>();
-            foreach (var Line in Lines)
+            List<string> StreamNames = new List<string>();
+            foreach (string Line in Lines)
             {
-                var Tokens = Line.Split(new[] {' '}, StringSplitOptions.RemoveEmptyEntries);
+                string[] Tokens = Line.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
                 if (Tokens.Length < 2 || Tokens[0] != "Stream" || !Tokens[1].StartsWith("//"))
                 {
                     Log.WriteLine(string.Format("Unexpected output from stream query: {0}", Line), "P4");
@@ -549,8 +603,8 @@ namespace K9.Services.Perforce
 
         public bool HasOpenFiles()
         {
-            var Records = new List<FileRecord>();
-            var bResult = RunCommand("opened -m 1", out Records, CommandOptions.None);
+            List<FileRecord> Records = new List<FileRecord>();
+            bool bResult = RunCommand("opened -m 1", out Records, CommandOptions.None);
             return bResult && Records.Count > 0;
         }
 
@@ -562,9 +616,9 @@ namespace K9.Services.Perforce
 
         public bool Describe(int ChangeNumber, out DescribeRecord Record)
         {
-            var CommandLine = string.Format("describe -s {0}", ChangeNumber);
+            string CommandLine = string.Format("describe -s {0}", ChangeNumber);
 
-            var Records = new List<Dictionary<string, string>>();
+            List<Dictionary<string, string>> Records = new List<Dictionary<string, string>>();
             if (!RunCommandWithBinaryOutput(CommandLine, Records, CommandOptions.None))
             {
                 Record = null;
@@ -643,9 +697,17 @@ namespace K9.Services.Perforce
 
         public bool Stat(string Options, List<string> Files, out List<FileRecord> FileRecords)
         {
-            var Arguments = new StringBuilder("fstat");
-            if (!string.IsNullOrEmpty(Options)) Arguments.AppendFormat(" {0}", Options);
-            foreach (var File in Files) Arguments.AppendFormat(" \"{0}\"", File);
+            StringBuilder Arguments = new StringBuilder("fstat");
+            if (!string.IsNullOrEmpty(Options))
+            {
+                Arguments.AppendFormat(" {0}", Options);
+            }
+
+            foreach (string File in Files)
+            {
+                Arguments.AppendFormat(" \"{0}\"", File);
+            }
+
             return RunCommand(Arguments.ToString(), out FileRecords,
                 CommandOptions.IgnoreFilesNotOnClientError | CommandOptions.IgnoreNoSuchFilesError |
                 CommandOptions.IgnoreProtectedNamespaceError);
@@ -660,7 +722,7 @@ namespace K9.Services.Perforce
             bool bForce, SyncOptions Options)
         {
             // Write all the files we want to sync to a temp file
-            var TempFileName = Path.GetTempFileName();
+            string TempFileName = Path.GetTempFileName();
             try
             {
                 // Write out the temp file
@@ -668,18 +730,31 @@ namespace K9.Services.Perforce
 
                 // Create a filter to strip all the sync records
                 bool bResult;
-                using (var Parser = new TagRecordParser(x => SyncOutput(new FileRecord(x))))
+                using (TagRecordParser Parser = new TagRecordParser(x => SyncOutput(new FileRecord(x))))
                 {
-                    var CommandLine = new StringBuilder();
+                    StringBuilder CommandLine = new StringBuilder();
                     CommandLine.AppendFormat("-x \"{0}\" -z tag", TempFileName);
                     if (Options != null && Options.NumRetries > 0)
+                    {
                         CommandLine.AppendFormat(" -r {0}", Options.NumRetries);
+                    }
+
                     if (Options != null && Options.TcpBufferSize > 0)
+                    {
                         CommandLine.AppendFormat(" -v net.tcpsize={0}", Options.TcpBufferSize);
+                    }
+
                     CommandLine.Append(" sync");
-                    if (bForce) CommandLine.AppendFormat(" -f");
+                    if (bForce)
+                    {
+                        CommandLine.AppendFormat(" -f");
+                    }
+
                     if (Options != null && Options.NumThreads > 1)
+                    {
                         CommandLine.AppendFormat(" --parallel=threads={0}", Options.NumThreads);
+                    }
+
                     bResult = RunCommand(CommandLine.ToString(), null,
                         Line => FilterSyncOutput(Line, Parser, TamperedFiles),
                         CommandOptions.NoFailOnErrors | CommandOptions.IgnoreFilesUpToDateError |
@@ -724,7 +799,10 @@ namespace K9.Services.Perforce
         private void ParseTamperedFile(string Line, List<string> TamperedFiles)
         {
             const string Prefix = "Can't clobber writable file ";
-            if (Line.StartsWith(Prefix)) TamperedFiles.Add(Line.Substring(Prefix.Length).Trim());
+            if (Line.StartsWith(Prefix))
+            {
+                TamperedFiles.Add(Line.Substring(Prefix.Length).Trim());
+            }
         }
 
         public bool SyncPreview(string Filter, int ChangeNumber, bool bOnlyFilesInThisChange,
@@ -813,10 +891,13 @@ namespace K9.Services.Perforce
                 return false;
             }
 
-            var LocalOutput = new List<Dictionary<string, string>>();
-            using (var Parser = new TagRecordParser(Record => LocalOutput.Add(Record)))
+            List<Dictionary<string, string>> LocalOutput = new List<Dictionary<string, string>>();
+            using (TagRecordParser Parser = new TagRecordParser(Record => LocalOutput.Add(Record)))
             {
-                foreach (var Line in Lines) Parser.OutputLine(Line);
+                foreach (string Line in Lines)
+                {
+                    Parser.OutputLine(Line);
+                }
             }
 
             TagRecords = LocalOutput;
@@ -827,10 +908,15 @@ namespace K9.Services.Perforce
         private bool RunCommand(string CommandLine, CommandOptions Options)
         {
             List<string> Lines;
-            var bResult = RunCommand(CommandLine, out Lines, Options);
+            bool bResult = RunCommand(CommandLine, out Lines, Options);
             if (Lines != null)
-                foreach (var Line in Lines)
+            {
+                foreach (string Line in Lines)
+                {
                     Log.WriteLine(Line, "P4");
+                }
+            }
+
             return bResult;
         }
 
@@ -842,7 +928,7 @@ namespace K9.Services.Perforce
         private bool RunCommand(string CommandLine, OutputChannel Channel, out List<string> Lines,
             CommandOptions Options)
         {
-            var FullCommandLine = GetFullCommandLine(CommandLine, Options);
+            string FullCommandLine = GetFullCommandLine(CommandLine, Options);
             Log.WriteLine(string.Format("p4.exe {0}", FullCommandLine), "P4");
 
             List<string> RawOutputLines;
@@ -850,21 +936,28 @@ namespace K9.Services.Perforce
                 !Options.HasFlag(CommandOptions.IgnoreExitCode))
             {
                 Lines = null;
-                foreach (var RawOutputLine in RawOutputLines) Log.WriteLine(RawOutputLine, "P4");
+                foreach (string RawOutputLine in RawOutputLines)
+                {
+                    Log.WriteLine(RawOutputLine, "P4");
+                }
+
                 return false;
             }
 
-            var bResult = true;
+            bool bResult = true;
             if (Options.HasFlag(CommandOptions.NoChannels))
             {
                 Lines = RawOutputLines;
             }
             else
             {
-                var LocalLines = new List<string>();
-                foreach (var RawOutputLine in RawOutputLines)
+                List<string> LocalLines = new List<string>();
+                foreach (string RawOutputLine in RawOutputLines)
+                {
                     bResult &= PerforceUtil.ParseCommandOutput(RawOutputLine,
                         Line => FilterOutput(Line, Channel, LocalLines), Options);
+                }
+
                 Lines = LocalLines;
             }
 
@@ -886,27 +979,42 @@ namespace K9.Services.Perforce
         private bool RunCommand(string CommandLine, string Input, HandleOutputDelegate HandleOutput,
             CommandOptions Options)
         {
-            var FullCommandLine = GetFullCommandLine(CommandLine, Options);
+            string FullCommandLine = GetFullCommandLine(CommandLine, Options);
 
-            var bResult = true;
+            bool bResult = true;
             Log.WriteLine(string.Format("p4.exe {0}", FullCommandLine), "P4");
             if (ProcessUtil.ExecuteProcess("p4.exe", null, FullCommandLine, Input,
                     Line => { bResult &= PerforceUtil.ParseCommandOutput(Line, HandleOutput, Options); }) != 0 &&
-                !Options.HasFlag(CommandOptions.IgnoreExitCode)) bResult = false;
+                !Options.HasFlag(CommandOptions.IgnoreExitCode))
+            {
+                bResult = false;
+            }
+
             return bResult;
         }
 
         private string GetFullCommandLine(string CommandLine, CommandOptions Options)
         {
-            var FullCommandLine = new StringBuilder();
-            if (ServerAndPort != null) FullCommandLine.AppendFormat("-p{0} ", ServerAndPort);
+            StringBuilder FullCommandLine = new StringBuilder();
+            if (ServerAndPort != null)
+            {
+                FullCommandLine.AppendFormat("-p{0} ", ServerAndPort);
+            }
 
-            if (!string.IsNullOrEmpty(UserName)) FullCommandLine.AppendFormat("-u{0} ", UserName);
+            if (!string.IsNullOrEmpty(UserName))
+            {
+                FullCommandLine.AppendFormat("-u{0} ", UserName);
+            }
 
             if (!Options.HasFlag(CommandOptions.NoClient) && ClientName != null)
+            {
                 FullCommandLine.AppendFormat("-c{0} ", ClientName);
+            }
 
-            if (!Options.HasFlag(CommandOptions.NoChannels)) FullCommandLine.Append("-s ");
+            if (!Options.HasFlag(CommandOptions.NoChannels))
+            {
+                FullCommandLine.Append("-s ");
+            }
 
             FullCommandLine.AppendFormat("-zprog=K9 -zversion={0} ",
                 Assembly.GetExecutingAssembly().GetName().Version);
@@ -945,8 +1053,8 @@ namespace K9.Services.Perforce
             CommandOptions Options)
         {
             // Execute Perforce, consuming the binary output into a memory stream
-            var MemoryStream = new MemoryStream();
-            using (var Process = new Process())
+            MemoryStream MemoryStream = new MemoryStream();
+            using (Process Process = new Process())
             {
                 Process.StartInfo.FileName = "p4.exe";
                 Process.StartInfo.Arguments =
@@ -968,13 +1076,13 @@ namespace K9.Services.Perforce
             MemoryStream.Position = 0;
 
             // Parse the records
-            var Records = new List<Dictionary<string, string>>();
-            using (var Reader = new BinaryReader(MemoryStream, Encoding.UTF8))
+            List<Dictionary<string, string>> Records = new List<Dictionary<string, string>>();
+            using (BinaryReader Reader = new BinaryReader(MemoryStream, Encoding.UTF8))
             {
                 while (Reader.BaseStream.Position < Reader.BaseStream.Length)
                 {
                     // Check that a dictionary follows
-                    var Temp = Reader.ReadByte();
+                    byte Temp = Reader.ReadByte();
                     if (Temp != '{')
                     {
                         Log.WriteLine("Unexpected data while parsing marshaled output - expected '{'", "P4");
@@ -982,11 +1090,11 @@ namespace K9.Services.Perforce
                     }
 
                     // Read all the fields in the record
-                    var Record = new Dictionary<string, string>();
+                    Dictionary<string, string> Record = new Dictionary<string, string>();
                     for (;;)
                     {
                         // Read the next field type. Perforce only outputs string records. A '0' character indicates the end of the dictionary.
-                        var KeyFieldType = Reader.ReadByte();
+                        byte KeyFieldType = Reader.ReadByte();
                         if (KeyFieldType == '0')
                         {
                             break;
@@ -997,27 +1105,27 @@ namespace K9.Services.Perforce
                             Log.WriteLine(
                                 string.Format(
                                     "Unexpected key field type while parsing marshaled output ({0}) - expected 's'",
-                                    (int) KeyFieldType), "P4");
+                                    (int)KeyFieldType), "P4");
                             return false;
                         }
 
                         // Read the key
-                        var KeyLength = Reader.ReadInt32();
-                        var Key = Encoding.UTF8.GetString(Reader.ReadBytes(KeyLength));
+                        int KeyLength = Reader.ReadInt32();
+                        string Key = Encoding.UTF8.GetString(Reader.ReadBytes(KeyLength));
 
                         // Read the value type.
-                        var ValueFieldType = Reader.ReadByte();
+                        byte ValueFieldType = Reader.ReadByte();
                         if (ValueFieldType == 'i')
                         {
                             // An integer
-                            var Value = Reader.ReadInt32().ToString();
+                            string Value = Reader.ReadInt32().ToString();
                             Record.Add(Key, Value);
                         }
                         else if (ValueFieldType == 's')
                         {
                             // A string
-                            var ValueLength = Reader.ReadInt32();
-                            var Value = Encoding.UTF8.GetString(Reader.ReadBytes(ValueLength));
+                            int ValueLength = Reader.ReadInt32();
+                            string Value = Encoding.UTF8.GetString(Reader.ReadBytes(ValueLength));
                             Record.Add(Key, Value);
                         }
                         else
@@ -1025,12 +1133,15 @@ namespace K9.Services.Perforce
                             Log.WriteLine(
                                 string.Format(
                                     "Unexpected value field type while parsing marshalled output ({0}) - expected 's'",
-                                    (int) ValueFieldType), "P4");
+                                    (int)ValueFieldType), "P4");
                             return false;
                         }
                     }
 
-                    if (!HandleOutput(Record)) return false;
+                    if (!HandleOutput(Record))
+                    {
+                        return false;
+                    }
                 }
             }
 

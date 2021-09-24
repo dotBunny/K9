@@ -9,8 +9,8 @@ namespace K9.Unity.Verbs
     {
         [Option('c', "clear", Required = false, Default = true)]
         public bool ClearSettings { get; set; } = true;
-        
-        
+
+
         public bool CanExecute()
         {
             return Directory.Exists(GetFolder());
@@ -18,42 +18,43 @@ namespace K9.Unity.Verbs
 
         public bool Execute()
         {
-            var settingsPath = System.IO.Path.Combine(System.IO.Path.GetFullPath(GetFolder()), "ProjectSettings", "VersionControlSettings.asset");
+            string settingsPath = Path.Combine(Path.GetFullPath(GetFolder()), "ProjectSettings",
+                "VersionControlSettings.asset");
             if (!File.Exists(settingsPath))
             {
                 Log.WriteLine($"Unable to find VersionControlSettings.asset at {settingsPath}");
                 return false;
             }
-            
-            var settingsContent = File.ReadAllLines(settingsPath);
+
+            string[] settingsContent = File.ReadAllLines(settingsPath);
 
             if (settingsContent.Length == 0)
             {
-                Log.WriteLine($"No content found in VersionControlSettings.asset");
+                Log.WriteLine("No content found in VersionControlSettings.asset");
                 return false;
             }
 
-            var count = settingsContent.Length;
+            int count = settingsContent.Length;
             for (int i = 0; i < count; i++)
             {
                 if (settingsContent[i].Trim().StartsWith("m_Mode:"))
                 {
-                    var original = settingsContent[i].Trim().Replace("m_Mode:", "").Trim();
+                    string original = settingsContent[i].Trim().Replace("m_Mode:", "").Trim();
                     Log.WriteLine($"VCS original value: {original}");
                     if (ClearSettings)
                     {
                         settingsContent[i] = settingsContent[i].Replace(original, "Visible Meta Files");
-                        Log.WriteLine($"VCS set to \"Visible Meta Files\"");
+                        Log.WriteLine("VCS set to \"Visible Meta Files\"");
                     }
 
                     break;
                 }
             }
-           
-            
+
+
             settingsPath.MakeWritable();
             File.WriteAllLines(settingsPath, settingsContent);
-            
+
             return true;
         }
 

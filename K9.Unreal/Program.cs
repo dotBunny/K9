@@ -15,12 +15,13 @@ namespace K9.Unreal
             Instance = new Program();
             Core.Init(Instance);
 
-            var parser = new Parser(Settings => Settings.CaseInsensitiveEnumValues = true);
+            Parser parser = new Parser(Settings => Settings.CaseInsensitiveEnumValues = true);
 
-            var results = parser.ParseArguments<UERunTestsJSONToNUnitXML>(Core.Arguments);
+            ParserResult<UERunTestsJSONToNUnitXML> results =
+                parser.ParseArguments<UERunTestsJSONToNUnitXML>(Core.Arguments);
 
-            var newResult = results.MapResult(
-                (UERunTestsJSONToNUnitXML vcs) => vcs.CanExecute() && vcs.Execute(),
+            bool newResult = results.MapResult(
+                vcs => vcs.CanExecute() && vcs.Execute(),
                 _ => false);
 
             if (!newResult)

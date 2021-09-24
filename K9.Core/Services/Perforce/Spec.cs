@@ -22,7 +22,7 @@ namespace K9.Services.Perforce
         /// <returns>The value of the field, or null if it does not exist</returns>
         public string GetField(string Name)
         {
-            var Idx = Sections.FindIndex(x => x.Key == Name);
+            int Idx = Sections.FindIndex(x => x.Key == Name);
             return Idx == -1 ? null : Sections[Idx].Value;
         }
 
@@ -33,11 +33,15 @@ namespace K9.Services.Perforce
         /// <param name="Value">New value of the field</param>
         public void SetField(string Name, string Value)
         {
-            var Idx = Sections.FindIndex(x => x.Key == Name);
+            int Idx = Sections.FindIndex(x => x.Key == Name);
             if (Idx == -1)
+            {
                 Sections.Add(new KeyValuePair<string, string>(Name, Value));
+            }
             else
+            {
                 Sections[Idx] = new KeyValuePair<string, string>(Name, Value);
+            }
         }
 
         /// <summary>
@@ -48,14 +52,17 @@ namespace K9.Services.Perforce
         public static bool TryParse(List<string> Lines, out Spec Spec)
         {
             Spec = new Spec();
-            for (var LineIdx = 0; LineIdx < Lines.Count; LineIdx++)
+            for (int LineIdx = 0; LineIdx < Lines.Count; LineIdx++)
             {
                 if (Lines[LineIdx].EndsWith("\r"))
+                {
                     Lines[LineIdx] = Lines[LineIdx].Substring(0, Lines[LineIdx].Length - 1);
+                }
+
                 if (!string.IsNullOrWhiteSpace(Lines[LineIdx]) && !Lines[LineIdx].StartsWith("#"))
                 {
                     // Read the section name
-                    var SeparatorIdx = Lines[LineIdx].IndexOf(':');
+                    int SeparatorIdx = Lines[LineIdx].IndexOf(':');
                     if (SeparatorIdx == -1 || !char.IsLetter(Lines[LineIdx][0]))
                     {
                         Log.WriteLine($"Invalid spec format at line {LineIdx}: \"{Lines[LineIdx]}\"", "P4");
@@ -63,17 +70,26 @@ namespace K9.Services.Perforce
                     }
 
                     // Get the section name
-                    var SectionName = Lines[LineIdx].Substring(0, SeparatorIdx);
+                    string SectionName = Lines[LineIdx].Substring(0, SeparatorIdx);
 
                     // Parse the section value
-                    var Value = new StringBuilder(Lines[LineIdx].Substring(SeparatorIdx + 1).TrimStart());
+                    StringBuilder Value = new StringBuilder(Lines[LineIdx].Substring(SeparatorIdx + 1).TrimStart());
                     for (; LineIdx + 1 < Lines.Count; LineIdx++)
+                    {
                         if (Lines[LineIdx + 1].Length == 0)
+                        {
                             Value.AppendLine();
+                        }
                         else if (Lines[LineIdx + 1][0] == '\t')
+                        {
                             Value.AppendLine(Lines[LineIdx + 1].Substring(1));
+                        }
                         else
+                        {
                             break;
+                        }
+                    }
+
                     Spec.Sections.Add(new KeyValuePair<string, string>(SectionName, Value.ToString().TrimEnd()));
                 }
             }
@@ -87,13 +103,18 @@ namespace K9.Services.Perforce
         /// <returns></returns>
         public override string ToString()
         {
-            var Result = new StringBuilder();
-            foreach (var Section in Sections)
+            StringBuilder Result = new StringBuilder();
+            foreach (KeyValuePair<string, string> Section in Sections)
             {
                 if (Section.Value.Contains('\n'))
+                {
                     Result.AppendLine(Section.Key + ":\n\t" + Section.Value.Replace("\n", "\n\t"));
+                }
                 else
+                {
                     Result.AppendLine(Section.Key + ":\t" + Section.Value);
+                }
+
                 Result.AppendLine();
             }
 

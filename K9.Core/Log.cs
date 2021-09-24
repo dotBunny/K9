@@ -11,7 +11,10 @@ namespace K9
 
         public static void WriteLine(string output, string category = "DEFAULT")
         {
-            if (string.IsNullOrEmpty(output)) return;
+            if (string.IsNullOrEmpty(output))
+            {
+                return;
+            }
 
             Console.WriteLine(
                 $"[{DateTime.Now.ToString(DateStampFormat)}] {category.ToUpper().PadLeft(FixedCategoryLength, ' ')} > {output}");
@@ -24,7 +27,10 @@ namespace K9
 
         public static void Write(string output)
         {
-            if (string.IsNullOrEmpty(output)) return;
+            if (string.IsNullOrEmpty(output))
+            {
+                return;
+            }
 
             Console.Write(output);
         }

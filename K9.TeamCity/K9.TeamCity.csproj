@@ -1,40 +1,40 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
-    <PropertyGroup>
-        <OutputType>Exe</OutputType>
-        <TargetFramework>net5.0</TargetFramework>
-        <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
-        <AppendRuntimeIdentifierToOutputPath>false</AppendRuntimeIdentifierToOutputPath>
-        <Authors>dotBunny</Authors>        
-        <Company>dotBunny Inc.</Company>        
-        <RepositoryUrl>https://github.com/dotBunny/K9</RepositoryUrl>
-        <ProduceReferenceAssembly>False</ProduceReferenceAssembly>
-    </PropertyGroup>
-    
-<!--    <Target Name="OrganizeFiles" AfterTargets="Build">-->
-<!--        <ItemGroup>-->
-<!--            <AllFiles Include="..\Build\$(Configuration)\*.*"/>-->
-<!--            <ReferencesFiles Include="@(AllFiles)"-->
-<!--                             Condition="!$([System.String]::Copy(%(Filename)).StartsWith('K9'))" />-->
-<!--        </ItemGroup>-->
-<!--        <Move SourceFiles="@(ReferencesFiles)" DestinationFolder="..\Build\$(Configuration)\ref" />-->
-<!--    </Target>-->
-    
-    <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
-        <OutputPath>..\Build\Release\</OutputPath>
-        <DebugType>none</DebugType>
-    </PropertyGroup>
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net5.0</TargetFramework>
+    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+    <AppendRuntimeIdentifierToOutputPath>false</AppendRuntimeIdentifierToOutputPath>
+    <Authors>dotBunny</Authors>
+    <Company>dotBunny Inc.</Company>
+    <RepositoryUrl>https://github.com/dotBunny/K9</RepositoryUrl>
+    <ProduceReferenceAssembly>False</ProduceReferenceAssembly>
+  </PropertyGroup>
 
-    <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
-      <OutputPath>..\Build\Debug\</OutputPath>
-    </PropertyGroup>
+  <!--    <Target Name="OrganizeFiles" AfterTargets="Build">-->
+  <!--        <ItemGroup>-->
+  <!--            <AllFiles Include="..\Build\$(Configuration)\*.*"/>-->
+  <!--            <ReferencesFiles Include="@(AllFiles)"-->
+  <!--                             Condition="!$([System.String]::Copy(%(Filename)).StartsWith('K9'))" />-->
+  <!--        </ItemGroup>-->
+  <!--        <Move SourceFiles="@(ReferencesFiles)" DestinationFolder="..\Build\$(Configuration)\ref" />-->
+  <!--    </Target>-->
 
-    <ItemGroup>
-      <ProjectReference Include="..\K9.Core\K9.Core.csproj" />
-    </ItemGroup>
+  <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
+    <OutputPath>..\Build\Release\</OutputPath>
+    <DebugType>none</DebugType>
+  </PropertyGroup>
 
-    <ItemGroup>
-      <PackageReference Include="TeamCity.ServiceMessages" Version="3.0.13" />
-      <PackageReference Include="TeamCitySharp-forked-mavezeau" Version="2.0.13" />
-    </ItemGroup>
+  <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
+    <OutputPath>..\Build\Debug\</OutputPath>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\K9.Core\K9.Core.csproj"/>
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="TeamCity.ServiceMessages" Version="3.0.13"/>
+    <PackageReference Include="TeamCitySharp-forked-mavezeau" Version="2.0.13"/>
+  </ItemGroup>
 </Project>

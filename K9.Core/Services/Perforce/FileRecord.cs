@@ -19,14 +19,19 @@ namespace K9.Services.Perforce
             Tags.TryGetValue("depotFile", out DepotPath);
             Tags.TryGetValue("clientFile", out ClientPath);
             Tags.TryGetValue("path", out Path);
-            if (!Tags.TryGetValue("action", out Action)) Tags.TryGetValue("headAction", out Action);
+            if (!Tags.TryGetValue("action", out Action))
+            {
+                Tags.TryGetValue("headAction", out Action);
+            }
 
             string Type;
             if (Tags.TryGetValue("headType", out Type))
             {
-                var AttributesIdx = Type.IndexOf('+');
+                int AttributesIdx = Type.IndexOf('+');
                 if (AttributesIdx != -1)
-                    for (var Idx = AttributesIdx + 1; Idx < Type.Length; Idx++)
+                {
+                    for (int Idx = AttributesIdx + 1; Idx < Type.Length; Idx++)
+                    {
                         switch (Type[Idx])
                         {
                             case 'm':
@@ -42,13 +47,18 @@ namespace K9.Services.Perforce
                                 Flags |= FileFlags.ExclusiveCheckout;
                                 break;
                         }
+                    }
+                }
             }
 
             IsMapped = Tags.ContainsKey("isMapped");
             Unmap = Tags.ContainsKey("unmap");
 
             string RevisionString;
-            if (Tags.TryGetValue("rev", out RevisionString)) int.TryParse(RevisionString, out Revision);
+            if (Tags.TryGetValue("rev", out RevisionString))
+            {
+                int.TryParse(RevisionString, out Revision);
+            }
 
             Tags.TryGetValue("digest", out Digest);
         }
