@@ -1,3 +1,4 @@
+using System.IO;
 using System.Runtime.InteropServices;
 
 namespace K9.Services.Utils
@@ -17,6 +18,12 @@ namespace K9.Services.Utils
         public static bool IsLinux()
         {
             return RuntimeInformation.IsOSPlatform(OSPlatform.Linux);
+        }
+
+        public static int GetBlockSize(string path = null)
+        {
+            // if (string.IsNullOrEmpty(path)) return 4096;
+            return 4096;
         }
     }
 }

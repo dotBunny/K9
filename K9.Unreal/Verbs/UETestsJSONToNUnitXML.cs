@@ -106,14 +106,7 @@ namespace K9.Unreal.Verbs
             XmlElement testSuite = doc.CreateElement(string.Empty, "test-suite", string.Empty);
             testSuite.SetAttribute("type", "Assembly");
 
-            if (!string.IsNullOrEmpty(Suite))
-            {
-                testSuite.SetAttribute("name", Suite);
-            }
-            else
-            {
-                testSuite.SetAttribute("name", "Tests");
-            }
+            testSuite.SetAttribute("name", !string.IsNullOrEmpty(Suite) ? Suite : "Tests");
 
             testSuite.SetAttribute("executed", "True");
 

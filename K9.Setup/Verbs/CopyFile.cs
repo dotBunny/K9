@@ -3,10 +3,11 @@ using CommandLine;
 using ICSharpCode.SharpZipLib.Core;
 using ICSharpCode.SharpZipLib.Zip;
 using K9.IO;
+using K9.Services.Utils;
 
 namespace K9.Setup.Verbs
 {
-    [Verb("Extract")]
+    [Verb("CopyFile")]
     public class CopyFile
     {
         [Option('i', "input", Required = true, HelpText = "The full path (uri) to the file to extract.")]
@@ -19,7 +20,7 @@ namespace K9.Setup.Verbs
             HelpText = "Determine if the output folder exists, skipping copy.")]
         public bool CheckExists { get; set; }
 
-        [Option('x', "extract", Required = false, Default = true,
+        [Option('x', "extract", Required = false, Default = false,
             HelpText = "Attempt to extract archives into output path.")]
         public bool Extract { get; set; }
 
@@ -43,6 +44,7 @@ namespace K9.Setup.Verbs
 
         public bool Execute()
         {
+            // In the case were doing a quick check to see if the output is already in place.
             if (CheckExists)
             {
                 if (File.Exists(OutputPath) || Directory.Exists(OutputPath))
@@ -51,7 +53,6 @@ namespace K9.Setup.Verbs
                     return true;
                 }
             }
-
 
             string upperCaseFilePath = UriString.ToUpper();
             IFileAccessor protocolHandler = UriHandler.GetFileAccessor(UriString);
@@ -74,7 +75,7 @@ namespace K9.Setup.Verbs
                                 }
 
                                 string entryFileName = zipEntry.Name;
-                                byte[] buffer = new byte[4096];
+                                byte[] buffer = new byte[PlatformUtil.GetBlockSize()];
                                 Stream zipStream = archive.GetInputStream(zipEntry);
 
                                 string fullZipToPath = Path.Combine(OutputPath, entryFileName);
@@ -96,20 +97,36 @@ namespace K9.Setup.Verbs
                     }
                     else
                     {
+                        int bufferSize = PlatformUtil.GetBlockSize(OutputPath);
+
+                        FileMode fileMode = FileMode.Create;
                         if (File.Exists(OutputPath))
                         {
-                            using FileStream file = new(OutputPath, FileMode.Truncate, FileAccess.Write);
-                            byte[] bytes = new byte[stream.Length];
-                            stream.Read(bytes, 0, (int)stream.Length);
-                            file.Write(bytes, 0, bytes.Length);
+                            fileMode = FileMode.Truncate;
                         }
-                        else
+                        using FileStream outputFile = new(OutputPath, fileMode, FileAccess.Write);
+
+                        long streamLength = stream.Length;
+                        byte[] bytes = new byte[bufferSize];
+                        long writtenLength = 0;
+                        stream.Seek(0, SeekOrigin.Begin);
+                        while (writtenLength < streamLength)
                         {
-                            using FileStream file = new(OutputPath, FileMode.Create, FileAccess.Write);
-                            byte[] bytes = new byte[stream.Length];
-                            stream.Read(bytes, 0, (int)stream.Length);
-                            file.Write(bytes, 0, bytes.Length);
+                            int readAmount = bufferSize;
+                            if ((writtenLength + bufferSize) > streamLength)
+                            {
+                                readAmount = (int)(streamLength - writtenLength);
+                            }
+                            stream.Read(bytes, 0, readAmount);
+
+                            // Write read data
+                            outputFile.Write(bytes, 0, readAmount);
+
+                            // Add to our offset
+                            writtenLength += readAmount;
                         }
+
+                        outputFile.Close();
                     }
 
                     stream.Close();

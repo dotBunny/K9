@@ -43,9 +43,10 @@ namespace K9
 
                     // Send back new object
                     return new SMBFileAccessor(address, username, password, share, filePath);
+                default:
+                    // Default to a system level file stream
+                    return new SystemFileAccessor(connectionString);
             }
-
-            return null;
         }
     }
 }
