@@ -16,6 +16,7 @@ namespace K9
         private const string ConfigLocationKey = "K9CONFIG";
         public const string PlatformKey = "PLATFORM";
 
+        public static string AssemblyPath = "Undefined";
         public static string AssemblyLocation = "Undefined";
         public static string WorkspaceRoot = "Undefined";
         public static string Changelist = "0";
@@ -58,12 +59,18 @@ namespace K9
                 }
             }
 
-            AssemblyLocation = Assembly.GetEntryAssembly()?.Location;
+            AssemblyPath = Assembly.GetEntryAssembly()?.Location;
+            if (!string.IsNullOrEmpty(AssemblyPath))
+            {
+                AssemblyLocation = Path.GetFullPath(Path.Combine(AssemblyLocation, ".."));
+            }
+            Log.WriteLine($"Assembly Location: {AssemblyLocation}", LogCategory);
+
             WorkspaceRoot = PerforceUtil.GetWorkspaceRoot();
 
             // Check if first argument is actually passing in a DLL
             string fakePath = Path.GetFullPath(Arguments[0]);
-            if (File.Exists(fakePath) && fakePath.EndsWith(".dll") && AssemblyLocation == fakePath)
+            if (File.Exists(fakePath) && fakePath.EndsWith(".dll") && AssemblyPath == fakePath)
             {
                 Arguments.RemoveAt(0);
             }
@@ -129,7 +136,7 @@ namespace K9
             if (OverrideArguments.ContainsKey(ChangelistKey))
             {
                 Changelist = OverrideArguments[ChangelistKey];
-                Log.WriteLine($"Using manual changelist: {AssemblyLocation}");
+                Log.WriteLine($"Using manual changelist: {Changelist}");
             }
 
             if (OverrideArguments.ContainsKey(PlatformKey))
@@ -154,7 +161,7 @@ namespace K9
                 if (Directory.Exists(newPath))
                 {
                     WorkspaceRoot = newPath;
-                    Log.WriteLine($"Using manual WorkspaceRoot: {AssemblyLocation}");
+                    Log.WriteLine($"Using manual WorkspaceRoot: {WorkspaceRoot}");
                 }
             }
 
@@ -163,8 +170,8 @@ namespace K9
                 string newPath = Path.GetFullPath(OverrideArguments[ConfigLocationKey]);
                 if (Directory.Exists(newPath))
                 {
-                    Settings = new Config(Path.Combine(WorkspaceRoot, Config.FileName));
-                    Log.WriteLine($"Using manual config: {AssemblyLocation}");
+                    Settings = new Config(Path.Combine(newPath, Config.FileName));
+                    Log.WriteLine($"Using manual config: {Path.Combine(newPath, Config.FileName)}");
                 }
             }
 
