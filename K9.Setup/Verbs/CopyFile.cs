@@ -64,6 +64,7 @@ namespace K9.Setup.Verbs
                     if (Extract && upperCaseFilePath.EndsWith(".ZIP"))
                     {
                         Log.WriteLine("Extracting ZIP ...", Program.Instance.DefaultLogCategory);
+                        Timer timer = new();
                         ZipFile archive = new(stream, false);
                         try
                         {
@@ -94,6 +95,9 @@ namespace K9.Setup.Verbs
                             archive.IsStreamOwner = true; // Makes close also shut the underlying stream
                             archive.Close(); // Ensure we release resources
                         }
+
+                        Log.WriteLine($"Extracted in {timer.GetElapsedSeconds()} seconds.",
+                            Program.Instance.DefaultLogCategory);
                     }
                     else
                     {
@@ -110,7 +114,7 @@ namespace K9.Setup.Verbs
                         long streamLength = stream.Length;
                         byte[] bytes = new byte[bufferSize];
                         long writtenLength = 0;
-                        stream.Seek(0, SeekOrigin.Begin);
+                        Timer timer = new();
                         while (writtenLength < streamLength)
                         {
                             int readAmount = bufferSize;
@@ -129,6 +133,9 @@ namespace K9.Setup.Verbs
                         }
 
                         outputFile.Close();
+                        Log.WriteLine(
+                            $"Wrote {writtenLength} bytes in {timer.GetElapsedSeconds()} seconds (∼{timer.TransferRate(writtenLength)}).",
+                            Program.Instance.DefaultLogCategory);
                     }
 
                     stream.Close();

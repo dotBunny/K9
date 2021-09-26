@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System.Diagnostics;
+using System.IO;
 using System.Net;
 using SMBLibrary;
 using SMBLibrary.Client;
@@ -62,8 +63,10 @@ namespace K9.IO.FileAccessors
                 {
                     FileStandardInformation fileInfo = (FileStandardInformation)result;
                     CoalesceStream stream = new(fileInfo.EndOfFile);
-                    Log.WriteLine($"Opened {_filePath} for read. Expected size {fileInfo.EndOfFile} bytes.");
+                    Log.WriteLine($"Opened {_filePath} for read. Expected size {fileInfo.EndOfFile} bytes.", Core.LogCategory);
                     long bytesRead = 0;
+
+                    Timer timer = new();
                     while (bytesRead < fileInfo.EndOfFile)
                     {
                         NTStatus readFileStatus = _fileStore.ReadFile(out byte[] data, fileHandle, bytesRead,
@@ -93,17 +96,18 @@ namespace K9.IO.FileAccessors
                         }
                     }
 
-                    Log.WriteLine($"Read {bytesRead} bytes.");
+                    Log.WriteLine($"Read {bytesRead} bytes in {timer.GetElapsedSeconds()} seconds (∼{timer.TransferRate(bytesRead)}).", Core.LogCategory);
                     _fileStore.CloseFile(fileHandle);
                     Cleanup();
+                    stream.Seek(0, SeekOrigin.Begin);
                     return stream;
                 }
 
-                Log.WriteLine($"Unable to query file stats. {fileInfoStatus}");
+                Log.WriteLine($"Unable to query file stats. {fileInfoStatus}", Core.LogCategory);
             }
             else
             {
-                Log.WriteLine($"File not found, or unable to open. {fileCreateStatus}|{fileStatus}");
+                Log.WriteLine($"File not found, or unable to open. {fileCreateStatus}|{fileStatus}", Core.LogCategory);
             }
 
             return null;

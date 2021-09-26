@@ -30,12 +30,12 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="ClosedXML" Version="0.95.4"/>
-    <PackageReference Include="CommandLineParser" Version="2.9.0-preview1"/>
-    <PackageReference Include="Google.Apis" Version="1.55.0"/>
-    <PackageReference Include="Google.Apis.Oauth2.v2" Version="1.55.0.1869"/>
-    <PackageReference Include="Google.Apis.Sheets.v4" Version="1.55.0.2371"/>
-    <PackageReference Include="ini-parser-netstandard" Version="2.5.2"/>
-    <PackageReference Include="SMBLibrary" Version="1.4.6.2"/>
+    <PackageReference Include="ClosedXML" Version="0.95.4" />
+    <PackageReference Include="CommandLineParser" Version="2.9.0-preview1" />
+    <PackageReference Include="Google.Apis" Version="1.55.0" />
+    <PackageReference Include="Google.Apis.Oauth2.v2" Version="1.55.0.1869" />
+    <PackageReference Include="Google.Apis.Sheets.v4" Version="1.55.0.2371" />
+    <PackageReference Include="ini-parser-netstandard" Version="2.5.2" />
+    <PackageReference Include="SMBLibrary" Version="1.4.6.2" />
   </ItemGroup>
 </Project>
