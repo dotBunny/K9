@@ -89,15 +89,14 @@ namespace K9.Setup.Verbs
                                 using FileStream streamWriter = File.Create(fullZipToPath);
                                 StreamUtils.Copy(zipStream, streamWriter, buffer);
                             }
+                            Log.WriteLine($"Extracted {archive.Count} entries in {timer.GetElapsedSeconds()} seconds.",
+                                Program.Instance.DefaultLogCategory);
                         }
                         finally
                         {
                             archive.IsStreamOwner = true; // Makes close also shut the underlying stream
                             archive.Close(); // Ensure we release resources
                         }
-
-                        Log.WriteLine($"Extracted in {timer.GetElapsedSeconds()} seconds.",
-                            Program.Instance.DefaultLogCategory);
                     }
                     else
                     {
