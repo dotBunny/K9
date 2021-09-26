@@ -16,8 +16,13 @@ namespace K9.Unity.Tests
         {
             // Get TestRun Performance Data
             Assembly assembly = Assembly.GetExecutingAssembly();
-            using Stream? stream =
+            using Stream stream =
                 assembly.GetManifestResourceStream("K9.Unity.Tests.Content.unityTestResults-Performance.xml");
+            if (stream == null)
+            {
+                return;
+            }
+
             using StreamReader reader = new(stream);
             byte[] byteArray = Encoding.ASCII.GetBytes(reader.ReadToEnd());
             _testRunPerformanceDataStream = new MemoryStream(byteArray);

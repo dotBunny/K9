@@ -104,6 +104,7 @@ namespace K9.Setup.Verbs
                         {
                             fileMode = FileMode.Truncate;
                         }
+
                         using FileStream outputFile = new(OutputPath, fileMode, FileAccess.Write);
 
                         long streamLength = stream.Length;
@@ -113,10 +114,11 @@ namespace K9.Setup.Verbs
                         while (writtenLength < streamLength)
                         {
                             int readAmount = bufferSize;
-                            if ((writtenLength + bufferSize) > streamLength)
+                            if (writtenLength + bufferSize > streamLength)
                             {
                                 readAmount = (int)(streamLength - writtenLength);
                             }
+
                             stream.Read(bytes, 0, readAmount);
 
                             // Write read data

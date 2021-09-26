@@ -55,7 +55,9 @@ namespace K9.Unreal.Verbs
             // Create Header
             XmlDocument doc = new();
             XmlDeclaration xmlDeclaration = doc.CreateXmlDeclaration("1.0", "UTF-8", "no");
-            XmlElement? root = doc.DocumentElement;
+            XmlElement root = doc.DocumentElement;
+            if (root == null) return false;
+
             doc.InsertBefore(xmlDeclaration, root);
 
             // Create Results Root
@@ -92,15 +94,15 @@ namespace K9.Unreal.Verbs
             rootResults.AppendChild(cultureElement);
 
             // Convert to internal format
-            IEnumerable<JToken?> tests = source["tests"].Values<JToken>();
+            IEnumerable<JToken> tests = source["tests"].Values<JToken>();
             List<UETestResult> ueTests = new(tests.Count());
-            foreach (JToken? test in tests)
+            foreach (JToken test in tests)
             {
                 ueTests.Add(new UETestResult(test));
             }
 
             // UE does a single run so heres our time
-            string? runTime = source["totalDuration"].Value<string>();
+            string runTime = source["totalDuration"].Value<string>();
 
             // Test Suite
             XmlElement testSuite = doc.CreateElement(string.Empty, "test-suite", string.Empty);
