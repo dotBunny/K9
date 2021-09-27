@@ -22,19 +22,19 @@ namespace K9.IO.FileAccessors
         /// <inheritdoc />
         public bool ValidConnection()
         {
-            return File.Exists(_filePath);
+            return true;
         }
 
         /// <inheritdoc />
         public Stream GetReader()
         {
-            return !ValidConnection() ? null : File.OpenRead(_filePath);;
+            return File.OpenRead(_filePath);;
         }
 
         /// <inheritdoc />
         public Stream GetWriter()
         {
-            return !ValidConnection() ? null : File.Create(_filePath);
+            return File.Create(_filePath);
         }
     }
 }

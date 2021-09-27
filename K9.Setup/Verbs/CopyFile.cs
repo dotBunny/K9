@@ -56,7 +56,7 @@ namespace K9.Setup.Verbs
                 Stream stream = inputHandler.GetReader();
                 if (stream == null)
                 {
-                    Log.WriteLine("No valid reader was found. Check your input.");
+                    Log.WriteLine("No valid reader was found. Check your input, the input may not exist.");
                     return false;
                 }
 
