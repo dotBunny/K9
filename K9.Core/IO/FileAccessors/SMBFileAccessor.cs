@@ -143,6 +143,7 @@ namespace K9.IO.FileAccessors
         {
             private ISMBFileStore _fileStore;
             private object _fileHandle;
+            private long _length;
 
             public SMBWriteStream(ISMBFileStore fileStore, object fileHandle)
             {
@@ -187,8 +188,23 @@ namespace K9.IO.FileAccessors
             /// <inheritdoc />
             public override void Write(byte[] buffer, int offset, int count)
             {
-                _fileStore.WriteFile(out int written, _fileHandle, offset + Position, buffer);
+                // Because the write buffer could be potentially bigger then whats actually going to be written
+                // we need to check and trim down in that case.
+                int written = 0;
+                if (buffer.Length > count)
+                {
+                    byte[] finalWrite = new byte[count];
+                    System.Array.Copy(buffer, finalWrite, count);
+                    _fileStore.WriteFile(out written, _fileHandle, offset + Position, finalWrite);
+                }
+                else
+                {
+                    _fileStore.WriteFile(out written, _fileHandle, offset + Position, buffer);
+                }
+
+
                 Position += written;
+                _length += written;
             }
 
             /// <inheritdoc />
@@ -201,7 +217,7 @@ namespace K9.IO.FileAccessors
             public override bool CanWrite { get { return true; } }
 
             /// <inheritdoc />
-            public override long Length { get; }
+            public override long Length { get { return _length; } }
 
             /// <inheritdoc />
             public override long Position { get; set; }
