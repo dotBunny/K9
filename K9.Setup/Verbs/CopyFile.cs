@@ -28,18 +28,13 @@ namespace K9.Setup.Verbs
         {
             if (CheckExists)
             {
-                if (Directory.Exists(OutputPath))
+                if (File.Exists(OutputPath) || Directory.Exists(OutputPath))
                 {
-                    return false;
+                    return true;
                 }
             }
 
-            if (string.IsNullOrEmpty(UriString) || string.IsNullOrEmpty(OutputPath))
-            {
-                return false;
-            }
-
-            return true;
+            return !string.IsNullOrEmpty(UriString) && !string.IsNullOrEmpty(OutputPath);
         }
 
         public bool Execute()
@@ -55,90 +50,87 @@ namespace K9.Setup.Verbs
             }
 
             string upperCaseFilePath = UriString.ToUpper();
-            IFileAccessor protocolHandler = UriHandler.GetFileAccessor(UriString);
-            if (protocolHandler != null)
+            IFileAccessor inputHandler = UriHandler.GetFileAccessor(UriString);
+            if (inputHandler != null)
             {
-                Stream stream = protocolHandler.Get();
-                if (stream != null)
+                Stream stream = inputHandler.GetReader();
+                if (stream == null)
                 {
-                    if (Extract && upperCaseFilePath.EndsWith(".ZIP"))
+                    Log.WriteLine("No valid reader was found. Check your input.");
+                    return false;
+                }
+
+                if (Extract && upperCaseFilePath.EndsWith(".ZIP"))
+                {
+                    Log.WriteLine("Extracting ZIP ...", Program.Instance.DefaultLogCategory);
+                    Timer timer = new();
+                    ZipFile archive = new(stream, false);
+                    try
                     {
-                        Log.WriteLine("Extracting ZIP ...", Program.Instance.DefaultLogCategory);
-                        Timer timer = new();
-                        ZipFile archive = new(stream, false);
-                        try
+                        foreach (ZipEntry zipEntry in archive)
                         {
-                            foreach (ZipEntry zipEntry in archive)
+                            if (!zipEntry.IsFile)
                             {
-                                if (!zipEntry.IsFile)
-                                {
-                                    continue;
-                                }
-
-                                string entryFileName = zipEntry.Name;
-                                byte[] buffer = new byte[PlatformUtil.GetBlockSize()];
-                                Stream zipStream = archive.GetInputStream(zipEntry);
-
-                                string fullZipToPath = Path.Combine(OutputPath, entryFileName);
-                                string directoryName = Path.GetDirectoryName(fullZipToPath);
-                                if (directoryName is { Length: > 0 } && !Directory.Exists(directoryName))
-                                {
-                                    Directory.CreateDirectory(directoryName);
-                                }
-
-                                using FileStream streamWriter = File.Create(fullZipToPath);
-                                StreamUtils.Copy(zipStream, streamWriter, buffer);
-                            }
-                            Log.WriteLine($"Extracted {archive.Count} entries in {timer.GetElapsedSeconds()} seconds.",
-                                Program.Instance.DefaultLogCategory);
-                        }
-                        finally
-                        {
-                            archive.IsStreamOwner = true; // Makes close also shut the underlying stream
-                            archive.Close(); // Ensure we release resources
-                        }
-                    }
-                    else
-                    {
-                        int bufferSize = PlatformUtil.GetBlockSize(OutputPath);
-
-                        FileMode fileMode = FileMode.Create;
-                        if (File.Exists(OutputPath))
-                        {
-                            fileMode = FileMode.Truncate;
-                        }
-
-                        using FileStream outputFile = new(OutputPath, fileMode, FileAccess.Write);
-
-                        long streamLength = stream.Length;
-                        byte[] bytes = new byte[bufferSize];
-                        long writtenLength = 0;
-                        Timer timer = new();
-                        while (writtenLength < streamLength)
-                        {
-                            int readAmount = bufferSize;
-                            if (writtenLength + bufferSize > streamLength)
-                            {
-                                readAmount = (int)(streamLength - writtenLength);
+                                continue;
                             }
 
-                            stream.Read(bytes, 0, readAmount);
+                            string entryFileName = zipEntry.Name;
+                            byte[] buffer = new byte[PlatformUtil.GetBlockSize()];
+                            Stream zipStream = archive.GetInputStream(zipEntry);
 
-                            // Write read data
-                            outputFile.Write(bytes, 0, readAmount);
+                            string fullZipToPath = Path.Combine(OutputPath, entryFileName);
+                            string directoryName = Path.GetDirectoryName(fullZipToPath);
+                            if (directoryName is { Length: > 0 } && !Directory.Exists(directoryName))
+                            {
+                                Directory.CreateDirectory(directoryName);
+                            }
 
-                            // Add to our offset
-                            writtenLength += readAmount;
+                            using FileStream streamWriter = File.Create(fullZipToPath);
+                            StreamUtils.Copy(zipStream, streamWriter, buffer);
                         }
-
-                        outputFile.Close();
-                        Log.WriteLine(
-                            $"Wrote {writtenLength} bytes in {timer.GetElapsedSeconds()} seconds (∼{timer.TransferRate(writtenLength)}).",
+                        Log.WriteLine($"Extracted {archive.Count} entries in {timer.GetElapsedSeconds()} seconds.",
                             Program.Instance.DefaultLogCategory);
                     }
-
-                    stream.Close();
+                    finally
+                    {
+                        archive.IsStreamOwner = true; // Makes close also shut the underlying stream
+                        archive.Close(); // Ensure we release resources
+                    }
                 }
+                else
+                {
+                    IFileAccessor outputHandler = UriHandler.GetFileAccessor(OutputPath);
+                    int bufferSize = (int)outputHandler.GetBlockSize();
+                    using Stream outputFile = outputHandler.GetWriter();
+
+                    long streamLength = stream.Length;
+                    byte[] bytes = new byte[bufferSize];
+                    long writtenLength = 0;
+                    Timer timer = new();
+                    while (writtenLength < streamLength)
+                    {
+                        int readAmount = bufferSize;
+                        if (writtenLength + bufferSize > streamLength)
+                        {
+                            readAmount = (int)(streamLength - writtenLength);
+                        }
+
+                        stream.Read(bytes, 0, readAmount);
+
+                        // Write read data
+                        outputFile.Write(bytes, 0, readAmount);
+
+                        // Add to our offset
+                        writtenLength += readAmount;
+                    }
+
+                    outputFile.Close();
+                    Log.WriteLine(
+                        $"Wrote {writtenLength} of {streamLength} bytes in {timer.GetElapsedSeconds()} seconds (∼{timer.TransferRate(writtenLength)}).",
+                        Program.Instance.DefaultLogCategory);
+                }
+
+                stream.Close();
             }
 
             return true;

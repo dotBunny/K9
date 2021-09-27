@@ -14,13 +14,25 @@ namespace K9.IO.FileAccessors
         }
 
         /// <inheritdoc />
+        public uint GetBlockSize()
+        {
+            return 4096;
+        }
+
+        /// <inheritdoc />
         public bool ValidConnection()
         {
             return File.Exists(_filePath);
         }
 
         /// <inheritdoc />
-        public Stream Get()
+        public Stream GetReader()
+        {
+            return !ValidConnection() ? null : File.OpenRead(_filePath);;
+        }
+
+        /// <inheritdoc />
+        public Stream GetWriter()
         {
             return !ValidConnection() ? null : File.Create(_filePath);
         }

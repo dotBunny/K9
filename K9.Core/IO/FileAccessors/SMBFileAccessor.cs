@@ -19,7 +19,6 @@ namespace K9.IO.FileAccessors
         public SMBFileAccessor(string address, string username, string password, string share, string filePath)
         {
             _filePath = filePath;
-
             _client = new SMB2Client();
             _connected = _client.Connect(IPAddress.Parse(address), SMBTransportType.DirectTCPTransport);
 
@@ -33,6 +32,12 @@ namespace K9.IO.FileAccessors
         }
 
         /// <inheritdoc />
+        public uint GetBlockSize()
+        {
+            return SMB2Client.ClientMaxReadSize;
+        }
+
+        /// <inheritdoc />
         public bool ValidConnection()
         {
             return _connected &&
@@ -41,7 +46,7 @@ namespace K9.IO.FileAccessors
         }
 
         /// <inheritdoc />
-        public Stream Get()
+        public Stream GetReader()
         {
             if (!ValidConnection())
             {
@@ -111,6 +116,95 @@ namespace K9.IO.FileAccessors
             }
 
             return null;
+        }
+
+        /// <inheritdoc />
+        public Stream GetWriter()
+        {
+            if (!ValidConnection())
+            {
+                return null;
+            }
+
+            NTStatus fileCreateStatus = _fileStore.CreateFile(out object fileHandle, out FileStatus fileStatus,
+                _filePath,
+                AccessMask.GENERIC_WRITE | AccessMask.SYNCHRONIZE, FileAttributes.Normal,
+                ShareAccess.Read, CreateDisposition.FILE_OVERWRITE_IF,
+                CreateOptions.FILE_NON_DIRECTORY_FILE | CreateOptions.FILE_SYNCHRONOUS_IO_ALERT, null);
+
+            if (fileCreateStatus == NTStatus.STATUS_SUCCESS)
+            {
+                return new SMBWriteStream(_fileStore, fileHandle);
+            }
+            return null;
+        }
+
+        public class SMBWriteStream : Stream
+        {
+            private ISMBFileStore _fileStore;
+            private object _fileHandle;
+
+            public SMBWriteStream(ISMBFileStore fileStore, object fileHandle)
+            {
+                _fileStore = fileStore;
+                _fileHandle = fileHandle;
+            }
+
+            /// <inheritdoc />
+            public override void Close()
+            {
+                if (_fileStore != null && _fileHandle != null)
+                {
+                    _fileStore.CloseFile(_fileHandle);
+                }
+                base.Close();
+            }
+
+            /// <inheritdoc />
+            public override void Flush()
+            {
+                throw new System.NotImplementedException();
+            }
+
+            /// <inheritdoc />
+            public override int Read(byte[] buffer, int offset, int count)
+            {
+                throw new System.NotImplementedException();
+            }
+
+            /// <inheritdoc />
+            public override long Seek(long offset, SeekOrigin origin)
+            {
+                throw new System.NotImplementedException();
+            }
+
+            /// <inheritdoc />
+            public override void SetLength(long value)
+            {
+                throw new System.NotImplementedException();
+            }
+
+            /// <inheritdoc />
+            public override void Write(byte[] buffer, int offset, int count)
+            {
+                _fileStore.WriteFile(out int written, _fileHandle, offset + Position, buffer);
+                Position += written;
+            }
+
+            /// <inheritdoc />
+            public override bool CanRead { get { return false; } }
+
+            /// <inheritdoc />
+            public override bool CanSeek { get { return false; } }
+
+            /// <inheritdoc />
+            public override bool CanWrite { get { return true; } }
+
+            /// <inheritdoc />
+            public override long Length { get; }
+
+            /// <inheritdoc />
+            public override long Position { get; set; }
         }
 
         ~SMBFileAccessor()

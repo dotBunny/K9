@@ -4,7 +4,9 @@ namespace K9.IO
 {
     public interface IFileAccessor
     {
+        public uint GetBlockSize();
         public bool ValidConnection();
-        public Stream Get();
+        public Stream GetReader();
+        public Stream GetWriter();
     }
 }
