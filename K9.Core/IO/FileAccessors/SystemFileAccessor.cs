@@ -20,6 +20,18 @@ namespace K9.IO.FileAccessors
         }
 
         /// <inheritdoc />
+        public int GetReadBufferSize()
+        {
+            return 4096;
+        }
+
+        /// <inheritdoc />
+        public int GetWriteBufferSize()
+        {
+            return 4096;
+        }
+
+        /// <inheritdoc />
         public bool ValidConnection()
         {
             return true;

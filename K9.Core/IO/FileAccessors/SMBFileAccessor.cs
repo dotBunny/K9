@@ -38,6 +38,18 @@ namespace K9.IO.FileAccessors
         }
 
         /// <inheritdoc />
+        public int GetReadBufferSize()
+        {
+            return (int)SMB2Client.ClientMaxReadSize;
+        }
+
+        /// <inheritdoc />
+        public int GetWriteBufferSize()
+        {
+            return (int)SMB2Client.ClientMaxWriteSize;
+        }
+
+        /// <inheritdoc />
         public bool ValidConnection()
         {
             return _connected &&

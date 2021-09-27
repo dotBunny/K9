@@ -100,7 +100,8 @@ namespace K9.Setup.Verbs
                 else
                 {
                     IFileAccessor outputHandler = UriHandler.GetFileAccessor(OutputPath);
-                    int bufferSize = (int)outputHandler.GetBlockSize();
+
+                    int bufferSize = outputHandler.GetWriteBufferSize();
                     using Stream outputFile = outputHandler.GetWriter();
 
                     long streamLength = stream.Length;
