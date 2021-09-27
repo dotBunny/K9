@@ -28,12 +28,14 @@ namespace K9.IO.FileAccessors
         /// <inheritdoc />
         public Stream GetReader()
         {
+            Log.WriteLine($"Open file stream for {_filePath} (R).", Core.LogCategory);
             return File.OpenRead(_filePath);;
         }
 
         /// <inheritdoc />
         public Stream GetWriter()
         {
+            Log.WriteLine($"Open file stream for {_filePath} (W).", Core.LogCategory);
             return File.Create(_filePath);
         }
     }

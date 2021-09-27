@@ -1,4 +1,4 @@
-﻿using System.Diagnostics;
+﻿using System;
 using System.IO;
 using System.Net;
 using SMBLibrary;
@@ -68,7 +68,8 @@ namespace K9.IO.FileAccessors
                 {
                     FileStandardInformation fileInfo = (FileStandardInformation)result;
                     CoalesceStream stream = new(fileInfo.EndOfFile);
-                    Log.WriteLine($"Opened {_filePath} for read. Expected size {fileInfo.EndOfFile} bytes.", Core.LogCategory);
+                    Log.WriteLine($"Opened {_filePath} for read. Expected size {fileInfo.EndOfFile} bytes.",
+                        Core.LogCategory);
                     long bytesRead = 0;
 
                     Timer timer = new();
@@ -101,7 +102,9 @@ namespace K9.IO.FileAccessors
                         }
                     }
 
-                    Log.WriteLine($"Read {bytesRead} bytes in {timer.GetElapsedSeconds()} seconds (∼{timer.TransferRate(bytesRead)}).", Core.LogCategory);
+                    Log.WriteLine(
+                        $"Read {bytesRead} bytes in {timer.GetElapsedSeconds()} seconds (∼{timer.TransferRate(bytesRead)}).",
+                        Core.LogCategory);
                     _fileStore.CloseFile(fileHandle);
                     Cleanup();
                     stream.Seek(0, SeekOrigin.Begin);
@@ -136,91 +139,8 @@ namespace K9.IO.FileAccessors
             {
                 return new SMBWriteStream(_fileStore, fileHandle);
             }
+
             return null;
-        }
-
-        public class SMBWriteStream : Stream
-        {
-            private ISMBFileStore _fileStore;
-            private object _fileHandle;
-            private long _length;
-
-            public SMBWriteStream(ISMBFileStore fileStore, object fileHandle)
-            {
-                _fileStore = fileStore;
-                _fileHandle = fileHandle;
-            }
-
-            /// <inheritdoc />
-            public override void Close()
-            {
-                if (_fileStore != null && _fileHandle != null)
-                {
-                    _fileStore.CloseFile(_fileHandle);
-                }
-                base.Close();
-            }
-
-            /// <inheritdoc />
-            public override void Flush()
-            {
-                throw new System.NotImplementedException();
-            }
-
-            /// <inheritdoc />
-            public override int Read(byte[] buffer, int offset, int count)
-            {
-                throw new System.NotImplementedException();
-            }
-
-            /// <inheritdoc />
-            public override long Seek(long offset, SeekOrigin origin)
-            {
-                throw new System.NotImplementedException();
-            }
-
-            /// <inheritdoc />
-            public override void SetLength(long value)
-            {
-                throw new System.NotImplementedException();
-            }
-
-            /// <inheritdoc />
-            public override void Write(byte[] buffer, int offset, int count)
-            {
-                // Because the write buffer could be potentially bigger then whats actually going to be written
-                // we need to check and trim down in that case.
-                int written = 0;
-                if (buffer.Length > count)
-                {
-                    byte[] finalWrite = new byte[count];
-                    System.Array.Copy(buffer, finalWrite, count);
-                    _fileStore.WriteFile(out written, _fileHandle, offset + Position, finalWrite);
-                }
-                else
-                {
-                    _fileStore.WriteFile(out written, _fileHandle, offset + Position, buffer);
-                }
-
-
-                Position += written;
-                _length += written;
-            }
-
-            /// <inheritdoc />
-            public override bool CanRead { get { return false; } }
-
-            /// <inheritdoc />
-            public override bool CanSeek { get { return false; } }
-
-            /// <inheritdoc />
-            public override bool CanWrite { get { return true; } }
-
-            /// <inheritdoc />
-            public override long Length { get { return _length; } }
-
-            /// <inheritdoc />
-            public override long Position { get; set; }
         }
 
         ~SMBFileAccessor()
@@ -246,6 +166,91 @@ namespace K9.IO.FileAccessors
             _client.Disconnect();
 
             _connected = false;
+        }
+
+        public class SMBWriteStream : Stream
+        {
+            private readonly object _fileHandle;
+            private readonly ISMBFileStore _fileStore;
+            private long _length;
+
+            public SMBWriteStream(ISMBFileStore fileStore, object fileHandle)
+            {
+                _fileStore = fileStore;
+                _fileHandle = fileHandle;
+            }
+
+            /// <inheritdoc />
+            public override bool CanRead => false;
+
+            /// <inheritdoc />
+            public override bool CanSeek => false;
+
+            /// <inheritdoc />
+            public override bool CanWrite => true;
+
+            /// <inheritdoc />
+            public override long Length => _length;
+
+            /// <inheritdoc />
+            public override long Position { get; set; }
+
+            /// <inheritdoc />
+            public override void Close()
+            {
+                if (_fileStore != null && _fileHandle != null)
+                {
+                    _fileStore.CloseFile(_fileHandle);
+                }
+
+                base.Close();
+            }
+
+            /// <inheritdoc />
+            public override void Flush()
+            {
+                throw new NotImplementedException();
+            }
+
+            /// <inheritdoc />
+            public override int Read(byte[] buffer, int offset, int count)
+            {
+                throw new NotImplementedException();
+            }
+
+            /// <inheritdoc />
+            public override long Seek(long offset, SeekOrigin origin)
+            {
+                throw new NotImplementedException();
+            }
+
+            /// <inheritdoc />
+            public override void SetLength(long value)
+            {
+                throw new NotImplementedException();
+            }
+
+            /// <inheritdoc />
+            public override void Write(byte[] buffer, int offset, int count)
+            {
+                // Because the write buffer could be potentially bigger then whats actually going to be written
+                // we need to check and trim down in that case.
+                int written = 0;
+                if (buffer.Length > count)
+                {
+                    byte[] finalWrite = new byte[count];
+                    Array.Copy(buffer, finalWrite, count);
+                    _fileStore.WriteFile(out written, _fileHandle, offset + Position, finalWrite);
+                }
+                else
+                {
+                    _fileStore.WriteFile(out written, _fileHandle, offset + Position, buffer);
+                }
+
+
+                Position += written;
+                _length += written;
+            }
         }
     }
 }
