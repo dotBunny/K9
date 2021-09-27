@@ -53,8 +53,8 @@ namespace K9.Setup.Verbs
             IFileAccessor inputHandler = UriHandler.GetFileAccessor(UriString);
             if (inputHandler != null)
             {
-                Stream stream = inputHandler.GetReader();
-                if (stream == null)
+                Stream inputStream = inputHandler.GetReader();
+                if (inputStream == null)
                 {
                     Log.WriteLine("No valid reader was found. Check your input, the input may not exist.");
                     return false;
@@ -64,7 +64,7 @@ namespace K9.Setup.Verbs
                 {
                     Log.WriteLine("Extracting ZIP ...", Program.Instance.DefaultLogCategory);
                     Timer timer = new();
-                    ZipFile archive = new(stream, false);
+                    ZipFile archive = new(inputStream, false);
                     try
                     {
                         foreach (ZipEntry zipEntry in archive)
@@ -104,19 +104,19 @@ namespace K9.Setup.Verbs
                     int bufferSize = outputHandler.GetWriteBufferSize();
                     using Stream outputFile = outputHandler.GetWriter();
 
-                    long streamLength = stream.Length;
+                    long inputStreamLength = inputStream.Length;
                     byte[] bytes = new byte[bufferSize];
                     long writtenLength = 0;
                     Timer timer = new();
-                    while (writtenLength < streamLength)
+                    while (writtenLength < inputStreamLength)
                     {
                         int readAmount = bufferSize;
-                        if (writtenLength + bufferSize > streamLength)
+                        if (writtenLength + bufferSize > inputStreamLength)
                         {
-                            readAmount = (int)(streamLength - writtenLength);
+                            readAmount = (int)(inputStreamLength - writtenLength);
                         }
 
-                        stream.Read(bytes, 0, readAmount);
+                        inputStream.Read(bytes, 0, readAmount);
 
                         // Write read data
                         outputFile.Write(bytes, 0, readAmount);
@@ -127,11 +127,11 @@ namespace K9.Setup.Verbs
 
                     outputFile.Close();
                     Log.WriteLine(
-                        $"Wrote {writtenLength} of {streamLength} bytes in {timer.GetElapsedSeconds()} seconds (∼{timer.TransferRate(writtenLength)}).",
+                        $"Wrote {writtenLength} of {inputStreamLength} bytes in {timer.GetElapsedSeconds()} seconds (∼{timer.TransferRate(writtenLength)}).",
                         Program.Instance.DefaultLogCategory);
                 }
 
-                stream.Close();
+                inputStream.Close();
             }
 
             return true;
