@@ -11,7 +11,7 @@ namespace K9.Setup.Verbs
     [Verb("Delete")]
     public class Delete : DefaultOptions
     {
-        [Option('t', "target", Required = true, HelpText = "Target file name")]
+        [Option('t', "target", Required = false, HelpText = "Target file name")]
         public string TargetFileName { get; set; }
 
         public bool CanExecute()
