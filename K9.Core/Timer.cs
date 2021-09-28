@@ -13,9 +13,13 @@ namespace K9
             _stopwatch.Start();
         }
 
-        public void Reset()
+        public void Reset(bool restart = true)
         {
             _stopwatch.Reset();
+            if (restart)
+            {
+                _stopwatch.Start();
+            }
         }
 
         public long GetElapsedMilliseconds()

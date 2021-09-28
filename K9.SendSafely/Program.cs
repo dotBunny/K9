@@ -24,6 +24,7 @@ namespace K9.Setup
             bool newResult = results.MapResult(
                 (Upload upload) => upload.CanExecute() && upload.Execute(),
                 (Download download) => download.CanExecute() && download.Execute(),
+                (Delete delete) => delete.CanExecute() && delete.Execute(),
                 _ => false);
 
             if (!newResult)
