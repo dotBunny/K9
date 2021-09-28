@@ -18,7 +18,7 @@ namespace K9.Setup
             Parser parser = new(Settings => Settings.CaseInsensitiveEnumValues = true);
 
             ParserResult<object> results =
-                parser.ParseArguments<Upload, Download>(
+                parser.ParseArguments<Upload, Download, Delete>(
                     Core.Arguments);
 
             bool newResult = results.MapResult(
