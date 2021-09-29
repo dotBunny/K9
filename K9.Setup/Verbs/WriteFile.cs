@@ -1,6 +1,7 @@
 ﻿#nullable enable
 using System.IO;
 using CommandLine;
+using K9.Utils;
 
 namespace K9.Setup.Verbs
 {
@@ -12,6 +13,9 @@ namespace K9.Setup.Verbs
 
         [Option('c', "content", Required = false, HelpText = "The content of the file to be written")]
         public string? Content { get; set; }
+
+        [Option('l', "legacy", Required = false, HelpText = "Use legacy line writer, resulting in extra line ending.")]
+        public bool AllowTrailingLine { get; set; }
 
         public bool CanExecute()
         {
@@ -35,7 +39,15 @@ namespace K9.Setup.Verbs
             if (!string.IsNullOrEmpty(Content))
             {
                 Content = Content.Replace("___SPACE___", " ");
-                System.IO.File.WriteAllLines(File, Content.Split("___NEWLINE___"));
+                if (AllowTrailingLine)
+                {
+                    System.IO.File.WriteAllLines(File, Content.Split("___NEWLINE___"));
+                }
+                else
+                {
+                    FileUtil.WriteAllLinesNoExtraLine(File, Content.Split("___NEWLINE___"));
+                }
+
             }
             else
             {
