@@ -12,10 +12,10 @@ namespace K9.Setup.Verbs
     public class WriteFile : IVerb
     {
         [Option('f', "file", Required = false, HelpText = "Path to file to write too.")]
-        public string? File { get; set; }
+        public string File { get; set; }
 
         [Option('c', "content", Required = false, HelpText = "The content of the file to be written")]
-        public string? Content { get; set; }
+        public string Content { get; set; }
 
         [Option('l', "legacy", Required = false, HelpText = "Use legacy line writer, resulting in extra line ending.")]
         public bool AllowTrailingLine { get; set; }
