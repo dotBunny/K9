@@ -6,6 +6,17 @@ namespace K9.Services.Perforce
 {
     public class OutputLine
     {
+        public enum OutputChannel
+        {
+            Unknown,
+            Text,
+            Info,
+            TaggedInfo,
+            Warning,
+            Error,
+            Exit
+        }
+        
         public readonly OutputChannel Channel;
         public readonly string Text;
 

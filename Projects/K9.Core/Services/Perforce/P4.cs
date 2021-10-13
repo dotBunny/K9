@@ -20,6 +20,14 @@ namespace K9.Services.Perforce
 
         public delegate bool HandleRecordDelegate(Dictionary<string, string> Tags);
 
+        public enum LoginResult
+        {
+            Failed,
+            MissingPassword,
+            IncorrectPassword,
+            Succeded
+        }
+
         [Flags]
         public enum CommandOptions
         {
@@ -92,7 +100,7 @@ namespace K9.Services.Perforce
                 return true;
             }
 
-            if (Lines[0].Channel == OutputChannel.Error &&
+            if (Lines[0].Channel == OutputLine.OutputChannel.Error &&
                 (Lines[0].Text.Contains("P4PASSWD") || Lines[0].Text.Contains("has expired")))
             {
                 bIsLoggedIn = false;
@@ -117,18 +125,18 @@ namespace K9.Services.Perforce
                 return LoginResult.Succeded;
             }
 
-            ErrorMessage = string.Join("\n", Lines.Where(x => x.Channel != OutputChannel.Unknown).Select(x => x.Text));
+            ErrorMessage = string.Join("\n", Lines.Where(x => x.Channel != OutputLine.OutputChannel.Unknown).Select(x => x.Text));
 
             if (string.IsNullOrEmpty(Password))
             {
-                if (Lines.Any(x => x.Channel == OutputChannel.Error && x.Text.Contains("EOF")))
+                if (Lines.Any(x => x.Channel == OutputLine.OutputChannel.Error && x.Text.Contains("EOF")))
                 {
                     return LoginResult.MissingPassword;
                 }
             }
             else
             {
-                if (Lines.Any(x => x.Channel == OutputChannel.Error && x.Text.Contains("Authentication failed")))
+                if (Lines.Any(x => x.Channel == OutputLine.OutputChannel.Error && x.Text.Contains("Authentication failed")))
                 {
                     return LoginResult.IncorrectPassword;
                 }
@@ -224,7 +232,7 @@ namespace K9.Services.Perforce
             bool bResult = RunCommand("client -i", Client.ToString(), Line =>
             {
                 Lines.Add(Line.Text);
-                return Line.Channel == OutputChannel.Info;
+                return Line.Channel == OutputLine.OutputChannel.Info;
             }, CommandOptions.None);
             ErrorMessage = string.Join("\n", Lines);
 
@@ -448,7 +456,7 @@ namespace K9.Services.Perforce
             Arguments += string.Format(" \"{0}\"", FilePath);
 
             List<string> Lines;
-            if (!RunCommand(Arguments, OutputChannel.TaggedInfo, out Lines, CommandOptions.None))
+            if (!RunCommand(Arguments, OutputLine.OutputChannel.TaggedInfo, out Lines, CommandOptions.None))
             {
                 Changes = null;
                 return false;
@@ -782,7 +790,7 @@ namespace K9.Services.Perforce
 
         private static bool FilterSyncOutput(OutputLine Line, TagRecordParser Parser, List<string> TamperedFiles)
         {
-            if (Line.Channel == OutputChannel.TaggedInfo)
+            if (Line.Channel == OutputLine.OutputChannel.TaggedInfo)
             {
                 Parser.OutputLine(Line.Text);
                 return true;
@@ -791,13 +799,13 @@ namespace K9.Services.Perforce
             Log.WriteLine(Line.Text, "P4");
 
             const string Prefix = "Can't clobber writable file ";
-            if (Line.Channel == OutputChannel.Error && Line.Text.StartsWith(Prefix))
+            if (Line.Channel == OutputLine.OutputChannel.Error && Line.Text.StartsWith(Prefix))
             {
                 TamperedFiles.Add(Line.Text.Substring(Prefix.Length).Trim());
                 return true;
             }
 
-            return Line.Channel != OutputChannel.Error;
+            return Line.Channel != OutputLine.OutputChannel.Error;
         }
 
         private void ParseTamperedFile(string Line, List<string> TamperedFiles)
@@ -889,7 +897,7 @@ namespace K9.Services.Perforce
             CommandOptions Options)
         {
             List<string> Lines;
-            if (!RunCommand("-ztag " + CommandLine, OutputChannel.TaggedInfo, out Lines, Options))
+            if (!RunCommand("-ztag " + CommandLine, OutputLine.OutputChannel.TaggedInfo, out Lines, Options))
             {
                 TagRecords = null;
                 return false;
@@ -926,10 +934,10 @@ namespace K9.Services.Perforce
 
         private bool RunCommand(string CommandLine, out List<string> Lines, CommandOptions Options)
         {
-            return RunCommand(CommandLine, OutputChannel.Info, out Lines, Options);
+            return RunCommand(CommandLine, OutputLine.OutputChannel.Info, out Lines, Options);
         }
 
-        private bool RunCommand(string CommandLine, OutputChannel Channel, out List<string> Lines,
+        private bool RunCommand(string CommandLine, OutputLine.OutputChannel Channel, out List<string> Lines,
             CommandOptions Options)
         {
             string FullCommandLine = GetFullCommandLine(CommandLine, Options);
@@ -968,7 +976,7 @@ namespace K9.Services.Perforce
             return bResult;
         }
 
-        private bool FilterOutput(OutputLine Line, OutputChannel FilterChannel, List<string> FilterLines)
+        private bool FilterOutput(OutputLine Line, OutputLine.OutputChannel FilterChannel, List<string> FilterLines)
         {
             if (Line.Channel == FilterChannel)
             {
@@ -977,7 +985,7 @@ namespace K9.Services.Perforce
             }
 
             Log.WriteLine(Line.Text, "P4");
-            return Line.Channel != OutputChannel.Error;
+            return Line.Channel != OutputLine.OutputChannel.Error;
         }
 
         private bool RunCommand(string CommandLine, string Input, HandleOutputDelegate HandleOutput,

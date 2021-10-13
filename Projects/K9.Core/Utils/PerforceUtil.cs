@@ -146,7 +146,7 @@ namespace K9.Services.Utils
         {
             if (Options.HasFlag(P4.CommandOptions.NoChannels))
             {
-                OutputLine Line = new(OutputChannel.Unknown, Text);
+                OutputLine Line = new(OutputLine.OutputChannel.Unknown, Text);
                 return HandleOutput(Line);
             }
 
@@ -155,33 +155,33 @@ namespace K9.Services.Utils
                 OutputLine Line;
                 if (Text.StartsWith("text: "))
                 {
-                    Line = new OutputLine(OutputChannel.Text, Text.Substring(6));
+                    Line = new OutputLine(OutputLine.OutputChannel.Text, Text.Substring(6));
                 }
                 else if (Text.StartsWith("info: "))
                 {
-                    Line = new OutputLine(OutputChannel.Info, Text.Substring(6));
+                    Line = new OutputLine(OutputLine.OutputChannel.Info, Text.Substring(6));
                 }
                 else if (Text.StartsWith("info1: "))
                 {
-                    Line = new OutputLine(IsValidTag(Text, 7) ? OutputChannel.TaggedInfo : OutputChannel.Info,
+                    Line = new OutputLine(IsValidTag(Text, 7) ? OutputLine.OutputChannel.TaggedInfo : OutputLine.OutputChannel.Info,
                         Text.Substring(7));
                 }
                 else if (Text.StartsWith("warning: "))
                 {
-                    Line = new OutputLine(OutputChannel.Warning, Text.Substring(9));
+                    Line = new OutputLine(OutputLine.OutputChannel.Warning, Text.Substring(9));
                 }
                 else if (Text.StartsWith("error: "))
                 {
-                    Line = new OutputLine(OutputChannel.Error, Text.Substring(7));
+                    Line = new OutputLine(OutputLine.OutputChannel.Error, Text.Substring(7));
                 }
                 else
                 {
-                    Line = new OutputLine(OutputChannel.Unknown, Text);
+                    Line = new OutputLine(OutputLine.OutputChannel.Unknown, Text);
                 }
 
                 return HandleOutput(Line) &&
-                       (Line.Channel != OutputChannel.Error || Options.HasFlag(P4.CommandOptions.NoFailOnErrors)) &&
-                       Line.Channel != OutputChannel.Unknown;
+                       (Line.Channel != OutputLine.OutputChannel.Error || Options.HasFlag(P4.CommandOptions.NoFailOnErrors)) &&
+                       Line.Channel != OutputLine.OutputChannel.Unknown;
             }
 
             return true;
