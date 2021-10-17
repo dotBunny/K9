@@ -148,10 +148,7 @@ namespace K9.IO.FileAccessors
 
         ~SMBFileAccessor()
         {
-            if (_connected)
-            {
-                Cleanup();
-            }
+            Cleanup();
         }
 
         private void Cleanup()
