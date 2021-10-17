@@ -20,7 +20,7 @@ namespace K9.Setup.Verbs
         [Option('o', "output", Required = true, HelpText = "Folder to extract the aforementioned file too.")]
         public string OutputPath { get; set; }
 
-        [Option('c', "check", Required = false, Default = true,
+        [Option('c', "check", Required = false, Default = false,
             HelpText = "Determine if the output folder exists, skipping copy.")]
         public bool CheckExists { get; set; }
 

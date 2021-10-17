@@ -91,7 +91,8 @@ namespace K9.IO.FileAccessors
                     while (bytesRead < fileInfo.EndOfFile)
                     {
                         NTStatus readFileStatus = _fileStore.ReadFile(out byte[] data, fileHandle, bytesRead,
-                            (int)_client.MaxReadSize);
+                            (int)_fileStore.MaxReadSize);
+
                         if (readFileStatus == NTStatus.STATUS_SUCCESS)
                         {
                             if (data == null)
@@ -111,6 +112,9 @@ namespace K9.IO.FileAccessors
                         }
                         else
                         {
+
+                            Log.WriteLine(readFileStatus.ToString(), "SMB");
+                            _fileStore.CloseFile(fileHandle);
                             stream.Dispose();
                             Cleanup();
                             return null;
@@ -152,19 +156,18 @@ namespace K9.IO.FileAccessors
 
         private void Cleanup()
         {
-            if (_fileStoreStatus == NTStatus.STATUS_SUCCESS)
+            _fileStore?.Disconnect();
+
+            // Handle Client
+            if (_client != null)
             {
-                _fileStore.Disconnect();
+                if (_connected)
+                {
+                    _client.Logoff();
+                }
+                _connected = false;
+                _client.Disconnect();
             }
-
-            if (_loginStatus == NTStatus.STATUS_SUCCESS)
-            {
-                _client.Logoff();
-            }
-
-            _client.Disconnect();
-
-            _connected = false;
         }
     }
 }

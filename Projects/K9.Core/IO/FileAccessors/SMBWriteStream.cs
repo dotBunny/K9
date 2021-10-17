@@ -92,6 +92,11 @@ namespace K9.IO.FileAccessors
         {
             if (!_valid) return;
 
+            if (count > _fileStore.MaxWriteSize)
+            {
+                throw new Exception($"Maximum write size exceeded. SMB server reports a maximum write size of {_fileStore.MaxWriteSize}.");
+            }
+
             // Because the write buffer could be potentially bigger then whats actually going to be written
             // we need to check and trim down in that case.
             int written = 0;
