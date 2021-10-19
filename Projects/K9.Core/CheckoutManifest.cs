@@ -8,6 +8,7 @@ using K9.Services;
 using K9.Utils;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
+using Utilities;
 
 namespace K9
 {
@@ -23,6 +24,12 @@ namespace K9
 
         public class CheckoutManifestItem
         {
+            /// <inheritdoc />
+            public override string ToString()
+            {
+                return $"{Type.ToString()}://{URI}/{Branch}#{Commit}";
+            }
+
             [JsonProperty("branch")] public string Branch;
             [JsonProperty("commit")] public string Commit;
             [JsonProperty("id")] public string ID;
@@ -37,7 +44,7 @@ namespace K9
             public bool Checkout(string basePath)
             {
                 var outputPath = System.IO.Path.Combine(basePath, Path);
-                Log.WriteLine($"Processing {ID} ({Type}) => {outputPath}.");
+                Log.WriteLine($"{ID} ({this}) => {outputPath}.", "CHECKOUT");
 
                 // Check current
                 List<string> output = new ();
@@ -46,19 +53,65 @@ namespace K9
                 {
                     case CheckoutManifestItemType.Git:
 
-                        // Check output
+                        // The output folder does not exist, so we can just do a straight clone
                         if (!System.IO.Directory.Exists(outputPath))
                         {
-                            // TOOD: Feel like we probably want to show whats going on?
                             ProcessUtil.ExecuteProcess("git.exe", basePath,
-                                $"{Git.CloneArguments} {URI} {outputPath}", null, out output);
-                            break;
+                                $"{Git.CloneArguments} {URI} {outputPath}", null, Line =>
+                                {
+                                    Log.WriteLine(Line, "GIT", Log.LogType.ExternalProcess);
+                                });
+                            ProcessUtil.ExecuteProcess("git.exe", outputPath,
+                                $"{Git.SwitchBranchArguments} {Branch}", null, Line =>
+                                {
+                                    Log.WriteLine(Line, "GIT", Log.LogType.ExternalProcess);
+                                });
                         }
+                        else
+                        {
+                            // Get status of the repository
+                            ProcessUtil.ExecuteProcess("git.exe", outputPath,
+                                Git.StatusArguments, null, Line =>
+                                {
+                                    Log.WriteLine(Line, "GIT", Log.LogType.ExternalProcess);
+                                    output.Add(Line);
+                                });
 
+                            bool foundKeywords = false;
+                            foreach (string s in output)
+                            {
+                                if (s.Contains(Git.StatusAlreadyUpToDate) || s.Contains(Git.StatusBranchUpToDate))
+                                {
+                                    foundKeywords = true;
+                                    break;
+                                }
+                            }
 
+                            // Clear our cached output
+                            output.Clear();
+
+                            if (foundKeywords)
+                            {
+                                Log.WriteLine($"{ID} is up-to-date.", "CHECKOUT");
+                            }
+                            else
+                            {
+                                // We actually need to do something to upgrade this repo
+                                Log.WriteLine($"{ID} needs updating.", "CHECKOUT");
+                                ProcessUtil.ExecuteProcess("git.exe", outputPath,
+                                    Git.ResetArguments, null, Line =>
+                                    {
+                                        Log.WriteLine(Line, "GIT");
+                                    });
+                                ProcessUtil.ExecuteProcess("git.exe", outputPath,
+                                    Git.UpdateArguments, null, Line =>
+                                    {
+                                        Log.WriteLine(Line, "GIT");
+                                    });
+                            }
+                        }
                         break;
                 }
-
                 return true;
             }
         }

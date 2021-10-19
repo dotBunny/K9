@@ -7,6 +7,7 @@ namespace K9.Services
     public static class Git
     {
         public const string CloneArguments = "clone";
+        public const string SwitchBranchArguments = "checkout";
         public const string StatusArguments = "status -uno --long";
         public const string ResetArguments = "reset --hard";
         public const string UpdateArguments = "pull";

@@ -2,6 +2,7 @@
 // dotBunny licenses this file to you under the BSL-1.0 license.
 // See the LICENSE file in the project root for more information.
 
+using System;
 using CommandLine;
 using K9.Setup.Verbs;
 using K9.Utils;
@@ -15,25 +16,37 @@ namespace K9.Setup
 
         private static void Main(string[] args)
         {
-            // Initialize Core
-            Instance = new Program();
-            Core.Init(Instance);
-
-            Parser parser = new(Settings => Settings.CaseInsensitiveEnumValues = true);
-
-            ParserResult<object> results =
-                parser.ParseArguments<Upload, Download, Delete>(
-                    Core.Arguments);
-
-            bool newResult = results.MapResult(
-                (Upload upload) => upload.CanExecute() && upload.Execute(),
-                (Download download) => download.CanExecute() && download.Execute(),
-                (Delete delete) => delete.CanExecute() && delete.Execute(),
-                _ => false);
-
-            if (!newResult)
+            try
             {
-                CommandLineUtil.HandleParserResults(results);
+                // Initialize Core
+                Instance = new Program();
+                Core.Init(Instance);
+
+                Parser parser = new(Settings => Settings.CaseInsensitiveEnumValues = true);
+
+                ParserResult<object> results =
+                    parser.ParseArguments<Upload, Download, Delete>(
+                        Core.Arguments);
+
+                bool newResult = results.MapResult(
+                    (Upload upload) => upload.CanExecute() && upload.Execute(),
+                    (Download download) => download.CanExecute() && download.Execute(),
+                    (Delete delete) => delete.CanExecute() && delete.Execute(),
+                    _ => false);
+
+                if (!newResult)
+                {
+                    CommandLineUtil.HandleParserResults(results);
+                }
+            }
+            catch (Exception e)
+            {
+                Core.ExceptionHandler(e);
+                throw;
+            }
+            finally
+            {
+                Core.Shutdown();
             }
         }
     }

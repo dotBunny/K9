@@ -20,12 +20,24 @@ namespace K9.Setup.Verbs
         public bool CanExecute()
         {
             if (string.IsNullOrEmpty(Manifest))
+            {
+                Log.WriteLine("No manifest provided.", "CHECKOUT", Log.LogType.Error);
                 return false;
+            }
 
             if (!System.IO.File.Exists(Manifest))
+            {
+                Log.WriteLine("Unable to find manifest.", "CHECKOUT", Log.LogType.Error);
                 return false;
+            }
 
-            return CheckManifest();
+            if (CheckManifest())
+            {
+                return true;
+            }
+
+            Log.WriteLine("Manifest failed to deserialize.", "CHECKOUT", Log.LogType.Error);
+            return false;
         }
 
         /// <inheritdoc />

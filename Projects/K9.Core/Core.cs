@@ -68,7 +68,7 @@ namespace K9
             {
                 AssemblyLocation = Path.GetFullPath(Path.Combine(AssemblyLocation, ".."));
             }
-            Log.WriteLine($"Assembly Location: {AssemblyLocation}", LogCategory);
+            Log.WriteLine($"Assembly Location: {AssemblyLocation}", LogCategory, Log.LogType.Info);
 
             WorkspaceRoot = PerforceUtil.GetWorkspaceRoot();
 
@@ -118,19 +118,19 @@ namespace K9
 
             if (Arguments.Count > 0)
             {
-                Log.WriteLine("Arguments:", LogCategory);
+                Log.WriteLine("Arguments:", LogCategory, Log.LogType.Info);
                 foreach (string s in Arguments)
                 {
-                    Log.WriteLine($"\t{s}", LogCategory);
+                    Log.WriteLine($"\t{s}", LogCategory, Log.LogType.Info);
                 }
             }
 
             if (OverrideArguments.Count > 0)
             {
-                Log.WriteLine("Override Arguments:", LogCategory);
+                Log.WriteLine("Override Arguments:", LogCategory, Log.LogType.Info);
                 foreach (KeyValuePair<string, string> pair in OverrideArguments)
                 {
-                    Log.WriteLine($"\t{pair.Key}={pair.Value}", LogCategory);
+                    Log.WriteLine($"\t{pair.Key}={pair.Value}", LogCategory, Log.LogType.Info);
                 }
             }
 
@@ -189,6 +189,18 @@ namespace K9
 
             // Initialize Workspace
             P4Config = new Services.Perforce.Config(Path.Combine(WorkspaceRoot, Services.Perforce.Config.FileName));
+        }
+
+        public static void Shutdown()
+        {
+            Console.ResetColor();
+        }
+
+        public static void ExceptionHandler(Exception e)
+        {
+            Console.WriteLine();
+            Console.WriteLine("EXCEPTION");
+            Console.WriteLine(e);
         }
     }
 }
