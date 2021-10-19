@@ -70,6 +70,7 @@ namespace K9.Utils
                     }
                 };
 
+                ChildProcess.StartInfo.WorkingDirectory = WorkingDir;
                 ChildProcess.StartInfo.FileName = FileName;
                 ChildProcess.StartInfo.Arguments = string.IsNullOrEmpty(CommandLine) ? "" : CommandLine;
                 ChildProcess.StartInfo.UseShellExecute = false;

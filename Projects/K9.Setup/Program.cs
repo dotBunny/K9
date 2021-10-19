@@ -22,7 +22,7 @@ namespace K9.Setup
             Parser parser = new(Settings => Settings.CaseInsensitiveEnumValues = true);
 
             ParserResult<object> results =
-                parser.ParseArguments<Perforce, SetEnvironmentVariable, WriteFile, DeleteFolder, CopyFile>(
+                parser.ParseArguments<Perforce, SetEnvironmentVariable, WriteFile, DeleteFolder, CopyFile, Checkout>(
                     Core.Arguments);
 
             bool newResult = results.MapResult(
@@ -31,6 +31,7 @@ namespace K9.Setup
                 (WriteFile write) => write.CanExecute() && write.Execute(),
                 (DeleteFolder delete) => delete.CanExecute() && delete.Execute(),
                 (CopyFile copy) => copy.CanExecute() && copy.Execute(),
+                (Checkout checkout) => checkout.CanExecute() && checkout.Execute(),
                 _ => false);
 
             if (!newResult)
