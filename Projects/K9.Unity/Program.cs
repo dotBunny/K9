@@ -24,11 +24,13 @@ namespace K9.Unity
 
                 Parser parser = new(Settings => Settings.CaseInsensitiveEnumValues = true);
 
-                ParserResult<object> results = parser.ParseArguments<VersionControlSettings, TestResults>(Core.Arguments);
+                ParserResult<object> results = parser.ParseArguments<VersionControlSettings, TestResults, AddPackage, RemovePackage>(Core.Arguments);
 
                 bool newResult = results.MapResult(
                     (VersionControlSettings vcs) => vcs.CanExecute() && vcs.Execute(),
                     (TestResults tests) => tests.CanExecute() && tests.Execute(),
+                    (AddPackage addPackage) => addPackage.CanExecute() && addPackage.Execute(),
+                    (RemovePackage removePackage) => removePackage.CanExecute() && removePackage.Execute(),
                     _ => false);
 
                 if (!newResult)

@@ -17,7 +17,7 @@ using K9.Utils;
 namespace K9.Unity.Verbs
 {
     [Verb("TestResults")]
-    public class TestResults : DefaultOptions, IVerb
+    public class TestResults : IVerb
     {
         private const string SearchPattern = "unityTestResults-*.xml";
         private const string ConsoleCategory = "TESTRESULTS";
@@ -25,6 +25,9 @@ namespace K9.Unity.Verbs
 
         [Option('i', "input", Required = false, HelpText = "Unity tests runner results file to process.")]
         public string Input { get; set; }
+
+        [Option('f', "folder", Required = false, HelpText = "Target Folder")]
+        public string Folder { get; set; }
 
         [Option('o', "output", Required = false, HelpText = "Where to output processed report of tests.")]
         public string Output { get; set; }

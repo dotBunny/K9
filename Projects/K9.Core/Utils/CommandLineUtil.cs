@@ -19,11 +19,11 @@ namespace K9.Utils
                     {
                         if (e.Tag == ErrorType.HelpRequestedError || e.Tag == ErrorType.HelpVerbRequestedError)
                         {
-                            Log.WriteLine(HelpText.AutoBuild(results, _ => _, _ => _));
+                            Log.WriteLine(HelpText.AutoBuild(results, _ => _, _ => _), Core.DefaultLogCategory, Log.LogType.Info);
                         }
                         else
                         {
-                            Log.WriteLine($"{e.Tag} - No actions taken.");
+                            Log.WriteLine($"{e.Tag} - No actions taken.", Core.DefaultLogCategory, Log.LogType.Error);
                         }
                     }
                 });

@@ -9,11 +9,13 @@ using K9.Utils;
 namespace K9.Unity.Verbs
 {
     [Verb("VersionControlSettings")]
-    public class VersionControlSettings : DefaultOptions, IVerb
+    public class VersionControlSettings : IVerb
     {
         [Option('c', "clear", Required = false, Default = true)]
         public bool ClearSettings { get; set; } = true;
 
+        [Option('f', "folder", Required = false, HelpText = "Target Folder")]
+        public string Folder { get; set; }
 
         public bool CanExecute()
         {

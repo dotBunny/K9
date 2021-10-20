@@ -32,8 +32,11 @@ namespace K9
         public static Dictionary<string, string> OverrideArguments = new();
         public static Dictionary<string, string> Globals = new();
 
+        public static string DefaultLogCategory;
+
         public static void Init(IProgram program)
         {
+            DefaultLogCategory = program.DefaultLogCategory;
             Log.WriteLine("Running ...", program.DefaultLogCategory);
 
             // Clean Arguments
