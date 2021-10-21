@@ -46,19 +46,7 @@ namespace K9
                 // Quoted Argument
                 if (arg.StartsWith("\"") && arg.EndsWith("\""))
                 {
-                    Arguments.Add(arg.Trim());
-                }
-                else if (arg.Contains(" "))
-                {
-                    string[] split = arg.Split(" ");
-                    foreach (string s in split)
-                    {
-                        string check = s.Trim();
-                        if (!string.IsNullOrEmpty(check))
-                        {
-                            Arguments.Add(check);
-                        }
-                    }
+                    Arguments.Add(arg.Substring(1, arg.Length - 2));
                 }
                 else
                 {
