@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Text;
 using CommandLine;
 
 namespace K9.Unity.Verbs
@@ -35,12 +36,27 @@ namespace K9.Unity.Verbs
         public bool Execute()
         {
             var logFilePath = Path.GetTempFileName();
-            var passthroughArguments = $"{string.Join(' ', _workingArguments.ToArray())} -logFile {logFilePath}";
+            StringBuilder arguments = new();
+            foreach (string argument in _workingArguments)
+            {
+                if (argument.Contains(' '))
+                {
+                    arguments.Append('"');
+                    arguments.Append(argument);
+                    arguments.Append('"');
 
-            var process = new Process();
+                }
+                else
+                {
+                    arguments.Append(argument);
+                }
+                arguments.Append(' ');
+            }
+            string passthroughArguments = $"{arguments.ToString().TrimEnd()} -logFile {logFilePath}";
+
+            Process process = new();
             process.StartInfo.FileName = _executablePath;
             process.StartInfo.WindowStyle = ProcessWindowStyle.Hidden;
-            //process.StartInfo.WorkingDirectory = projectPath;
             process.StartInfo.ErrorDialog = false;
             process.StartInfo.Arguments = passthroughArguments;
 
