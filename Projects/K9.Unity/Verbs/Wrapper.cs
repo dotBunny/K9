@@ -61,12 +61,11 @@ namespace K9.Unity.Verbs
             process.StartInfo.Arguments = passthroughArguments;
 
             Log.WriteLine("Launching Unity ...", "WRAPPER", Log.LogType.ExternalProcess);
-            Log.WriteLine(process.StartInfo.FileName, "WRAPPER", Log.LogType.ExternalProcess);
-            Log.WriteLine(process.StartInfo.Arguments, "WRAPPER", Log.LogType.ExternalProcess);
+            Log.WriteLine($"{process.StartInfo.FileName} {process.StartInfo.Arguments}", "WRAPPER", Log.LogType.ExternalProcess);
 
             process.Start();
 
-            using ( FileStream stream = File.Open( logFilePath, FileMode.Open, FileAccess.Read, FileShare.Read ) )
+            using ( FileStream stream = File.Open( logFilePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite ) )
             {
                 using ( StreamReader reader = new ( stream ) )
                 {
@@ -81,19 +80,19 @@ namespace K9.Unity.Verbs
                 }
             }
 
-            for (int i=0; i< 5; i++ )
-            {
-                try
-                {
-                    File.Delete( logFilePath );
-                    break;
-                }
-                catch ( Exception)
-                {
-                    Log.WriteLine($"Unable to delete {logFilePath} ({i}).", "WRAPPER", Log.LogType.Notice);
-                    System.Threading.Thread.Sleep( 1000 );
-                }
-            }
+            // for (int i=0; i< 5; i++ )
+            // {
+            //     try
+            //     {
+            //         File.Delete( logFilePath );
+            //         break;
+            //     }
+            //     catch ( Exception)
+            //     {
+            //         Log.WriteLine($"Unable to delete {logFilePath} ({i}).", "WRAPPER", Log.LogType.Notice);
+            //         System.Threading.Thread.Sleep( 1000 );
+            //     }
+            // }
 
             return (process.ExitCode == 0);
         }
