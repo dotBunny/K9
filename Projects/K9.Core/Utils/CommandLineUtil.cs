@@ -26,6 +26,7 @@ namespace K9.Utils
                             Log.WriteLine($"{e.Tag} - No actions taken.", Core.DefaultLogCategory, Log.LogType.Error);
                         }
                     }
+                    Core.UpdateExitCode(-1);
                 });
             }
         }
