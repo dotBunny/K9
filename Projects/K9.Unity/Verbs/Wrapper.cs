@@ -80,19 +80,19 @@ namespace K9.Unity.Verbs
                 }
             }
 
-            // for (int i=0; i< 5; i++ )
-            // {
-            //     try
-            //     {
-            //         File.Delete( logFilePath );
-            //         break;
-            //     }
-            //     catch ( Exception)
-            //     {
-            //         Log.WriteLine($"Unable to delete {logFilePath} ({i}).", "WRAPPER", Log.LogType.Notice);
-            //         System.Threading.Thread.Sleep( 1000 );
-            //     }
-            // }
+            for (int i=0; i< 5; i++ )
+            {
+                try
+                {
+                    File.Delete( logFilePath );
+                    break;
+                }
+                catch ( Exception)
+                {
+                    Log.WriteLine($"Unable to delete {logFilePath} ({i}).", "WRAPPER", Log.LogType.Notice);
+                    System.Threading.Thread.Sleep( 1000 );
+                }
+            }
 
             return (process.ExitCode == 0);
         }
