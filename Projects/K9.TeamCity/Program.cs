@@ -34,6 +34,7 @@ namespace K9.TeamCity
                 if (!newResult)
                 {
                     CommandLineUtil.HandleParserResults(results);
+                    Core.UpdateExitCode(-1);
                 }
             }
             catch (Exception e)

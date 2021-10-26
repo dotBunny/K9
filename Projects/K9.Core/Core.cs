@@ -26,6 +26,8 @@ namespace K9
         public static string Changelist = "0";
         public static string Platform = "Win64";
 
+        public static int ExitCode = 0;
+
         public static Config Settings;
         public static Services.Perforce.Config P4Config;
         public static List<string> Arguments = new();
@@ -185,6 +187,24 @@ namespace K9
         public static void Shutdown()
         {
             Console.ResetColor();
+
+            // Set our last know code
+            Environment.ExitCode = ExitCode;
+        }
+
+        public static void UpdateExitCode(int code, bool forceSet = false)
+        {
+            if (forceSet)
+            {
+                ExitCode = code;
+                return;
+            }
+
+            // This will update the exit code to the last known bad code
+            if (code != 0)
+            {
+                ExitCode = code;
+            }
         }
 
         public static void ExceptionHandler(Exception e)
@@ -192,6 +212,9 @@ namespace K9
             Console.WriteLine();
             Console.WriteLine("EXCEPTION");
             Console.WriteLine(e);
+
+            // Update exit code
+            UpdateExitCode(e.HResult);
         }
     }
 }

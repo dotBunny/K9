@@ -35,7 +35,6 @@ namespace K9.Unity.Verbs
         /// <inheritdoc />
         public bool Execute()
         {
-            var logFilePath = Path.GetTempFileName();
             StringBuilder arguments = new();
             foreach (string argument in _workingArguments)
             {
@@ -52,10 +51,23 @@ namespace K9.Unity.Verbs
                 }
                 arguments.Append(' ');
             }
-            string passthroughArguments = $"{arguments.ToString().TrimEnd()} -logFile {logFilePath}";
+
+            int exitCode = WrapUnity(_executablePath, arguments.ToString());
+            Core.UpdateExitCode(exitCode);
+            return (exitCode == 0);
+        }
+
+        public static int WrapUnity(string executable, string arguments, string logFilePath = null, bool shouldCleanupLog = false)
+        {
+            if (string.IsNullOrEmpty(logFilePath))
+            {
+                logFilePath = Path.GetTempFileName();
+                shouldCleanupLog = true;
+            }
+            string passthroughArguments = $"{arguments.TrimEnd()} -logFile {logFilePath}";
 
             Process process = new();
-            process.StartInfo.FileName = _executablePath;
+            process.StartInfo.FileName = executable;
             process.StartInfo.WindowStyle = ProcessWindowStyle.Hidden;
             process.StartInfo.ErrorDialog = false;
             process.StartInfo.Arguments = passthroughArguments;
@@ -65,39 +77,38 @@ namespace K9.Unity.Verbs
 
             process.Start();
 
-            using ( FileStream stream = File.Open( logFilePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite ) )
+            using FileStream stream = File.Open( logFilePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite );
+            using StreamReader reader = new ( stream );
+            while ( !process.HasExited )
             {
-                using ( StreamReader reader = new ( stream ) )
+                StandardOutput( reader );
+                System.Threading.Thread.Sleep( 500 );
+            }
+
+            System.Threading.Thread.Sleep( 500 );
+            StandardOutput( reader );
+
+            if (shouldCleanupLog)
+            {
+                for (int i=0; i< 5; i++ )
                 {
-                    while ( !process.HasExited )
+                    try
                     {
-                        LogToConsole( reader );
-                        System.Threading.Thread.Sleep( 500 );
+                        File.Delete( logFilePath );
+                        break;
                     }
-
-                    System.Threading.Thread.Sleep( 500 );
-                    LogToConsole( reader );
+                    catch ( Exception)
+                    {
+                        Log.WriteLine($"Unable to delete {logFilePath} ({i}).", "WRAPPER", Log.LogType.Notice);
+                        System.Threading.Thread.Sleep( 1000 );
+                    }
                 }
             }
 
-            for (int i=0; i< 5; i++ )
-            {
-                try
-                {
-                    File.Delete( logFilePath );
-                    break;
-                }
-                catch ( Exception)
-                {
-                    Log.WriteLine($"Unable to delete {logFilePath} ({i}).", "WRAPPER", Log.LogType.Notice);
-                    System.Threading.Thread.Sleep( 1000 );
-                }
-            }
-
-            return (process.ExitCode == 0);
+            return process.ExitCode;
         }
 
-        private void LogToConsole( StreamReader logStream )
+        private static void StandardOutput( StreamReader logStream )
         {
             string content = logStream.ReadToEnd();
             if ( string.IsNullOrEmpty( content ) ) return;
