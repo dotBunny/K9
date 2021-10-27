@@ -35,6 +35,7 @@ namespace K9.Unity.Verbs
             // Add output file target
             // read result
             // write our middle file ? track?
+            // injest with testresults call?
             return true;
         }
     }
