@@ -9,7 +9,6 @@ namespace K9.Unity.Verbs
     [Verb("TestRunner")]
     public class TestRunner : IVerb
     {
-        // TODO: add more of unity's that are getting passed through, but forces making sure its there
         [Option('r', "run", Required = false, HelpText = "")]
         public string Run { get; set; }
 
@@ -18,6 +17,8 @@ namespace K9.Unity.Verbs
 
         [Option('c', "category", Required = false, HelpText = "")]
         public string Category { get; set; }
+
+        public bool HaltOnCrash { get; set; }
 
         public bool CanExecute()
         {
@@ -31,7 +32,9 @@ namespace K9.Unity.Verbs
 
         public bool Execute()
         {
-
+            // Add output file target
+            // read result
+            // write our middle file ? track?
             return true;
         }
     }
