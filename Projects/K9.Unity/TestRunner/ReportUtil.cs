@@ -10,7 +10,7 @@ namespace K9.Unity.TestRunner
 {
     public static class ReportUtil
     {
-        public static List<TestCase> GetTestCases(this TestRun inTestRun)
+        public static List<TestCase> GetTestCases(this Report.TestRun inTestRun)
         {
             return inTestRun.TestSuite.GetTestCases();
         }

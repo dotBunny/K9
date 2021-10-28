@@ -42,8 +42,6 @@ namespace K9.Setup
             catch (Exception e)
             {
                 Core.ExceptionHandler(e);
-
-                throw;
             }
             finally
             {

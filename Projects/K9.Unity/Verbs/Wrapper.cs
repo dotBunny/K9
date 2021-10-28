@@ -75,6 +75,7 @@ namespace K9.Unity.Verbs
             Log.WriteLine("Launching Unity ...", "WRAPPER", Log.LogType.ExternalProcess);
             Log.WriteLine($"{process.StartInfo.FileName} {process.StartInfo.Arguments}", "WRAPPER", Log.LogType.ExternalProcess);
 
+
             process.Start();
 
             using FileStream stream = File.Open( logFilePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite );
