@@ -39,7 +39,6 @@ namespace K9.Unreal
             catch (Exception e)
             {
                 Core.ExceptionHandler(e);
-                throw;
             }
             finally
             {
