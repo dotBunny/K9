@@ -11,21 +11,6 @@ namespace K9.Unity.Verbs
     [Verb("TestWrapper")]
     public class TestWrapper : IVerb
     {
-
-        /*
-        "C:\Program Files\Unity\Hub\Editor/2020.3.14f1-dots.0.spotlight.0/Editor/Unity.exe"
-        -projectPath
-        .
-        -runTests
-        -testPlatform
-        editmode
-        -testResults
-        D:\BuildAgent\temp\buildTmp/unityTestsResults-EditMode-16.xml
-        -editorTestsCategories
-        XP.Bonfire.Tests.Editor
-        -accept-apiupdate
-        -EnableCacheServer */
-
         [Option('d', "definition", Required = false, HelpText = "")]
         public string Definition { get; set; }
 
