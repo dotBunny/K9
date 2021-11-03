@@ -4,6 +4,7 @@
 
 using System.IO;
 using CommandLine;
+using K9.Utils;
 
 namespace K9.Setup.Verbs
 {
@@ -22,7 +23,7 @@ namespace K9.Setup.Verbs
         {
             if (File.Exists(Path))
             {
-                File.Delete(Path);
+                FileUtil.ForceDeleteFile(Path);
             }
 
             return true;
