@@ -24,11 +24,12 @@ namespace K9.TeamCity
 
                 Parser parser = new(Settings => Settings.CaseInsensitiveEnumValues = true);
 
-                ParserResult<object> results = parser.ParseArguments<BuildChangelist, SetParameter>(Core.Arguments);
+                ParserResult<object> results = parser.ParseArguments<BuildChangelist, SetParameter, CompareImage>(Core.Arguments);
 
                 bool newResult = results.MapResult(
                     (BuildChangelist changelist) => changelist.CanExecute() && changelist.Execute(),
                     (SetParameter param) => param.CanExecute() && param.Execute(),
+                    (CompareImage compareImage) => compareImage.CanExecute() && compareImage.Execute(),
                     _ => false);
 
                 if (!newResult)
