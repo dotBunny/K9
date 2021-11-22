@@ -90,7 +90,7 @@ namespace K9.Unity.Verbs
                 string resultsCache = System.IO.Path.GetTempFileName();
                 string runArguments = $"-projectPath \"{ProjectPath}\" {s_BaseArguments}{optionArgs}{run.ToArgumentString()} -testResults {resultsCache}";
 
-                int executionCode = Wrapper.WrapUnity(Executable, runArguments);
+                int executionCode = Wrapper.WrapUnity(Executable, runArguments, ProjectPath);
                 if (executionCode != 0)
                 {
                 }
