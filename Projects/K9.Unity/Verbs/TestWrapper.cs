@@ -90,13 +90,10 @@ namespace K9.Unity.Verbs
                 string resultsCache = System.IO.Path.GetTempFileName();
                 string runArguments = $"-projectPath \"{ProjectPath}\" {s_BaseArguments}{optionArgs}{run.ToArgumentString()} -testResults {resultsCache}";
 
-                int executionCode = Wrapper.WrapUnity(Executable, runArguments, ProjectPath);
+                int executionCode = Wrapper.WrapUnity(Executable, runArguments);
                 if (executionCode != 0)
                 {
-                }
-                else
-                {
-
+                    Log.WriteLine($"Unity returned a value of {executionCode.ToString()}");
                 }
                 FileUtil.ForceDeleteFile(resultsCache);
             }
