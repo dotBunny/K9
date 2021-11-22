@@ -80,17 +80,17 @@ namespace K9.Unity.Verbs
                 process.StartInfo.WorkingDirectory = workingDirectory;
             }
             process.StartInfo.FileName = executable;
-            process.StartInfo.WindowStyle = ProcessWindowStyle.Hidden;
+            process.StartInfo.WindowStyle = ProcessWindowStyle.Normal;
             process.StartInfo.ErrorDialog = false;
             process.StartInfo.Arguments = passthroughArguments;
-            //process.StartInfo.CreateNoWindow = false;
+            process.StartInfo.CreateNoWindow = false;
 
-//             if (PlatformUtil.IsWindows())
-//             {
-// #pragma warning disable CA1416
-//                 //process.StartInfo.LoadUserProfile = true;
-// #pragma warning restore CA1416
-//             }
+            if (PlatformUtil.IsWindows())
+            {
+#pragma warning disable CA1416
+                process.StartInfo.LoadUserProfile = true;
+#pragma warning restore CA1416
+            }
 
             Log.WriteLine(
                 Directory.Exists(workingDirectory)
