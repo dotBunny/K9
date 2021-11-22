@@ -76,7 +76,9 @@ namespace K9.Unity.Verbs
 
             if (PlatformUtil.IsWindows())
             {
+#pragma warning disable CA1416
                 process.StartInfo.LoadUserProfile = true;
+#pragma warning restore CA1416
             }
 
             Log.WriteLine("Launching Unity ...", "WRAPPER", Log.LogType.ExternalProcess);
