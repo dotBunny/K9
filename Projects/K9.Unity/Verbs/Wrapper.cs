@@ -8,6 +8,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Text;
 using CommandLine;
+using K9.Services.Utils;
 
 namespace K9.Unity.Verbs
 {
@@ -68,9 +69,15 @@ namespace K9.Unity.Verbs
 
             Process process = new();
             process.StartInfo.FileName = executable;
-            process.StartInfo.WindowStyle = ProcessWindowStyle.Hidden;
+            process.StartInfo.WindowStyle = ProcessWindowStyle.Normal;
             process.StartInfo.ErrorDialog = false;
             process.StartInfo.Arguments = passthroughArguments;
+            process.StartInfo.CreateNoWindow = false;
+
+            if (PlatformUtil.IsWindows())
+            {
+                process.StartInfo.LoadUserProfile = true;
+            }
 
             Log.WriteLine("Launching Unity ...", "WRAPPER", Log.LogType.ExternalProcess);
             Log.WriteLine($"{process.StartInfo.FileName} {process.StartInfo.Arguments}", "WRAPPER", Log.LogType.ExternalProcess);
