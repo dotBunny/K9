@@ -38,14 +38,9 @@ namespace K9.Unity.Verbs
         {
             StringBuilder arguments = new();
             int workingCount = _workingArguments.Count;
-            string foundProjectPath = string.Empty;
             for (int i = 0; i < workingCount; i++)
             {
                 string argument = _workingArguments[i];
-                if (argument.Contains("projectPath") && string.IsNullOrEmpty(foundProjectPath))
-                {
-                    foundProjectPath = _workingArguments[i+1];
-                }
                 if (argument.Contains(' '))
                 {
                     arguments.Append('"');
@@ -60,12 +55,12 @@ namespace K9.Unity.Verbs
                 arguments.Append(' ');
             }
 
-            int exitCode = WrapUnity(_executablePath, arguments.ToString(), foundProjectPath);
+            int exitCode = WrapUnity(_executablePath, arguments.ToString());
             Core.UpdateExitCode(exitCode);
             return (exitCode == 0);
         }
 
-        public static int WrapUnity(string executable, string arguments, string workingDirectory, string logFilePath = null, bool shouldCleanupLog = false)
+        public static int WrapUnity(string executable, string arguments, string logFilePath = null, bool shouldCleanupLog = false)
         {
             if (string.IsNullOrEmpty(logFilePath))
             {
@@ -75,10 +70,8 @@ namespace K9.Unity.Verbs
             string passthroughArguments = $"{arguments.TrimEnd()} -logFile {logFilePath}";
 
             Process process = new();
-            if (Directory.Exists(workingDirectory))
-            {
-                process.StartInfo.WorkingDirectory = workingDirectory;
-            }
+
+            process.StartInfo.WorkingDirectory = Directory.GetCurrentDirectory();
             process.StartInfo.FileName = executable;
             process.StartInfo.WindowStyle = ProcessWindowStyle.Normal;
             process.StartInfo.ErrorDialog = false;
@@ -92,10 +85,7 @@ namespace K9.Unity.Verbs
 #pragma warning restore CA1416
             }
 
-            Log.WriteLine(
-                Directory.Exists(workingDirectory)
-                    ? $"Launching Unity in {workingDirectory} ..."
-                    : "Launching Unity ...", "WRAPPER", Log.LogType.ExternalProcess);
+            Log.WriteLine($"Launching Unity in {process.StartInfo.WorkingDirectory} ...", "WRAPPER", Log.LogType.ExternalProcess);
 
             Log.WriteLine($"{process.StartInfo.FileName} {process.StartInfo.Arguments}", "WRAPPER", Log.LogType.ExternalProcess);
 

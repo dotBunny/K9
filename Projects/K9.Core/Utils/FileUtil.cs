@@ -14,20 +14,20 @@ namespace K9.Utils
             File.WriteAllText(outputPath, contents);
         }
 
-        public static void ForceDeleteFile(this string FilePath)
+        public static void ForceDeleteFile(string filePath)
         {
-            if (File.Exists(FilePath))
+            if (File.Exists(filePath))
             {
-                File.SetAttributes(FilePath, File.GetAttributes(FilePath) & ~FileAttributes.ReadOnly);
-                File.Delete(FilePath);
+                File.SetAttributes(filePath, File.GetAttributes(filePath) & ~FileAttributes.ReadOnly);
+                File.Delete(filePath);
             }
         }
 
-        public static bool IsSafeToWrite(this string FilePath)
+        public static bool IsSafeToWrite(string filePath)
         {
-            if (File.Exists(FilePath))
+            if (File.Exists(filePath))
             {
-                FileAttributes attributes = File.GetAttributes(FilePath);
+                FileAttributes attributes = File.GetAttributes(filePath);
                 if ((attributes & FileAttributes.ReadOnly) == FileAttributes.ReadOnly ||
                     (attributes & FileAttributes.Offline) == FileAttributes.Offline)
                 {
