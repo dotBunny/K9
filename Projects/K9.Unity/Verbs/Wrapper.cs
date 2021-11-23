@@ -70,13 +70,13 @@ namespace K9.Unity.Verbs
             string passthroughArguments = $"{arguments.TrimEnd()} -logFile {logFilePath}";
 
             Process process = new();
-
             process.StartInfo.WorkingDirectory = Directory.GetCurrentDirectory();
             process.StartInfo.FileName = executable;
             process.StartInfo.WindowStyle = ProcessWindowStyle.Normal;
             process.StartInfo.ErrorDialog = false;
             process.StartInfo.Arguments = passthroughArguments;
-            process.StartInfo.CreateNoWindow = false;
+            process.StartInfo.CreateNoWindow = true;
+            process.StartInfo.UseShellExecute = false;
 
             if (PlatformUtil.IsWindows())
             {
