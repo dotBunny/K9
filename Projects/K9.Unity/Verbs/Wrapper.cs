@@ -72,11 +72,11 @@ namespace K9.Unity.Verbs
             Process process = new();
             process.StartInfo.WorkingDirectory = Directory.GetCurrentDirectory();
             process.StartInfo.FileName = executable;
-            process.StartInfo.WindowStyle = ProcessWindowStyle.Normal;
+            process.StartInfo.WindowStyle = ProcessWindowStyle.Maximized;
             process.StartInfo.ErrorDialog = false;
             process.StartInfo.Arguments = passthroughArguments;
-            process.StartInfo.CreateNoWindow = true;
-            process.StartInfo.UseShellExecute = true;
+            process.StartInfo.CreateNoWindow = false;
+            process.StartInfo.UseShellExecute = false;
 
             if (PlatformUtil.IsWindows())
             {
