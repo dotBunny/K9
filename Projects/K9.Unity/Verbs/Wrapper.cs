@@ -76,7 +76,7 @@ namespace K9.Unity.Verbs
             process.StartInfo.ErrorDialog = false;
             process.StartInfo.Arguments = passthroughArguments;
             process.StartInfo.CreateNoWindow = true;
-            process.StartInfo.UseShellExecute = false;
+            process.StartInfo.UseShellExecute = true;
 
             if (PlatformUtil.IsWindows())
             {
