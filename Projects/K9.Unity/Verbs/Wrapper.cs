@@ -6,15 +6,20 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Runtime.Versioning;
 using System.Text;
 using CommandLine;
 using K9.Services.Utils;
+
 
 namespace K9.Unity.Verbs
 {
     [Verb("Wrapper")]
     public class Wrapper : IVerb
     {
+        private const int sessionID = 9;
+        public bool Interactive { get; set; }
+
         private List<string> _workingArguments;
         private string _executablePath;
 
@@ -26,7 +31,17 @@ namespace K9.Unity.Verbs
             // Remove verb
             _workingArguments.RemoveAt(0);
 
-            // Get executable
+            if (_workingArguments.Contains("--interactive"))
+            {
+                Interactive = true;
+                _workingArguments.Remove("--interactive");
+            }
+            if (_workingArguments.Contains("-i"))
+            {
+                Interactive = true;
+                _workingArguments.Remove("-i");
+            }
+
             _executablePath = _workingArguments[0];
             _workingArguments.RemoveAt(0);
 
@@ -54,44 +69,77 @@ namespace K9.Unity.Verbs
                 }
                 arguments.Append(' ');
             }
-
-            int exitCode = WrapUnity(_executablePath, arguments.ToString());
+            int exitCode = WrapUnity(_executablePath, arguments.ToString(), Interactive);
             Core.UpdateExitCode(exitCode);
             return (exitCode == 0);
         }
 
-        public static int WrapUnity(string executable, string arguments, string logFilePath = null, bool shouldCleanupLog = false)
+        public static int WrapUnity(string executable, string arguments, bool interactive, string logFilePath = null, bool shouldCleanupLog = false)
+        {
+            string trimmedArguments = arguments.Trim();
+            return PlatformUtil.IsWindows() ?
+#pragma warning disable CA1416
+                WrapUnity_Windows(executable, trimmedArguments, interactive, logFilePath, shouldCleanupLog) :
+#pragma warning restore CA1416
+                WrapUnity_Default(executable, trimmedArguments, interactive, logFilePath, shouldCleanupLog);
+        }
+
+        private static int WrapUnity_Default(string executable, string arguments, bool interactive, string logFilePath = null, bool shouldCleanupLog = false)
         {
             if (string.IsNullOrEmpty(logFilePath))
             {
                 logFilePath = Path.GetTempFileName();
                 shouldCleanupLog = true;
             }
-            string passthroughArguments = $"{arguments.TrimEnd()} -logFile {logFilePath}";
+            string passthroughArguments = $"{arguments} -logFile {logFilePath}";
 
             Process process = new();
             process.StartInfo.WorkingDirectory = Directory.GetCurrentDirectory();
             process.StartInfo.FileName = executable;
-            process.StartInfo.WindowStyle = ProcessWindowStyle.Normal;
+            process.StartInfo.WindowStyle = interactive ? ProcessWindowStyle.Normal : ProcessWindowStyle.Hidden;
             process.StartInfo.ErrorDialog = false;
             process.StartInfo.Arguments = passthroughArguments;
             process.StartInfo.CreateNoWindow = false;
             process.StartInfo.UseShellExecute = false;
 
-            if (PlatformUtil.IsWindows())
-            {
-#pragma warning disable CA1416
-                process.StartInfo.LoadUserProfile = true;
-#pragma warning restore CA1416
-            }
-
-            Log.WriteLine($"Launching Unity in {process.StartInfo.WorkingDirectory} ...", "WRAPPER", Log.LogType.ExternalProcess);
-
+            Log.WriteLine($"Launching in {process.StartInfo.WorkingDirectory} ...", "WRAPPER", Log.LogType.ExternalProcess);
             Log.WriteLine($"{process.StartInfo.FileName} {process.StartInfo.Arguments}", "WRAPPER", Log.LogType.ExternalProcess);
-
 
             process.Start();
 
+            return WatchProcess(process, logFilePath, shouldCleanupLog);
+        }
+
+        [SupportedOSPlatform("windows")]
+        private static int WrapUnity_Windows(string executable, string arguments, bool interactive,
+            string logFilePath = null, bool shouldCleanupLog = false)
+        {
+            if (!interactive)
+            {
+                return WrapUnity_Default(executable, arguments, false, logFilePath, shouldCleanupLog);
+            }
+            Log.WriteLine($"Launching on Session {sessionID} in {Directory.GetCurrentDirectory()} ...", "WRAPPER", Log.LogType.ExternalProcess);
+            Log.WriteLine($"{executable} {arguments.Trim()}", "WRAPPER", Log.LogType.ExternalProcess);
+
+            uint processId =  Platform.Win32.StartProcessOnSession(
+                sessionID, executable, $"{executable} {arguments}", Directory.GetCurrentDirectory());
+
+            Process process;
+            try
+            {
+                process = Process.GetProcessById((int)processId);
+            }
+            catch (Exception e)
+            {
+                Core.ExceptionHandler(e);
+                return e.HResult;
+            }
+
+            return WatchProcess(process, logFilePath, shouldCleanupLog);
+        }
+
+        private static int WatchProcess(Process process, string logFilePath, bool shouldCleanupLog)
+        {
             using FileStream stream = File.Open( logFilePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite );
             using StreamReader reader = new ( stream );
             while ( !process.HasExited )
@@ -103,23 +151,32 @@ namespace K9.Unity.Verbs
             System.Threading.Thread.Sleep( 500 );
             StandardOutput( reader );
 
-            if (shouldCleanupLog)
+            // We dont need it any
+            reader.Close();
+            stream.Close();
+
+            // Early out on the return
+            if (!shouldCleanupLog || !File.Exists(logFilePath))
             {
-                for (int i=0; i< 5; i++ )
+                return process.ExitCode;
+            }
+
+            // Try to delete file, protecting against longer then expected locks
+            for (int i=0; i< 5; i++ )
+            {
+                try
                 {
-                    try
-                    {
-                        File.Delete( logFilePath );
-                        break;
-                    }
-                    catch ( Exception)
-                    {
-                        Log.WriteLine($"Unable to delete {logFilePath} ({i}).", "WRAPPER", Log.LogType.Notice);
-                        System.Threading.Thread.Sleep( 1000 );
-                    }
+                    File.Delete( logFilePath );
+                    break;
+                }
+                catch ( Exception)
+                {
+                    Log.WriteLine($"Unable to delete {logFilePath} ({i}).", "WRAPPER", Log.LogType.Notice);
+                    System.Threading.Thread.Sleep( 1000 );
                 }
             }
 
+            // Finally return code
             return process.ExitCode;
         }
 
@@ -130,4 +187,6 @@ namespace K9.Unity.Verbs
             Log.Write(content, Log.LogType.ExternalProcess);
         }
     }
+
+
 }
