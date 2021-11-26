@@ -114,12 +114,12 @@ namespace K9.Unity.Verbs
                 !string.IsNullOrEmpty(Username) && !string.IsNullOrEmpty(Password))
             {
 #pragma warning disable CA1416
-                // Platform.Windows.Impersonate.RunImpersonated(Username, Domain, Password, () => {
-                //     Log.WriteLine($"Impersonating {Username} ...", "WRAPPER", Log.LogType.ExternalProcess);
-                //     process = StartProcess(executable, trimmedArguments, true, logFilePath);
-                // });
-                process = StartProcessDifferentSession(Username, Domain, Password, executable, trimmedArguments, true,
-                    logFilePath);
+                Platform.Windows.Impersonate.RunImpersonated(Username, Domain, Password, () => {
+                    Log.WriteLine($"Impersonating {Username} ...", "WRAPPER", Log.LogType.ExternalProcess);
+                    process = StartProcess(executable, trimmedArguments, true, logFilePath);
+                });
+                //process = StartProcessDifferentSession(Username, Domain, Password, executable, trimmedArguments, true,
+                //    logFilePath);
 #pragma warning restore CA1416
             }
             else
@@ -147,7 +147,8 @@ namespace K9.Unity.Verbs
             process.StartInfo.ErrorDialog = false;
             process.StartInfo.Arguments = passthroughArguments;
             process.StartInfo.CreateNoWindow = false;
-            process.StartInfo.UseShellExecute = false;
+            process.StartInfo.UseShellExecute = interactive;
+            process.StartInfo.Verb = interactive ? "runas" : string.Empty;
 
             Log.WriteLine($"Launching ...", "WRAPPER", Log.LogType.ExternalProcess);
             Log.WriteLine($"{process.StartInfo.FileName} {process.StartInfo.Arguments}", "WRAPPER", Log.LogType.ExternalProcess);
