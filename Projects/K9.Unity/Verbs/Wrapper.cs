@@ -9,6 +9,7 @@ using System.IO;
 using System.Runtime.Versioning;
 using System.Text;
 using CommandLine;
+using K9.Platform;
 using K9.Services.Utils;
 
 namespace K9.Unity.Verbs
@@ -114,12 +115,10 @@ namespace K9.Unity.Verbs
                 !string.IsNullOrEmpty(Username) && !string.IsNullOrEmpty(Password))
             {
 #pragma warning disable CA1416
-                // Platform.Windows.Impersonate.RunImpersonated(Username, Domain, Password, () => {
-                //     Log.WriteLine($"Impersonating {Username} ...", "WRAPPER", Log.LogType.ExternalProcess);
-                //     process = StartProcess(executable, trimmedArguments, true, logFilePath);
-                // });
-                process = StartProcessDifferentSession(Username, Domain, Password, executable, trimmedArguments, true,
-                    logFilePath);
+                Win32.RunImpersonated(Username, Domain, Password, () => {
+                    Log.WriteLine($"Impersonating {Username} ...", "WRAPPER", Log.LogType.ExternalProcess);
+                    process = StartProcess(executable, trimmedArguments, true, logFilePath);
+                });
 #pragma warning restore CA1416
             }
             else
@@ -146,7 +145,7 @@ namespace K9.Unity.Verbs
             process.StartInfo.WindowStyle = interactive ? ProcessWindowStyle.Normal : ProcessWindowStyle.Hidden;
             process.StartInfo.ErrorDialog = false;
             process.StartInfo.Arguments = passthroughArguments;
-            process.StartInfo.CreateNoWindow = false;
+            process.StartInfo.CreateNoWindow = !interactive;
             process.StartInfo.UseShellExecute = interactive;
             process.StartInfo.Verb = interactive ? "runas" : string.Empty;
 
@@ -154,33 +153,6 @@ namespace K9.Unity.Verbs
             Log.WriteLine($"{process.StartInfo.FileName} {process.StartInfo.Arguments}", "WRAPPER", Log.LogType.ExternalProcess);
 
             process.Start();
-            return process;
-        }
-
-        [SupportedOSPlatform("windows")]
-        private static Process StartProcessDifferentSession(string username, string domain, string password, string executable, string arguments, bool interactive,
-            string logFilePath)
-        {
-            if (!interactive)
-            {
-                return StartProcess(executable, arguments, false, logFilePath);
-            }
-            Log.WriteLine($"Launching on different session ...", "WRAPPER", Log.LogType.ExternalProcess);
-            Log.WriteLine($"{executable} {arguments.Trim()}", "WRAPPER", Log.LogType.ExternalProcess);
-
-
-            uint processId =  Platform.Windows.Impersonate.StartProcessAsUser(username, domain, password, executable, $"{executable} {arguments}", Directory.GetCurrentDirectory(), interactive);
-
-            Process process;
-            try
-            {
-                process = Process.GetProcessById((int)processId);
-            }
-            catch (Exception e)
-            {
-                Core.ExceptionHandler(e);
-                return null;
-            }
             return process;
         }
 
