@@ -61,6 +61,7 @@ namespace K9.Setup.Verbs
                 if (inputStream == null)
                 {
                     Log.WriteLine("No valid reader was found. Check your input, the input may not exist.");
+                    Core.UpdateExitCode(-1, true);
                     return false;
                 }
 
