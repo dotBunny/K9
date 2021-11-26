@@ -60,7 +60,8 @@ namespace K9.Setup.Verbs
                 Stream inputStream = inputHandler.GetReader();
                 if (inputStream == null)
                 {
-                    Log.WriteLine("No valid reader was found. Check your input, the input may not exist.");
+                    Log.WriteLine("No valid reader was found. Check your input, the input may not exist.",
+                        Program.Instance.DefaultLogCategory, Log.LogType.Error);
                     Core.UpdateExitCode(-1, true);
                     return false;
                 }
