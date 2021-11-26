@@ -30,7 +30,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\K9.Core\K9.Core.csproj"/>
+    <ProjectReference Include="..\K9.Core\K9.Core.csproj" />
   </ItemGroup>
 
 </Project>

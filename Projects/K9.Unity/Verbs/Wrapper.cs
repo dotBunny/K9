@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2018-2021 dotBunny Inc.
+// Copyright (c) 2018-2021 dotBunny Inc.
 // dotBunny licenses this file to you under the BSL-1.0 license.
 // See the LICENSE file in the project root for more information.
 
@@ -7,9 +7,12 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Runtime.Versioning;
+using System.Security.Principal;
 using System.Text;
+using System.Threading;
 using CommandLine;
 using K9.Services.Utils;
+using K9.Utils;
 
 
 namespace K9.Unity.Verbs
@@ -17,7 +20,6 @@ namespace K9.Unity.Verbs
     [Verb("Wrapper")]
     public class Wrapper : IVerb
     {
-        private const int sessionID = 6;
         public bool Interactive { get; set; }
 
         private List<string> _workingArguments;
@@ -77,11 +79,19 @@ namespace K9.Unity.Verbs
         public static int LaunchUnity(string executable, string arguments, bool interactive, string logFilePath = null, bool shouldCleanupLog = false)
         {
             string trimmedArguments = arguments.Trim();
-            Process process = PlatformUtil.IsWindows() ?
+            if (string.IsNullOrEmpty(logFilePath))
+            {
+                logFilePath = Path.GetTempFileName();
+                shouldCleanupLog = true;
+            }
+
+            Process process = PlatformUtil.IsWindows()
+                ?
 #pragma warning disable CA1416
-                StartProcessOnSession(executable, trimmedArguments, interactive, logFilePath, shouldCleanupLog) :
+                //StartPowerShell(executable, trimmedArguments, interactive, logFilePath) :
+                StartProcessDifferentSession(executable, trimmedArguments, interactive, logFilePath) :
 #pragma warning restore CA1416
-                StartProcess(executable, trimmedArguments, interactive, logFilePath, shouldCleanupLog);
+                StartProcess(executable, trimmedArguments, interactive, logFilePath);
 
             if (process == null)
             {
@@ -91,13 +101,8 @@ namespace K9.Unity.Verbs
             return WatchProcess(process, logFilePath, shouldCleanupLog);
         }
 
-        private static Process StartProcess(string executable, string arguments, bool interactive, string logFilePath = null, bool shouldCleanupLog = false)
+        private static Process StartProcess(string executable, string arguments, bool interactive, string logFilePath)
         {
-            if (string.IsNullOrEmpty(logFilePath))
-            {
-                logFilePath = Path.GetTempFileName();
-                shouldCleanupLog = true;
-            }
             string passthroughArguments = $"{arguments} -logFile {logFilePath}";
 
             Process process = new();
@@ -109,26 +114,26 @@ namespace K9.Unity.Verbs
             process.StartInfo.CreateNoWindow = false;
             process.StartInfo.UseShellExecute = false;
 
-            Log.WriteLine($"Launching in {process.StartInfo.WorkingDirectory} ...", "WRAPPER", Log.LogType.ExternalProcess);
+            Log.WriteLine($"Launching ...", "WRAPPER", Log.LogType.ExternalProcess);
             Log.WriteLine($"{process.StartInfo.FileName} {process.StartInfo.Arguments}", "WRAPPER", Log.LogType.ExternalProcess);
 
             process.Start();
             return process;
         }
 
+
         [SupportedOSPlatform("windows")]
-        private static Process StartProcessOnSession(string executable, string arguments, bool interactive,
-            string logFilePath = null, bool shouldCleanupLog = false)
+        private static Process StartProcessDifferentSession(string executable, string arguments, bool interactive,
+            string logFilePath)
         {
             if (!interactive)
             {
-                return StartProcess(executable, arguments, false, logFilePath, shouldCleanupLog);
+                return StartProcess(executable, arguments, false, logFilePath);
             }
-            Log.WriteLine($"Launching on Session {sessionID} in {Directory.GetCurrentDirectory()} ...", "WRAPPER", Log.LogType.ExternalProcess);
+            Log.WriteLine($"Launching on different session ...", "WRAPPER", Log.LogType.ExternalProcess);
             Log.WriteLine($"{executable} {arguments.Trim()}", "WRAPPER", Log.LogType.ExternalProcess);
 
-            uint processId =  Platform.Win32.StartProcessOnSession(
-                sessionID, executable, $"{executable} {arguments}", Directory.GetCurrentDirectory());
+            uint processId =  Platform.Win32.StartProcessAsCurrentUser2(executable, $"{executable} {arguments}", Directory.GetCurrentDirectory(), interactive);
 
             Process process;
             try
@@ -163,7 +168,7 @@ namespace K9.Unity.Verbs
             // Early out on the return
             if (!shouldCleanupLog || !File.Exists(logFilePath))
             {
-                return process.ExitCode;
+                return 0;
             }
 
             // Try to delete file, protecting against longer then expected locks
@@ -182,7 +187,7 @@ namespace K9.Unity.Verbs
             }
 
             // Finally return code
-            return process.ExitCode;
+            return 0;
         }
 
         private static void CaptureStream( StreamReader logStream )
