@@ -7,13 +7,9 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Runtime.Versioning;
-using System.Security.Principal;
 using System.Text;
-using System.Threading;
 using CommandLine;
 using K9.Services.Utils;
-using K9.Utils;
-
 
 namespace K9.Unity.Verbs
 {
@@ -21,6 +17,13 @@ namespace K9.Unity.Verbs
     public class Wrapper : IVerb
     {
         public bool Interactive { get; set; }
+
+        [Option("iusername", Required = false, HelpText = "The user to impersonate (Windows Only).")]
+        public string Username { get; set; }
+        [Option("ipassword", Required = false, HelpText = "The password of the user to impersonate (Windows Only).")]
+        public string Password { get; set; }
+        [Option("idomain", Required = false, HelpText = "The domain of the user to impersonate (Windows Only).")]
+        public string Domain { get; set; }
 
         private List<string> _workingArguments;
         private string _executablePath;
@@ -38,10 +41,31 @@ namespace K9.Unity.Verbs
                 Interactive = true;
                 _workingArguments.Remove("--interactive");
             }
+
             if (_workingArguments.Contains("-i"))
             {
                 Interactive = true;
                 _workingArguments.Remove("-i");
+            }
+
+            int workingArgumentCount = _workingArguments.Count;
+            for (int i = workingArgumentCount - 1; i >= 0; i--)
+            {
+                if (_workingArguments[i] == "--iusername")
+                {
+                    _workingArguments.RemoveAt(i+1);
+                    _workingArguments.RemoveAt(i);
+                }
+                if (_workingArguments[i] == "--ipassword")
+                {
+                    _workingArguments.RemoveAt(i+1);
+                    _workingArguments.RemoveAt(i);
+                }
+                if (_workingArguments[i] == "--idomain")
+                {
+                    _workingArguments.RemoveAt(i+1);
+                    _workingArguments.RemoveAt(i);
+                }
             }
 
             _executablePath = _workingArguments[0];
@@ -76,7 +100,7 @@ namespace K9.Unity.Verbs
             return (exitCode == 0);
         }
 
-        public static int LaunchUnity(string executable, string arguments, bool interactive, string logFilePath = null, bool shouldCleanupLog = false)
+        public int LaunchUnity(string executable, string arguments, bool interactive, string logFilePath = null, bool shouldCleanupLog = false)
         {
             string trimmedArguments = arguments.Trim();
             if (string.IsNullOrEmpty(logFilePath))
@@ -85,19 +109,30 @@ namespace K9.Unity.Verbs
                 shouldCleanupLog = true;
             }
 
-            Process process = PlatformUtil.IsWindows()
-                ?
+            Process process = null;
+            if (interactive && PlatformUtil.IsWindows() &&
+                !string.IsNullOrEmpty(Username) && !string.IsNullOrEmpty(Password))
+            {
 #pragma warning disable CA1416
-                //StartPowerShell(executable, trimmedArguments, interactive, logFilePath) :
-                StartProcessDifferentSession(executable, trimmedArguments, interactive, logFilePath) :
+                Platform.Windows.Impersonate.RunImpersonated(Username, Domain, Password, () => {
+                    Log.WriteLine($"Impersonating {Username} ...", "WRAPPER", Log.LogType.ExternalProcess);
+                    process = StartProcess(executable, trimmedArguments, true, logFilePath);
+                });
+
+                //StartProcessDifferentSession(executable, trimmedArguments, true, logFilePath) :
 #pragma warning restore CA1416
-                StartProcess(executable, trimmedArguments, interactive, logFilePath);
+            }
+            else
+            {
+                process = StartProcess(executable, trimmedArguments, interactive, logFilePath);
+            }
 
             if (process == null)
             {
                 Log.WriteLine("No process found", "WRAPPER", Log.LogType.Error);
                 return -1;
             }
+
             return WatchProcess(process, logFilePath, shouldCleanupLog);
         }
 
@@ -121,9 +156,8 @@ namespace K9.Unity.Verbs
             return process;
         }
 
-
         [SupportedOSPlatform("windows")]
-        private static Process StartProcessDifferentSession(string executable, string arguments, bool interactive,
+        private static Process StartProcessDifferentSession(string username, string domain, string password, string executable, string arguments, bool interactive,
             string logFilePath)
         {
             if (!interactive)
@@ -133,7 +167,8 @@ namespace K9.Unity.Verbs
             Log.WriteLine($"Launching on different session ...", "WRAPPER", Log.LogType.ExternalProcess);
             Log.WriteLine($"{executable} {arguments.Trim()}", "WRAPPER", Log.LogType.ExternalProcess);
 
-            uint processId =  Platform.Win32.StartProcessAsCurrentUser2(executable, $"{executable} {arguments}", Directory.GetCurrentDirectory(), interactive);
+
+            uint processId =  Platform.Windows.Impersonate.StartProcessAsUser(username, domain, password, executable, $"{executable} {arguments}", Directory.GetCurrentDirectory(), interactive);
 
             Process process;
             try
@@ -147,6 +182,7 @@ namespace K9.Unity.Verbs
             }
             return process;
         }
+
 
         private static int WatchProcess(Process process, string logFilePath, bool shouldCleanupLog)
         {
