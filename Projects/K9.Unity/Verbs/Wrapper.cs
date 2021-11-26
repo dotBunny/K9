@@ -6,26 +6,14 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
-using System.Runtime.Versioning;
 using System.Text;
 using CommandLine;
-using K9.Platform;
-using K9.Services.Utils;
 
 namespace K9.Unity.Verbs
 {
     [Verb("Wrapper")]
     public class Wrapper : IVerb
     {
-        public bool Interactive { get; set; }
-
-        [Option("iusername", Required = false, HelpText = "The user to impersonate (Windows Only).")]
-        public string Username { get; set; }
-        [Option("ipassword", Required = false, HelpText = "The password of the user to impersonate (Windows Only).")]
-        public string Password { get; set; }
-        [Option("idomain", Required = false, HelpText = "The domain of the user to impersonate (Windows Only).")]
-        public string Domain { get; set; }
-
         private List<string> _workingArguments;
         private string _executablePath;
 
@@ -36,39 +24,6 @@ namespace K9.Unity.Verbs
 
             // Remove verb
             _workingArguments.RemoveAt(0);
-
-            if (_workingArguments.Contains("--interactive"))
-            {
-                Interactive = true;
-                _workingArguments.Remove("--interactive");
-            }
-
-            if (_workingArguments.Contains("-i"))
-            {
-                Interactive = true;
-                _workingArguments.Remove("-i");
-            }
-
-            int workingArgumentCount = _workingArguments.Count;
-            for (int i = workingArgumentCount - 1; i >= 0; i--)
-            {
-                if (_workingArguments[i] == "--iusername")
-                {
-                    _workingArguments.RemoveAt(i+1);
-                    _workingArguments.RemoveAt(i);
-                }
-                if (_workingArguments[i] == "--ipassword")
-                {
-                    _workingArguments.RemoveAt(i+1);
-                    _workingArguments.RemoveAt(i);
-                }
-                if (_workingArguments[i] == "--idomain")
-                {
-                    _workingArguments.RemoveAt(i+1);
-                    _workingArguments.RemoveAt(i);
-                }
-            }
-
             _executablePath = _workingArguments[0];
             _workingArguments.RemoveAt(0);
 
@@ -96,12 +51,12 @@ namespace K9.Unity.Verbs
                 }
                 arguments.Append(' ');
             }
-            int exitCode = LaunchUnity(_executablePath, arguments.ToString(), Interactive);
+            int exitCode = LaunchUnity(_executablePath, arguments.ToString());
             Core.UpdateExitCode(exitCode);
             return (exitCode == 0);
         }
 
-        public int LaunchUnity(string executable, string arguments, bool interactive, string logFilePath = null, bool shouldCleanupLog = false)
+        public int LaunchUnity(string executable, string arguments, string logFilePath = null, bool shouldCleanupLog = false)
         {
             string trimmedArguments = arguments.Trim();
             if (string.IsNullOrEmpty(logFilePath))
@@ -110,21 +65,7 @@ namespace K9.Unity.Verbs
                 shouldCleanupLog = true;
             }
 
-            Process process = null;
-            if (interactive && PlatformUtil.IsWindows() &&
-                !string.IsNullOrEmpty(Username) && !string.IsNullOrEmpty(Password))
-            {
-#pragma warning disable CA1416
-                Win32.RunImpersonated(Username, Domain, Password, () => {
-                    Log.WriteLine($"Impersonating {Username} ...", "WRAPPER", Log.LogType.ExternalProcess);
-                    process = StartProcess(executable, trimmedArguments, true, logFilePath);
-                });
-#pragma warning restore CA1416
-            }
-            else
-            {
-                process = StartProcess(executable, trimmedArguments, interactive, logFilePath);
-            }
+            Process process = StartProcess(executable, trimmedArguments, logFilePath);
 
             if (process == null)
             {
@@ -132,33 +73,6 @@ namespace K9.Unity.Verbs
                 return -1;
             }
 
-            return WatchProcess(process, logFilePath, shouldCleanupLog);
-        }
-
-        private static Process StartProcess(string executable, string arguments, bool interactive, string logFilePath)
-        {
-            string passthroughArguments = $"{arguments} -logFile {logFilePath}";
-
-            Process process = new();
-            process.StartInfo.WorkingDirectory = Directory.GetCurrentDirectory();
-            process.StartInfo.FileName = executable;
-            process.StartInfo.WindowStyle = interactive ? ProcessWindowStyle.Normal : ProcessWindowStyle.Hidden;
-            process.StartInfo.ErrorDialog = false;
-            process.StartInfo.Arguments = passthroughArguments;
-            process.StartInfo.CreateNoWindow = !interactive;
-            process.StartInfo.UseShellExecute = interactive;
-            process.StartInfo.Verb = interactive ? "runas" : string.Empty;
-
-            Log.WriteLine($"Launching ...", "WRAPPER", Log.LogType.ExternalProcess);
-            Log.WriteLine($"{process.StartInfo.FileName} {process.StartInfo.Arguments}", "WRAPPER", Log.LogType.ExternalProcess);
-
-            process.Start();
-            return process;
-        }
-
-
-        private static int WatchProcess(Process process, string logFilePath, bool shouldCleanupLog)
-        {
             using FileStream stream = File.Open( logFilePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite );
             using StreamReader reader = new ( stream );
             while ( !process.HasExited )
@@ -177,7 +91,7 @@ namespace K9.Unity.Verbs
             // Early out on the return
             if (!shouldCleanupLog || !File.Exists(logFilePath))
             {
-                return 0;
+                return process.ExitCode;
             }
 
             // Try to delete file, protecting against longer then expected locks
@@ -196,7 +110,26 @@ namespace K9.Unity.Verbs
             }
 
             // Finally return code
-            return 0;
+            return process.ExitCode;
+        }
+
+        private static Process StartProcess(string executable, string arguments, string logFilePath)
+        {
+            string passthroughArguments = $"{arguments} -logFile {logFilePath}";
+
+            Process process = new();
+            process.StartInfo.WorkingDirectory = Directory.GetCurrentDirectory();
+            process.StartInfo.FileName = executable;
+            process.StartInfo.WindowStyle = ProcessWindowStyle.Normal;
+            process.StartInfo.ErrorDialog = false;
+            process.StartInfo.Arguments = passthroughArguments;
+            process.StartInfo.CreateNoWindow = false;
+
+            Log.WriteLine($"Launching ...", "WRAPPER", Log.LogType.ExternalProcess);
+            Log.WriteLine($"{process.StartInfo.FileName} {process.StartInfo.Arguments}", "WRAPPER", Log.LogType.ExternalProcess);
+
+            process.Start();
+            return process;
         }
 
         private static void CaptureStream( StreamReader logStream )
