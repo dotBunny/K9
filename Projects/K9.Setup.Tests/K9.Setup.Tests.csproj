@@ -6,6 +6,8 @@
     <IsPackable>false</IsPackable>
 
     <RepositoryUrl>https://github.com/dotBunny/K9</RepositoryUrl>
+
+    <OutputType>Library</OutputType>
   </PropertyGroup>
 
   <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">

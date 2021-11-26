@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2018-2021 dotBunny Inc.
+// Copyright (c) 2018-2021 dotBunny Inc.
 // dotBunny licenses this file to you under the BSL-1.0 license.
 // See the LICENSE file in the project root for more information.
 
@@ -8,7 +8,6 @@ using System.Diagnostics;
 using System.IO;
 using System.Text;
 using CommandLine;
-using K9.Services.Utils;
 
 namespace K9.Unity.Verbs
 {
@@ -25,8 +24,6 @@ namespace K9.Unity.Verbs
 
             // Remove verb
             _workingArguments.RemoveAt(0);
-
-            // Get executable
             _executablePath = _workingArguments[0];
             _workingArguments.RemoveAt(0);
 
@@ -54,23 +51,73 @@ namespace K9.Unity.Verbs
                 }
                 arguments.Append(' ');
             }
-
-            int exitCode = WrapUnity(_executablePath, arguments.ToString());
+            int exitCode = LaunchUnity(_executablePath, arguments.ToString());
             Core.UpdateExitCode(exitCode);
             return (exitCode == 0);
         }
 
-        public static int WrapUnity(string executable, string arguments, string logFilePath = null, bool shouldCleanupLog = false)
+        public int LaunchUnity(string executable, string arguments, string logFilePath = null, bool shouldCleanupLog = false)
         {
+            string trimmedArguments = arguments.Trim();
             if (string.IsNullOrEmpty(logFilePath))
             {
                 logFilePath = Path.GetTempFileName();
                 shouldCleanupLog = true;
             }
-            string passthroughArguments = $"{arguments.TrimEnd()} -logFile {logFilePath}";
+
+            Process process = StartProcess(executable, trimmedArguments, logFilePath);
+
+            if (process == null)
+            {
+                Log.WriteLine("No process found", "WRAPPER", Log.LogType.Error);
+                return -1;
+            }
+
+            using FileStream stream = File.Open( logFilePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite );
+            using StreamReader reader = new ( stream );
+            while ( !process.HasExited )
+            {
+                CaptureStream( reader );
+                System.Threading.Thread.Sleep( 500 );
+            }
+
+            System.Threading.Thread.Sleep( 500 );
+            CaptureStream( reader );
+
+            // We dont need it any
+            reader.Close();
+            stream.Close();
+
+            // Early out on the return
+            if (!shouldCleanupLog || !File.Exists(logFilePath))
+            {
+                return process.ExitCode;
+            }
+
+            // Try to delete file, protecting against longer then expected locks
+            for (int i=0; i< 5; i++ )
+            {
+                try
+                {
+                    File.Delete( logFilePath );
+                    break;
+                }
+                catch ( Exception)
+                {
+                    Log.WriteLine($"Unable to delete {logFilePath} ({i}).", "WRAPPER", Log.LogType.Notice);
+                    System.Threading.Thread.Sleep( 1000 );
+                }
+            }
+
+            // Finally return code
+            return process.ExitCode;
+        }
+
+        private static Process StartProcess(string executable, string arguments, string logFilePath)
+        {
+            string passthroughArguments = $"{arguments} -logFile {logFilePath}";
 
             Process process = new();
-
             process.StartInfo.WorkingDirectory = Directory.GetCurrentDirectory();
             process.StartInfo.FileName = executable;
             process.StartInfo.WindowStyle = ProcessWindowStyle.Normal;
@@ -78,56 +125,20 @@ namespace K9.Unity.Verbs
             process.StartInfo.Arguments = passthroughArguments;
             process.StartInfo.CreateNoWindow = false;
 
-            if (PlatformUtil.IsWindows())
-            {
-#pragma warning disable CA1416
-                process.StartInfo.LoadUserProfile = true;
-#pragma warning restore CA1416
-            }
-
-            Log.WriteLine($"Launching Unity in {process.StartInfo.WorkingDirectory} ...", "WRAPPER", Log.LogType.ExternalProcess);
-
+            Log.WriteLine($"Launching ...", "WRAPPER", Log.LogType.ExternalProcess);
             Log.WriteLine($"{process.StartInfo.FileName} {process.StartInfo.Arguments}", "WRAPPER", Log.LogType.ExternalProcess);
 
-
             process.Start();
-
-            using FileStream stream = File.Open( logFilePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite );
-            using StreamReader reader = new ( stream );
-            while ( !process.HasExited )
-            {
-                StandardOutput( reader );
-                System.Threading.Thread.Sleep( 500 );
-            }
-
-            System.Threading.Thread.Sleep( 500 );
-            StandardOutput( reader );
-
-            if (shouldCleanupLog)
-            {
-                for (int i=0; i< 5; i++ )
-                {
-                    try
-                    {
-                        File.Delete( logFilePath );
-                        break;
-                    }
-                    catch ( Exception)
-                    {
-                        Log.WriteLine($"Unable to delete {logFilePath} ({i}).", "WRAPPER", Log.LogType.Notice);
-                        System.Threading.Thread.Sleep( 1000 );
-                    }
-                }
-            }
-
-            return process.ExitCode;
+            return process;
         }
 
-        private static void StandardOutput( StreamReader logStream )
+        private static void CaptureStream( StreamReader logStream )
         {
             string content = logStream.ReadToEnd();
             if ( string.IsNullOrEmpty( content ) ) return;
             Log.Write(content, Log.LogType.ExternalProcess);
         }
     }
+
+
 }

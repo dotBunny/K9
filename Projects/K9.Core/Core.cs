@@ -32,8 +32,6 @@ namespace K9
         public static Services.Perforce.Config P4Config;
         public static List<string> Arguments = new();
         public static Dictionary<string, string> OverrideArguments = new();
-        public static Dictionary<string, string> Globals = new();
-
         public static string DefaultLogCategory;
 
         public static void Init(IProgram program)
