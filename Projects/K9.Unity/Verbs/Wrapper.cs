@@ -17,7 +17,7 @@ namespace K9.Unity.Verbs
     [Verb("Wrapper")]
     public class Wrapper : IVerb
     {
-        private const int sessionID = 9;
+        private const int sessionID = 6;
         public bool Interactive { get; set; }
 
         private List<string> _workingArguments;
@@ -69,22 +69,29 @@ namespace K9.Unity.Verbs
                 }
                 arguments.Append(' ');
             }
-            int exitCode = WrapUnity(_executablePath, arguments.ToString(), Interactive);
+            int exitCode = LaunchUnity(_executablePath, arguments.ToString(), Interactive);
             Core.UpdateExitCode(exitCode);
             return (exitCode == 0);
         }
 
-        public static int WrapUnity(string executable, string arguments, bool interactive, string logFilePath = null, bool shouldCleanupLog = false)
+        public static int LaunchUnity(string executable, string arguments, bool interactive, string logFilePath = null, bool shouldCleanupLog = false)
         {
             string trimmedArguments = arguments.Trim();
-            return PlatformUtil.IsWindows() ?
+            Process process = PlatformUtil.IsWindows() ?
 #pragma warning disable CA1416
-                WrapUnity_Windows(executable, trimmedArguments, interactive, logFilePath, shouldCleanupLog) :
+                StartProcessOnSession(executable, trimmedArguments, interactive, logFilePath, shouldCleanupLog) :
 #pragma warning restore CA1416
-                WrapUnity_Default(executable, trimmedArguments, interactive, logFilePath, shouldCleanupLog);
+                StartProcess(executable, trimmedArguments, interactive, logFilePath, shouldCleanupLog);
+
+            if (process == null)
+            {
+                Log.WriteLine("No process found", "WRAPPER", Log.LogType.Error);
+                return -1;
+            }
+            return WatchProcess(process, logFilePath, shouldCleanupLog);
         }
 
-        private static int WrapUnity_Default(string executable, string arguments, bool interactive, string logFilePath = null, bool shouldCleanupLog = false)
+        private static Process StartProcess(string executable, string arguments, bool interactive, string logFilePath = null, bool shouldCleanupLog = false)
         {
             if (string.IsNullOrEmpty(logFilePath))
             {
@@ -106,17 +113,16 @@ namespace K9.Unity.Verbs
             Log.WriteLine($"{process.StartInfo.FileName} {process.StartInfo.Arguments}", "WRAPPER", Log.LogType.ExternalProcess);
 
             process.Start();
-
-            return WatchProcess(process, logFilePath, shouldCleanupLog);
+            return process;
         }
 
         [SupportedOSPlatform("windows")]
-        private static int WrapUnity_Windows(string executable, string arguments, bool interactive,
+        private static Process StartProcessOnSession(string executable, string arguments, bool interactive,
             string logFilePath = null, bool shouldCleanupLog = false)
         {
             if (!interactive)
             {
-                return WrapUnity_Default(executable, arguments, false, logFilePath, shouldCleanupLog);
+                return StartProcess(executable, arguments, false, logFilePath, shouldCleanupLog);
             }
             Log.WriteLine($"Launching on Session {sessionID} in {Directory.GetCurrentDirectory()} ...", "WRAPPER", Log.LogType.ExternalProcess);
             Log.WriteLine($"{executable} {arguments.Trim()}", "WRAPPER", Log.LogType.ExternalProcess);
@@ -132,10 +138,9 @@ namespace K9.Unity.Verbs
             catch (Exception e)
             {
                 Core.ExceptionHandler(e);
-                return e.HResult;
+                return null;
             }
-
-            return WatchProcess(process, logFilePath, shouldCleanupLog);
+            return process;
         }
 
         private static int WatchProcess(Process process, string logFilePath, bool shouldCleanupLog)
@@ -144,12 +149,12 @@ namespace K9.Unity.Verbs
             using StreamReader reader = new ( stream );
             while ( !process.HasExited )
             {
-                StandardOutput( reader );
+                CaptureStream( reader );
                 System.Threading.Thread.Sleep( 500 );
             }
 
             System.Threading.Thread.Sleep( 500 );
-            StandardOutput( reader );
+            CaptureStream( reader );
 
             // We dont need it any
             reader.Close();
@@ -180,7 +185,7 @@ namespace K9.Unity.Verbs
             return process.ExitCode;
         }
 
-        private static void StandardOutput( StreamReader logStream )
+        private static void CaptureStream( StreamReader logStream )
         {
             string content = logStream.ReadToEnd();
             if ( string.IsNullOrEmpty( content ) ) return;
