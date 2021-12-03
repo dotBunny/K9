@@ -47,10 +47,8 @@ namespace K9.Unity.Verbs
         /// <inheritdoc />
         public bool Execute()
         {
-            if (_cachedManifest.Dependencies.ContainsKey(ID))
+            if (_cachedManifest.Remove(ID))
             {
-                _cachedManifest.Dependencies.Remove(ID);
-
                 System.IO.File.WriteAllText(Manifest, JsonConvert.SerializeObject(_cachedManifest, Formatting.Indented));
             }
             return true;
