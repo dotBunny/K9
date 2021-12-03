@@ -69,18 +69,46 @@ namespace K9
                         }
                         else
                         {
-                            // We actually need to do something to upgrade this repo
-                            Log.WriteLine($"Checking {ID}.", "CHECKOUT");
+                            // Get status of the repository
                             ProcessUtil.ExecuteProcess("git.exe", outputPath,
-                                Git.ResetArguments, null, Line =>
+                                Git.CheckArguments, null, Line =>
                                 {
-                                    Log.WriteLine(Line, "GIT");
+                                    Log.WriteLine(Line, "GIT", Log.LogType.ExternalProcess);
+                                    output.Add(Line);
                                 });
-                            ProcessUtil.ExecuteProcess("git.exe", outputPath,
-                                Git.UpdateArguments, null, Line =>
+
+                            bool foundAnything = false;
+                            foreach (string s in output)
+                            {
+                                if (!string.IsNullOrEmpty(s))
                                 {
-                                    Log.WriteLine(Line, "GIT");
-                                });
+                                    foundAnything = true;
+                                    break;
+                                }
+                            }
+
+                            // Clear our cached output
+                            output.Clear();
+
+                            if (!foundAnything)
+                            {
+                                Log.WriteLine($"{ID} is up-to-date.", "CHECKOUT");
+                            }
+                            else
+                            {
+                                // We actually need to do something to upgrade this repo
+                                Log.WriteLine($"{ID} needs updating.", "CHECKOUT");
+                                ProcessUtil.ExecuteProcess("git.exe", outputPath,
+                                    Git.ResetArguments, null, Line =>
+                                    {
+                                        Log.WriteLine(Line, "GIT");
+                                    });
+                                ProcessUtil.ExecuteProcess("git.exe", outputPath,
+                                    Git.UpdateArguments, null, Line =>
+                                    {
+                                        Log.WriteLine(Line, "GIT");
+                                    });
+                            }
                         }
                         break;
                 }
