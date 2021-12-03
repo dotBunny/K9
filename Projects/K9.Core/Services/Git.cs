@@ -11,7 +11,10 @@ namespace K9.Services
         public const string ResetArguments = "reset --hard";
         public const string UpdateArguments = "pull";
 
-        public const string CheckArguments = "fetch --dry-run";
+        /// <summary>
+        /// Output what would happen, but dont actually do it
+        /// </summary>
+        public const string PullDryRunArguments = "fetch --dry-run";
 
     }
 }

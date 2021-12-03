@@ -71,7 +71,7 @@ namespace K9
                         {
                             // Get status of the repository
                             ProcessUtil.ExecuteProcess("git.exe", outputPath,
-                                Git.CheckArguments, null, Line =>
+                                Git.PullDryRunArguments, null, Line =>
                                 {
                                     Log.WriteLine(Line, "GIT", Log.LogType.ExternalProcess);
                                     output.Add(Line);
