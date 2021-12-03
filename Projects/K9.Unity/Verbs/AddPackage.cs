@@ -50,15 +50,7 @@ namespace K9.Unity.Verbs
         /// <inheritdoc />
         public bool Execute()
         {
-            if (_cachedManifest.Dependencies.ContainsKey(ID))
-            {
-                _cachedManifest.Dependencies[ID] = URI;
-            }
-            else
-            {
-                _cachedManifest.Dependencies.Add(ID,URI);
-            }
-
+            _cachedManifest.AddOrUpdate(ID, URI);
             System.IO.File.WriteAllText(Manifest, JsonConvert.SerializeObject(_cachedManifest, Formatting.Indented));
             return true;
         }
