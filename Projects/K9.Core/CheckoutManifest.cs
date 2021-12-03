@@ -69,52 +69,18 @@ namespace K9
                         }
                         else
                         {
+                            // We actually need to do something to upgrade this repo
+                            Log.WriteLine($"Checking {ID}.", "CHECKOUT");
+                            ProcessUtil.ExecuteProcess("git.exe", outputPath,
+                                Git.ResetArguments, null, Line =>
+                                {
+                                    Log.WriteLine(Line, "GIT");
+                                });
                             ProcessUtil.ExecuteProcess("git.exe", outputPath,
                                 Git.UpdateArguments, null, Line =>
                                 {
                                     Log.WriteLine(Line, "GIT");
                                 });
-
-                            // Get status of the repository
-                            ProcessUtil.ExecuteProcess("git.exe", outputPath,
-                                Git.StatusArguments, null, Line =>
-                                {
-                                    Log.WriteLine(Line, "GIT", Log.LogType.ExternalProcess);
-                                    output.Add(Line);
-                                });
-
-                            bool foundKeywords = false;
-                            foreach (string s in output)
-                            {
-                                if (s.Contains(Git.StatusAlreadyUpToDate) || s.Contains(Git.StatusBranchUpToDate))
-                                {
-                                    foundKeywords = true;
-                                    break;
-                                }
-                            }
-
-                            // Clear our cached output
-                            output.Clear();
-
-                            if (foundKeywords)
-                            {
-                                Log.WriteLine($"{ID} is up-to-date.", "CHECKOUT");
-                            }
-                            else
-                            {
-                                // We actually need to do something to upgrade this repo
-                                Log.WriteLine($"{ID} needs updating.", "CHECKOUT");
-                                ProcessUtil.ExecuteProcess("git.exe", outputPath,
-                                    Git.ResetArguments, null, Line =>
-                                    {
-                                        Log.WriteLine(Line, "GIT");
-                                    });
-                                ProcessUtil.ExecuteProcess("git.exe", outputPath,
-                                    Git.UpdateArguments, null, Line =>
-                                    {
-                                        Log.WriteLine(Line, "GIT");
-                                    });
-                            }
                         }
                         break;
                 }

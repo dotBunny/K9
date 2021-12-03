@@ -12,6 +12,9 @@ namespace K9.Services
         public const string ResetArguments = "reset --hard";
         public const string UpdateArguments = "pull";
 
+        public const string StatusFastForwarded = "Fast-forward";
+        public const string StatusInsertions = "insertions";
+        public const string StatusFileChanged = "file changed";
         public const string StatusAlreadyUpToDate = "Already up-to-date";
         public const string StatusBranchUpToDate = "Your branch is up to date with";
 
