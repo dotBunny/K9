@@ -70,8 +70,13 @@ namespace K9
                         else
                         {
                             // Get status of the repository
+                            ProcessUtil.ExecuteProcess("git.exe", basePath,
+                                $"{Git.UpdateOriginArguments} {URI} {outputPath}", null, Line =>
+                                {
+                                    Log.WriteLine(Line, "GIT", Log.LogType.ExternalProcess);
+                                });
                             ProcessUtil.ExecuteProcess("git.exe", outputPath,
-                                Git.PullDryRunArguments, null, Line =>
+                                Git.StatusArguments, null, Line =>
                                 {
                                     Log.WriteLine(Line, "GIT", Log.LogType.ExternalProcess);
                                     output.Add(Line);
@@ -80,7 +85,7 @@ namespace K9
                             bool foundAnything = false;
                             foreach (string s in output)
                             {
-                                if (!string.IsNullOrEmpty(s))
+                                if (s.Contains(Git.AlreadyUpToDateMessage) || s.Contains(Git.BranchUpToDateMessage))
                                 {
                                     foundAnything = true;
                                     break;
@@ -90,7 +95,7 @@ namespace K9
                             // Clear our cached output
                             output.Clear();
 
-                            if (!foundAnything)
+                            if (foundAnything)
                             {
                                 Log.WriteLine($"{ID} is up-to-date.", "CHECKOUT");
                             }

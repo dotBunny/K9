@@ -11,9 +11,11 @@ namespace K9.Services
         public const string ResetArguments = "reset --hard";
         public const string UpdateArguments = "pull";
 
-        /// <summary>
-        /// Output what would happen, but dont actually do it
-        /// </summary>
+        public const string UpdateOriginArguments = "fetch origin";
+        public const string StatusArguments = "status -uno --long";
+
+        public const string AlreadyUpToDateMessage = "Already up-to-date";
+        public const string BranchUpToDateMessage = "Your branch is up to date with 'origin/main'";
         public const string PullDryRunArguments = "fetch --dry-run";
 
     }
