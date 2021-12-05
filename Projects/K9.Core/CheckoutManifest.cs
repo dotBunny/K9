@@ -43,77 +43,20 @@ namespace K9
 
             public bool Checkout(string basePath)
             {
-                var outputPath = System.IO.Path.Combine(basePath, Path);
-                Log.WriteLine($"{ID} ({this}) => {outputPath}.", "CHECKOUT");
-
-                // Check current
-                List<string> output = new ();
-
+                var checkoutFolder = System.IO.Path.Combine(basePath, Path);
+                Log.WriteLine($"{ID} ({this}) => {checkoutFolder}.", "CHECKOUT");
                 switch (Type)
                 {
                     case CheckoutManifestItemType.Git:
 
                         // The output folder does not exist, so we can just do a straight clone
-                        if (!System.IO.Directory.Exists(outputPath))
+                        if (!System.IO.Directory.Exists(checkoutFolder))
                         {
-                            ProcessUtil.ExecuteProcess("git.exe", basePath,
-                                $"{Git.CloneArguments} {URI} {outputPath}", null, Line =>
-                                {
-                                    Log.WriteLine(Line, "GIT", Log.LogType.ExternalProcess);
-                                });
-                            ProcessUtil.ExecuteProcess("git.exe", outputPath,
-                                $"{Git.SwitchBranchArguments} {Branch}", null, Line =>
-                                {
-                                    Log.WriteLine(Line, "GIT", Log.LogType.ExternalProcess);
-                                });
+                           Git.CheckoutRepo(URI, checkoutFolder, Branch);
                         }
                         else
                         {
-                            // Get status of the repository
-                            ProcessUtil.ExecuteProcess("git.exe", basePath,
-                                $"{Git.UpdateOriginArguments} {URI} {outputPath}", null, Line =>
-                                {
-                                    Log.WriteLine(Line, "GIT", Log.LogType.ExternalProcess);
-                                });
-                            ProcessUtil.ExecuteProcess("git.exe", outputPath,
-                                Git.StatusArguments, null, Line =>
-                                {
-                                    Log.WriteLine(Line, "GIT", Log.LogType.ExternalProcess);
-                                    output.Add(Line);
-                                });
-
-                            bool foundAnything = false;
-                            foreach (string s in output)
-                            {
-                                if (s.Contains(Git.AlreadyUpToDateMessage) || s.Contains(Git.BranchUpToDateMessage))
-                                {
-                                    foundAnything = true;
-                                    break;
-                                }
-                            }
-
-                            // Clear our cached output
-                            output.Clear();
-
-                            if (foundAnything)
-                            {
-                                Log.WriteLine($"{ID} is up-to-date.", "CHECKOUT");
-                            }
-                            else
-                            {
-                                // We actually need to do something to upgrade this repo
-                                Log.WriteLine($"{ID} needs updating.", "CHECKOUT");
-                                ProcessUtil.ExecuteProcess("git.exe", outputPath,
-                                    Git.ResetArguments, null, Line =>
-                                    {
-                                        Log.WriteLine(Line, "GIT");
-                                    });
-                                ProcessUtil.ExecuteProcess("git.exe", outputPath,
-                                    Git.UpdateArguments, null, Line =>
-                                    {
-                                        Log.WriteLine(Line, "GIT");
-                                    });
-                            }
+                            Git.UpdateRepo(checkoutFolder);
                         }
                         break;
                 }
