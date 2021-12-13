@@ -10,23 +10,49 @@ namespace K9.Services
 {
     public static class Git
     {
-        public const string CloneArguments = "clone";
-        public const string SwitchBranchArguments = "checkout";
-        public const string ResetArguments = "reset --hard";
-        public const string UpdateArguments = "pull";
+        public static string GetRemote(string checkoutFolder)
+        {
+            string output = null;
+            ProcessUtil.ExecuteProcess("git.exe", checkoutFolder,
+                "status -sb", null, Line =>
+                {
+                    if (!string.IsNullOrEmpty(Line))
+                    {
+                        output = Line;
+                    }
+                });
 
-        public const string UpdateOriginArguments = "fetch origin";
-        public const string StatusArguments = "status -uno --long";
+            if (!string.IsNullOrEmpty(output))
+            {
+                string[] parts = output.Split(' ')[1].Split("...");
+                return parts[1];
+            }
+            return null;
+        }
+        public static string GetBranch(string checkoutFolder)
+        {
+            string output = null;
+            ProcessUtil.ExecuteProcess("git.exe", checkoutFolder,
+                "status -sb", null, Line =>
+                {
+                    if (!string.IsNullOrEmpty(Line))
+                    {
+                        output = Line;
+                    }
+                });
 
-        public const string AlreadyUpToDateMessage = "Already up-to-date";
-        public const string BranchUpToDateMessage = "Your branch is up to date with 'origin/main'";
-        public const string PullDryRunArguments = "fetch --dry-run";
-
+            if (!string.IsNullOrEmpty(output))
+            {
+                string[] parts = output.Split(' ')[1].Split("...");
+                return parts[0];
+            }
+            return null;
+        }
 
         public static void CheckoutRepo(string uri, string checkoutFolder, string branch = null)
         {
             ProcessUtil.ExecuteProcess("git.exe", Directory.GetParent(checkoutFolder).GetPathWithCorrectCase(),
-                $"{Git.CloneArguments} {uri} {checkoutFolder}", null, Line =>
+                $"clone {uri} {checkoutFolder}", null, Line =>
                 {
                     Log.WriteLine(Line, "GIT", Log.LogType.ExternalProcess);
                 });
@@ -34,7 +60,7 @@ namespace K9.Services
             if (!string.IsNullOrEmpty(branch))
             {
                 ProcessUtil.ExecuteProcess("git.exe", checkoutFolder,
-                    $"{Git.SwitchBranchArguments} {branch}", null, Line =>
+                    $"checkout {branch}", null, Line =>
                     {
                         Log.WriteLine(Line, "GIT", Log.LogType.ExternalProcess);
                     });
@@ -48,12 +74,12 @@ namespace K9.Services
 
             // Get status of the repository
             ProcessUtil.ExecuteProcess("git.exe", checkoutFolder,
-                $"{Git.UpdateOriginArguments} {checkoutFolder}", null, Line =>
+                $"fetch origin {checkoutFolder}", null, Line =>
                 {
                     Log.WriteLine(Line, "GIT", Log.LogType.ExternalProcess);
                 });
             ProcessUtil.ExecuteProcess("git.exe", checkoutFolder,
-                Git.StatusArguments, null, Line =>
+                "status -uno --long", null, Line =>
                 {
                     Log.WriteLine(Line, "GIT", Log.LogType.ExternalProcess);
                     output.Add(Line);
@@ -63,7 +89,7 @@ namespace K9.Services
             bool fastForward = false;
             foreach (string s in output)
             {
-                if (s.Contains("branch is beind"))
+                if (s.Contains("branch is behind"))
                 {
                     branchBehind = true;
                 }
@@ -80,12 +106,12 @@ namespace K9.Services
                 Log.WriteLine($"{checkoutFolder} needs updating, resetting as it could not be cleanly updated.", "CHECKOUT");
 
                 ProcessUtil.ExecuteProcess("git.exe", checkoutFolder,
-                    Git.ResetArguments, null, Line =>
+                    "reset --hard", null, Line =>
                     {
                         Log.WriteLine(Line, "GIT");
                     });
                 ProcessUtil.ExecuteProcess("git.exe", checkoutFolder,
-                    Git.UpdateArguments, null, Line =>
+                    "pull", null, Line =>
                     {
                         Log.WriteLine(Line, "GIT");
                     });
@@ -96,7 +122,7 @@ namespace K9.Services
                 Log.WriteLine($"Fast-forwarding {checkoutFolder}.", "CHECKOUT");
 
                 ProcessUtil.ExecuteProcess("git.exe", checkoutFolder,
-                    Git.UpdateArguments, null, Line =>
+                    "pull", null, Line =>
                     {
                         Log.WriteLine(Line, "GIT");
                     });
