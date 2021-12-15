@@ -57,7 +57,7 @@ namespace K9
                         }
                         else
                         {
-                            Git.UpdateRepo(checkoutFolder);
+                            Git.UpdateRepo(checkoutFolder, false);
                         }
                         break;
                 }
