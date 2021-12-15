@@ -40,8 +40,8 @@ namespace K9.Unity.Verbs
 
         private bool CheckManifests()
         {
-            _cachedUnityManifestContent ??= File.ReadAllText(UnityManifest);
-            _cachedManifest ??= JsonConvert.DeserializeObject<PackageManifest>(_cachedUnityManifestContent);
+            _cachedUnityManifestContent = File.ReadAllText(UnityManifest);
+            _cachedManifest = JsonConvert.DeserializeObject<PackageManifest>(_cachedUnityManifestContent);
 
             if (_cachedManifest == null)
             {
@@ -50,8 +50,8 @@ namespace K9.Unity.Verbs
                 return false;
             }
 
-            _cachedCheckoutManifestContent ??= File.ReadAllText(UnityManifest);
-            _cachedCheckoutManifest ??= JsonConvert.DeserializeObject<CheckoutManifest>(_cachedCheckoutManifestContent);
+            _cachedCheckoutManifestContent = File.ReadAllText(UnityManifest);
+            _cachedCheckoutManifest = JsonConvert.DeserializeObject<CheckoutManifest>(_cachedCheckoutManifestContent);
 
             if (_cachedCheckoutManifest == null)
             {
