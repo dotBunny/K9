@@ -49,6 +49,22 @@ namespace K9.Services
             return null;
         }
 
+        public static string GetLocalCommit(string checkoutFolder)
+        {
+            // Check current
+            List<string> output = new ();
+
+            // Get status of the repository
+            ProcessUtil.ExecuteProcess("git.exe", checkoutFolder,
+                $"rev-parse HEAD", null, Line =>
+                {
+                    Log.WriteLine(Line, "GIT", Log.LogType.ExternalProcess);
+                    output.Add(Line);
+                });
+
+            return output[0].Trim();
+        }
+
         public static void CheckoutRepo(string uri, string checkoutFolder, string branch = null)
         {
             ProcessUtil.ExecuteProcess("git.exe", Directory.GetParent(checkoutFolder).GetPathWithCorrectCase(),
@@ -74,7 +90,7 @@ namespace K9.Services
 
             // Get status of the repository
             ProcessUtil.ExecuteProcess("git.exe", checkoutFolder,
-                $"fetch origin {checkoutFolder}", null, Line =>
+                $"fetch origin", null, Line =>
                 {
                     Log.WriteLine(Line, "GIT", Log.LogType.ExternalProcess);
                 });
