@@ -50,7 +50,7 @@ namespace K9.Unity.Verbs
                 return false;
             }
 
-            _cachedCheckoutManifestContent = File.ReadAllText(UnityManifest);
+            _cachedCheckoutManifestContent = File.ReadAllText(Remotes);
             _cachedCheckoutManifest = JsonConvert.DeserializeObject<CheckoutManifest>(_cachedCheckoutManifestContent);
 
             if (_cachedCheckoutManifest == null)

@@ -12,7 +12,6 @@ using Utilities;
 
 namespace K9
 {
-    [Serializable]
     public class CheckoutManifest
     {
         [JsonConverter(typeof(StringEnumConverter))]
@@ -24,7 +23,6 @@ namespace K9
         [JsonProperty("items")]
         public CheckoutManifestItem[] Items;
 
-        [Serializable]
         public class CheckoutManifestItem
         {
             /// <inheritdoc />
