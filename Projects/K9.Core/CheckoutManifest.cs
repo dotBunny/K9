@@ -15,12 +15,14 @@ namespace K9
     [Serializable]
     public class CheckoutManifest
     {
+        [JsonConverter(typeof(StringEnumConverter))]
         public enum CheckoutManifestItemType
         {
             Git = 0
         }
 
-        [JsonProperty("items")] public CheckoutManifestItem[] Items;
+        [JsonProperty("items")]
+        public CheckoutManifestItem[] Items;
 
         [Serializable]
         public class CheckoutManifestItem
@@ -36,7 +38,7 @@ namespace K9
             [JsonProperty("id")] public string ID;
             [JsonProperty("path")] public string Path;
 
-            [JsonConverter(typeof(StringEnumConverter))]
+
             [JsonProperty("type")]
             public CheckoutManifestItemType Type;
 
