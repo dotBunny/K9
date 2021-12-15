@@ -22,6 +22,7 @@ namespace K9
 
         [JsonProperty("items")] public CheckoutManifestItem[] Items;
 
+        [Serializable]
         public class CheckoutManifestItem
         {
             /// <inheritdoc />
