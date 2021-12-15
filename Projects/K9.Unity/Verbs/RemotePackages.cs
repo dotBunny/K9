@@ -69,8 +69,10 @@ namespace K9.Unity.Verbs
             string rootFolder = Path.GetDirectoryName(Remotes);
             string packagesFolder = Path.GetDirectoryName(UnityManifest);
 
+            Log.WriteLine("EXECUTING.", "REMOTE PACKAGE", Log.LogType.Info);
             foreach(CheckoutManifest.CheckoutManifestItem item in _cachedCheckoutManifest.Items)
             {
+                Log.WriteLine("ITEM.", "REMOTE PACKAGE", Log.LogType.Info);
                 string targetPath = Path.Combine(rootFolder, item.Path);
                 string relativePath = $"file:{Path.GetRelativePath(packagesFolder, targetPath)}";
 
