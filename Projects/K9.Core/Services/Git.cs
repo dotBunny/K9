@@ -4,6 +4,7 @@
 
 using System.Collections.Generic;
 using System.IO;
+using System.Text;
 using K9.Utils;
 
 namespace K9.Services
@@ -65,18 +66,76 @@ namespace K9.Services
             return output[0].Trim();
         }
 
-        public static void CheckoutRepo(string uri, string checkoutFolder, string branch = null)
+        public static void CheckoutRepo(string uri, string checkoutFolder, string branch = null, string commit = null, int depth = -1, bool submodules = true, bool shallowsubmodules = true)
         {
+            StringBuilder commandLineBuilder = new();
+            commandLineBuilder.Append("clone ");
+
+            // Was a branch defined?
+            if (branch != null)
+            {
+                commandLineBuilder.AppendFormat("--branch {0} --single-branch ", branch);
+            }
+
+            // Do we have a specific depth to go too?
+            if (depth != -1)
+            {
+                commandLineBuilder.AppendFormat("--depth {0} ", depth.ToString());
+            }
+
+            if (submodules)
+            {
+                commandLineBuilder.Append("--recurse-submodules --remote-submodules ");
+                if (shallowsubmodules)
+                {
+                    commandLineBuilder.Append("--shallow-submodules ");
+                }
+            }
+
+            Log.WriteLine($"{commandLineBuilder}{uri} {checkoutFolder}", "GIT");
             ProcessUtil.ExecuteProcess("git.exe", Directory.GetParent(checkoutFolder).GetPathWithCorrectCase(),
-                $"clone {uri} {checkoutFolder}", null, Line =>
+                $"{commandLineBuilder}{uri} {checkoutFolder}", null, Line =>
                 {
                     Log.WriteLine(Line, "GIT", Log.LogType.ExternalProcess);
                 });
 
-            if (!string.IsNullOrEmpty(branch))
+            // Was a commit specified?
+            if (commit != null)
             {
+                Log.WriteLine($"Checkout Commit {commit}", "GIT", Log.LogType.ExternalProcess);
                 ProcessUtil.ExecuteProcess("git.exe", checkoutFolder,
-                    $"checkout {branch}", null, Line =>
+                    $"checkout {commit}", null, Line =>
+                    {
+                        Log.WriteLine(Line, "GIT", Log.LogType.ExternalProcess);
+                    });
+            }
+        }
+
+        public static void InitializeSubmodules(string checkoutFolder)
+        {
+            Log.WriteLine("Initialize Submodules", "GIT", Log.LogType.ExternalProcess);
+            ProcessUtil.ExecuteProcess("git.exe", checkoutFolder,
+                $"submodule init", null, Line =>
+                {
+                    Log.WriteLine(Line, "GIT", Log.LogType.ExternalProcess);
+                });
+        }
+        public static void UpdateSubmodule(string checkoutFolder, string  submodule = null)
+        {
+            if (submodule != null)
+            {
+                Log.WriteLine($"Update Submodule [{submodule}]", "GIT", Log.LogType.ExternalProcess);
+                ProcessUtil.ExecuteProcess("git.exe", checkoutFolder,
+                    $"submodule update --remote {submodule}", null, Line =>
+                    {
+                        Log.WriteLine(Line, "GIT", Log.LogType.ExternalProcess);
+                    });
+            }
+            else
+            {
+                Log.WriteLine($"Update Submodules", "GIT", Log.LogType.ExternalProcess);
+                ProcessUtil.ExecuteProcess("git.exe", checkoutFolder,
+                    $"submodule update", null, Line =>
                     {
                         Log.WriteLine(Line, "GIT", Log.LogType.ExternalProcess);
                     });

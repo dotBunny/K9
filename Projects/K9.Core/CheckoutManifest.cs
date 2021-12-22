@@ -31,18 +31,34 @@ namespace K9
                 return $"{Type.ToString()}://{URI}/{Branch}#{Commit}";
             }
 
-            [JsonProperty("branch")] public string Branch;
-            [JsonProperty("commit")] public string Commit;
-            [JsonProperty("id")] public string ID;
-            [JsonProperty("path")] public string Path;
+            [JsonProperty("branch")]
+            public string Branch;
 
+            [JsonProperty("commit")]
+            public string Commit; // TODO: Support at commit checkouts
+
+            [JsonProperty("id")]
+            public string ID;
+
+            [JsonProperty("path")]
+            public string Path;
 
             [JsonProperty("type")]
             public CheckoutManifestItemType Type;
 
-            [JsonProperty("uri")] public string URI;
+            [JsonProperty("uri")]
+            public string URI;
 
-            public bool Checkout(string basePath)
+            [JsonProperty("sparse")]
+            public string[] SparseDefinitions;
+
+            [JsonProperty("submodules")]
+            public string[] Submodules;
+
+            [JsonProperty("mappings")]
+            public Dictionary<string, string> Mappings = new();
+
+            public bool Checkout(string basePath, int depth = 1)
             {
                 var checkoutFolder = System.IO.Path.Combine(basePath, Path);
                 Log.WriteLine($"{ID} ({this}) => {checkoutFolder}.", "CHECKOUT");
@@ -53,12 +69,47 @@ namespace K9
                         // The output folder does not exist, so we can just do a straight clone
                         if (!System.IO.Directory.Exists(checkoutFolder))
                         {
-                           Git.CheckoutRepo(URI, checkoutFolder, Branch);
+                            Git.CheckoutRepo(URI, checkoutFolder, Branch, Commit, depth, false);
+                            if (Submodules != null && Submodules.Length > 0)
+                            {
+                                Git.InitializeSubmodules(checkoutFolder);
+                                foreach (string s in Submodules)
+                                {
+                                    Git.UpdateSubmodule(System.IO.Path.Combine(checkoutFolder, s));
+                                }
+                            }
+
+                            break;
                         }
-                        else
+
+                        string localCommit = Git.GetLocalCommit(checkoutFolder);
+                        if (string.IsNullOrEmpty(Commit))
                         {
                             Git.UpdateRepo(checkoutFolder, false);
+                            if (Submodules != null && Submodules.Length > 0)
+                            {
+                                foreach (string s in Submodules)
+                                {
+                                    Git.UpdateSubmodule(checkoutFolder, s);
+                                }
+                            }
+
+                            break;
                         }
+                        else if (!string.IsNullOrEmpty(Commit) && Commit != localCommit)
+                        {
+                            Git.UpdateRepo(checkoutFolder, false);
+                            if (Submodules != null && Submodules.Length > 0)
+                            {
+                                foreach (string s in Submodules)
+                                {
+                                    Git.UpdateSubmodule(System.IO.Path.Combine(checkoutFolder, s));
+                                }
+                            }
+
+                            break;
+                        }
+                        Log.WriteLine($"Nothing to do.", "CHECKOUT");
                         break;
                 }
                 return true;
