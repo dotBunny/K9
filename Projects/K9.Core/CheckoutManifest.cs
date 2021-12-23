@@ -58,6 +58,10 @@ namespace K9
             [JsonProperty("mappings")]
             public Dictionary<string, string> Mappings = new();
 
+            public bool HasMapping()
+            {
+                return Mappings.Count > 0;
+            }
             public bool Checkout(string basePath, int depth = 1)
             {
                 var checkoutFolder = System.IO.Path.Combine(basePath, Path);

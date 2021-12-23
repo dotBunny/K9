@@ -2,6 +2,7 @@
 // dotBunny licenses this file to you under the BSL-1.0 license.
 // See the LICENSE file in the project root for more information.
 
+using System.Collections.Generic;
 using System.IO;
 using CommandLine;
 using K9.Unity.PackageManager;
@@ -70,13 +71,38 @@ namespace K9.Unity.Verbs
 
             foreach(CheckoutManifest.CheckoutManifestItem item in _cachedCheckoutManifest.Items)
             {
-                string targetPath = Path.Combine(rootFolder, item.Path);
-                string relativePath = $"file:{Path.GetRelativePath(packagesFolder, targetPath)}";
-
                 // Add to Unity's manifest
-                if (!_cachedManifest.Has(item.ID, relativePath))
+                if (!item.HasMapping())
                 {
-                    _cachedManifest.AddOrUpdate(item.ID, relativePath);
+                    string baseFolder = Path.Combine(rootFolder, item.Path);
+                    string relativePath = $"file:{Path.GetRelativePath(packagesFolder, baseFolder)}";
+                    if(! Directory.Exists(baseFolder))
+                    {
+                        Log.WriteLine($"Unable to find {baseFolder} as outlined in item {item.ID} => {item.Path}", "PACKAGE", Log.LogType.Error);
+                        continue;
+                    }
+
+                    if (!_cachedManifest.Is(item.ID, relativePath))
+                    {
+                        _cachedManifest.AddOrUpdate(item.ID, relativePath);
+                    }
+                }
+                else
+                {
+                    foreach (KeyValuePair<string, string> mapping in item.Mappings)
+                    {
+                        string baseFolder = Path.Combine(rootFolder, item.Path, mapping.Value);
+                        string relativePath = $"file:{Path.GetRelativePath(packagesFolder, baseFolder)}";
+                        if(! Directory.Exists(baseFolder))
+                        {
+                            Log.WriteLine($"Unable to find {baseFolder} as outlined in mapping {item.ID} => {mapping.Key} => {mapping.Value}", "PACKAGE", Log.LogType.Error);
+                            continue;
+                        }
+                        if (!_cachedManifest.Is(mapping.Key, relativePath) && Directory.Exists(baseFolder))
+                        {
+                            _cachedManifest.AddOrUpdate(mapping.Key, relativePath);
+                        }
+                    }
                 }
             }
 

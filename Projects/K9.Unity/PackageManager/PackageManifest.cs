@@ -28,7 +28,12 @@ namespace K9.Unity.PackageManager
 
         public bool Has(string id, string uri)
         {
-            return Dependencies.ContainsKey(id) && Dependencies[id] == uri;
+            return Dependencies.ContainsKey(id);
+        }
+
+        public bool Is(string id, string uri)
+        {
+            return Has(id) && Dependencies[id] == uri;
         }
 
         public void AddOrUpdate(string id, string uri)
