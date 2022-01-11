@@ -28,7 +28,7 @@ namespace K9.Unity
                     Settings.IgnoreUnknownArguments = true; // Allows for Wrapper to work
                 });
 
-                ParserResult<object> results = parser.ParseArguments<VersionControlSettings, TestResults, AddPackage, RemovePackage, RemotePackages, Wrapper>(Core.Arguments);
+                ParserResult<object> results = parser.ParseArguments<VersionControlSettings, TestResults, AddPackage, RemovePackage, RemotePackages, FindEditor, Wrapper>(Core.Arguments);
 
 
                 bool newResult = results.MapResult(
@@ -37,6 +37,7 @@ namespace K9.Unity
                     (AddPackage addPackage) => addPackage.CanExecute() && addPackage.Execute(),
                     (RemovePackage removePackage) => removePackage.CanExecute() && removePackage.Execute(),
                     (RemotePackages remotePackages) => remotePackages.CanExecute() && remotePackages.Execute(),
+                    (FindEditor findEditor) => findEditor.CanExecute() && findEditor.Execute(),
                     (Wrapper wrapper) => wrapper.CanExecute() && wrapper.Execute(),
                     _ => false);
 
