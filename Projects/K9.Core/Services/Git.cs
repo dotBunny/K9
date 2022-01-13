@@ -147,7 +147,9 @@ namespace K9.Services
                 commandLineBuilder.Append(submodule);
             }
 
-            Log.WriteLine($"Update Submodule [{submodule}]", "GIT", Log.LogType.ExternalProcess);
+            Log.WriteLine(submodule != null ? $"Update Submodule [{submodule}]" : $"Update Submodule", "GIT",
+                Log.LogType.ExternalProcess);
+
             ProcessUtil.ExecuteProcess("git.exe", checkoutFolder,
                 commandLineBuilder.ToString(), null, Line =>
                 {

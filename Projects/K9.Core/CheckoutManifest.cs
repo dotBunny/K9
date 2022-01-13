@@ -79,7 +79,10 @@ namespace K9
                                 Git.InitializeSubmodules(checkoutFolder, depth);
                                 foreach (string s in Submodules)
                                 {
-                                    Git.UpdateSubmodule(System.IO.Path.Combine(checkoutFolder, s), depth);
+                                    Git.UpdateSubmodule(
+                                        System.IO.Path.Combine(checkoutFolder, s),
+                                        depth,
+                                        s);
                                 }
                             }
 
@@ -94,7 +97,10 @@ namespace K9
                             {
                                 foreach (string s in Submodules)
                                 {
-                                    Git.UpdateSubmodule(checkoutFolder, depth, s);
+                                    Git.UpdateSubmodule(
+                                        checkoutFolder,
+                                        depth,
+                                        s);
                                 }
                             }
 
@@ -107,7 +113,10 @@ namespace K9
                             {
                                 foreach (string s in Submodules)
                                 {
-                                    Git.UpdateSubmodule(System.IO.Path.Combine(checkoutFolder, s), depth);
+                                    Git.UpdateSubmodule(
+                                        System.IO.Path.Combine(checkoutFolder, s),
+                                        depth,
+                                        s);
                                 }
                             }
 
