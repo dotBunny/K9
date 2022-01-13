@@ -111,38 +111,51 @@ namespace K9.Services
             }
         }
 
-        public static void InitializeSubmodules(string checkoutFolder)
+        public static void InitializeSubmodules(string checkoutFolder, int depth = -1)
         {
+            StringBuilder commandLineBuilder = new();
+            commandLineBuilder.Append("submodule init ");
+
+            // if (depth != -1)
+            // {
+            //     commandLineBuilder.AppendFormat("--depth {0} ", depth.ToString());
+            // }
+            // if (depth == 1)
+            // {
+            //     commandLineBuilder.Append("--shallow-submodules ");
+            // }
+
             Log.WriteLine("Initialize Submodules", "GIT", Log.LogType.ExternalProcess);
             ProcessUtil.ExecuteProcess("git.exe", checkoutFolder,
-                $"submodule init", null, Line =>
+                commandLineBuilder.ToString(), null, Line =>
                 {
                     Log.WriteLine(Line, "GIT", Log.LogType.ExternalProcess);
                 });
         }
-        public static void UpdateSubmodule(string checkoutFolder, string  submodule = null)
+        public static void UpdateSubmodule(string checkoutFolder, int depth = -1, string  submodule = null)
         {
-            if (submodule != null)
+            StringBuilder commandLineBuilder = new();
+            commandLineBuilder.Append("submodule update --remote ");
+
+            if (depth == 1)
             {
-                Log.WriteLine($"Update Submodule [{submodule}]", "GIT", Log.LogType.ExternalProcess);
-                ProcessUtil.ExecuteProcess("git.exe", checkoutFolder,
-                    $"submodule update --remote {submodule}", null, Line =>
-                    {
-                        Log.WriteLine(Line, "GIT", Log.LogType.ExternalProcess);
-                    });
+                commandLineBuilder.Append("--recommend-shallow ");
             }
-            else
+
+            if (!string.IsNullOrEmpty(submodule))
             {
-                Log.WriteLine($"Update Submodules", "GIT", Log.LogType.ExternalProcess);
-                ProcessUtil.ExecuteProcess("git.exe", checkoutFolder,
-                    $"submodule update", null, Line =>
-                    {
-                        Log.WriteLine(Line, "GIT", Log.LogType.ExternalProcess);
-                    });
+                commandLineBuilder.Append(submodule);
             }
+
+            Log.WriteLine($"Update Submodule [{submodule}]", "GIT", Log.LogType.ExternalProcess);
+            ProcessUtil.ExecuteProcess("git.exe", checkoutFolder,
+                commandLineBuilder.ToString(), null, Line =>
+                {
+                    Log.WriteLine(Line, "GIT", Log.LogType.ExternalProcess);
+                });
         }
 
-        public static void UpdateRepo(string checkoutFolder, bool forceUpdate = true)
+        public static void UpdateRepo(string checkoutFolder, string branch = null, string commit = null, bool forceUpdate = true)
         {
             // Check current
             List<string> output = new ();
@@ -162,6 +175,7 @@ namespace K9.Services
 
             bool branchBehind = false;
             bool fastForward = false;
+            bool detached = false;
             foreach (string s in output)
             {
                 if (s.Contains("branch is behind"))
@@ -173,9 +187,51 @@ namespace K9.Services
                 {
                     fastForward = true;
                 }
+
+                if (s.Contains("HEAD detached at"))
+                {
+                    detached = true;
+                }
             }
 
-            if ((!fastForward && branchBehind) || forceUpdate)
+            if (detached)
+            {
+                ProcessUtil.ExecuteProcess("git.exe", checkoutFolder,
+                    $"reset --hard", null, Line =>
+                    {
+                        Log.WriteLine(Line, "GIT");
+                    });
+
+                if (branch != null)
+                {
+                    ProcessUtil.ExecuteProcess("git.exe", checkoutFolder,
+                        $"switch {branch}", null, Line =>
+                        {
+                            Log.WriteLine(Line, "GIT");
+                        });
+                }
+
+                ProcessUtil.ExecuteProcess("git.exe", checkoutFolder,
+                    "pull", null, Line =>
+                    {
+                        Log.WriteLine(Line, "GIT");
+                    });
+
+                if (commit != null)
+                {
+                    ProcessUtil.ExecuteProcess("git.exe", checkoutFolder,
+                        $"checkout {commit}", null, Line =>
+                        {
+                            Log.WriteLine(Line, "GIT");
+                        });
+                    Log.WriteLine($"{checkoutFolder} detached updated to {commit}.", "CHECKOUT");
+                }
+                else
+                {
+                    Log.WriteLine($"{checkoutFolder} detached head reset to latest.", "CHECKOUT");
+                }
+            }
+            else if ((!fastForward && branchBehind) || forceUpdate)
             {
                 // We actually need to do something to upgrade this repo
                 Log.WriteLine($"{checkoutFolder} needs updating, resetting as it could not be cleanly updated.", "CHECKOUT");

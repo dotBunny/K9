@@ -76,10 +76,10 @@ namespace K9
                             Git.CheckoutRepo(URI, checkoutFolder, Branch, Commit, depth, false);
                             if (Submodules != null && Submodules.Length > 0)
                             {
-                                Git.InitializeSubmodules(checkoutFolder);
+                                Git.InitializeSubmodules(checkoutFolder, depth);
                                 foreach (string s in Submodules)
                                 {
-                                    Git.UpdateSubmodule(System.IO.Path.Combine(checkoutFolder, s));
+                                    Git.UpdateSubmodule(System.IO.Path.Combine(checkoutFolder, s), depth);
                                 }
                             }
 
@@ -89,12 +89,12 @@ namespace K9
                         string localCommit = Git.GetLocalCommit(checkoutFolder);
                         if (string.IsNullOrEmpty(Commit))
                         {
-                            Git.UpdateRepo(checkoutFolder, false);
+                            Git.UpdateRepo(checkoutFolder, Branch, null, false);
                             if (Submodules != null && Submodules.Length > 0)
                             {
                                 foreach (string s in Submodules)
                                 {
-                                    Git.UpdateSubmodule(checkoutFolder, s);
+                                    Git.UpdateSubmodule(checkoutFolder, depth, s);
                                 }
                             }
 
@@ -102,12 +102,12 @@ namespace K9
                         }
                         else if (!string.IsNullOrEmpty(Commit) && Commit != localCommit)
                         {
-                            Git.UpdateRepo(checkoutFolder, false);
+                            Git.UpdateRepo(checkoutFolder, Branch, Commit, false);
                             if (Submodules != null && Submodules.Length > 0)
                             {
                                 foreach (string s in Submodules)
                                 {
-                                    Git.UpdateSubmodule(System.IO.Path.Combine(checkoutFolder, s));
+                                    Git.UpdateSubmodule(System.IO.Path.Combine(checkoutFolder, s), depth);
                                 }
                             }
 
