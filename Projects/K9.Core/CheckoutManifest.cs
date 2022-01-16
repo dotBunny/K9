@@ -80,7 +80,7 @@ namespace K9
                                 foreach (string s in Submodules)
                                 {
                                     Git.UpdateSubmodule(
-                                        System.IO.Path.Combine(checkoutFolder, s),
+                                        checkoutFolder,
                                         depth,
                                         s);
                                 }
