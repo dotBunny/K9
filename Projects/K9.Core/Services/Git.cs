@@ -135,12 +135,12 @@ namespace K9.Services
         public static void UpdateSubmodule(string checkoutFolder, int depth = -1, string  submodule = null)
         {
             StringBuilder commandLineBuilder = new();
-            commandLineBuilder.Append("submodule update --remote ");
-
+            commandLineBuilder.Append("submodule update ");
             if (depth == 1)
             {
                 commandLineBuilder.Append("--recommend-shallow ");
             }
+            commandLineBuilder.Append("--remote ");
 
             if (!string.IsNullOrEmpty(submodule))
             {
@@ -151,7 +151,7 @@ namespace K9.Services
                 Log.LogType.ExternalProcess);
 
             ProcessUtil.ExecuteProcess("git.exe", checkoutFolder,
-                commandLineBuilder.ToString(), null, Line =>
+                commandLineBuilder.ToString().Trim(), null, Line =>
                 {
                     Log.WriteLine(Line, "GIT", Log.LogType.ExternalProcess);
                 });
