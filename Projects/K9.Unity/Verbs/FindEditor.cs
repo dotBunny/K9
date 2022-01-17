@@ -30,16 +30,7 @@ namespace K9.Unity.Verbs
         private void RecordFindings(string path)
         {
             // Dump to log
-            Log.WriteLine(path, "UNITY_EDITOR", Log.LogType.Info);
-
-            // Set an environment variable
-            // if (PlatformUtil.IsWindows())
-            // {
-            //     Environment.SetEnvironmentVariable("UNITY_EDITOR", path, EnvironmentVariableTarget.User);
-            // }
-
-            // Write out to teamcity just because
-            Console.WriteLine($"##teamcity[setParameter name='UNITY_EDITOR' value='{path}']");
+            Log.WriteLine($"Found Unity @ {path}", "UNITY", Log.LogType.Info);
 
             // Write to tmp file
             if (!string.IsNullOrEmpty(Output))
@@ -64,6 +55,7 @@ namespace K9.Unity.Verbs
             string installLaunch = Environment.GetEnvironmentVariable("unityLaunch");
             if (!string.IsNullOrEmpty(installLocation) && !string.IsNullOrEmpty(installLaunch) )
             {
+                Log.WriteLine("Found environment variable hint ...", "UNITY", Log.LogType.Info);
                 string targetBaseFolder = System.IO.Path.Combine(installLocation, Version);
                 if (System.IO.Directory.Exists(targetBaseFolder))
                 {
