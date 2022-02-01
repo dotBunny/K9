@@ -91,8 +91,11 @@ namespace K9.Setup.Verbs
                                 Directory.CreateDirectory(directoryName);
                             }
 
-                            using FileStream streamWriter = File.Create(fullZipToPath);
-                            StreamUtils.Copy(zipStream, streamWriter, buffer);
+                            using (FileStream streamWriter = File.Create(fullZipToPath))
+                            {
+                                StreamUtils.Copy(zipStream, streamWriter, buffer);
+                            }
+                            File.SetAttributes(fullZipToPath, (FileAttributes)zipEntry.ExternalFileAttributes);
                         }
                         Log.WriteLine($"Extracted {archive.Count} entries in {timer.GetElapsedSeconds()} seconds.",
                             Program.Instance.DefaultLogCategory);
