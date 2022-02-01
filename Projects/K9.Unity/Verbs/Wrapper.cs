@@ -8,6 +8,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Text;
 using CommandLine;
+using K9.Services.Utils;
 
 namespace K9.Unity.Verbs
 {
@@ -65,7 +66,15 @@ namespace K9.Unity.Verbs
                 shouldCleanupLog = true;
             }
 
-            Process process = StartProcess(executable, trimmedArguments, logFilePath);
+            Process process = null;
+            if (PlatformUtil.IsMacOS())
+            {
+                process = StartProcess("open", $"{executable} {trimmedArguments}", logFilePath);
+            }
+            else
+            {
+                process = StartProcess(executable, trimmedArguments, logFilePath);
+            }
 
             if (process == null)
             {
