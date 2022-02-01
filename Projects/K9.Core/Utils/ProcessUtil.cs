@@ -12,23 +12,23 @@ namespace K9.Utils
 {
     public class ProcessUtil
     {
-        public static bool SpawnProcess(string FileName, string CommandLine)
+        public static bool SpawnProcess(string executablePath, string arguments)
         {
             using (Process ChildProcess = new())
             {
-                ChildProcess.StartInfo.FileName = FileName;
-                ChildProcess.StartInfo.Arguments = string.IsNullOrEmpty(CommandLine) ? "" : CommandLine;
+                ChildProcess.StartInfo.FileName = executablePath;
+                ChildProcess.StartInfo.Arguments = string.IsNullOrEmpty(arguments) ? "" : arguments;
                 ChildProcess.StartInfo.UseShellExecute = false;
                 return ChildProcess.Start();
             }
         }
 
-        public static bool SpawnHiddenProcess(string FileName, string CommandLine)
+        public static bool SpawnHiddenProcess(string executablePath, string arguments)
         {
             using (Process ChildProcess = new())
             {
-                ChildProcess.StartInfo.FileName = FileName;
-                ChildProcess.StartInfo.Arguments = string.IsNullOrEmpty(CommandLine) ? "" : CommandLine;
+                ChildProcess.StartInfo.FileName = executablePath;
+                ChildProcess.StartInfo.Arguments = string.IsNullOrEmpty(arguments) ? "" : arguments;
                 ChildProcess.StartInfo.UseShellExecute = false;
                 ChildProcess.StartInfo.RedirectStandardOutput = true;
                 ChildProcess.StartInfo.RedirectStandardError = true;
@@ -37,22 +37,22 @@ namespace K9.Utils
             }
         }
 
-        public static int ExecuteProcess(string FileName, string WorkingDir, string CommandLine, string Input,
+        public static int ExecuteProcess(string executablePath, string workingDirectory, string arguments, string Input,
             TextWriter Log)
         {
-            return ExecuteProcess(FileName, WorkingDir, CommandLine, Input, Line => Log.WriteLine(Line));
+            return ExecuteProcess(executablePath, workingDirectory, arguments, Input, Line => Log.WriteLine(Line));
         }
 
-        public static int ExecuteProcess(string FileName, string WorkingDir, string CommandLine, string Input,
+        public static int ExecuteProcess(string executablePath, string workingDirectory, string arguments, string Input,
             out List<string> OutputLines)
         {
             List<string> output = new();
-            int returnValue = ExecuteProcess(FileName, WorkingDir, CommandLine, Input, Line => output.Add(Line));
+            int returnValue = ExecuteProcess(executablePath, workingDirectory, arguments, Input, Line => output.Add(Line));
             OutputLines = output;
             return returnValue;
         }
 
-        public static int ExecuteProcess(string FileName, string WorkingDir, string CommandLine, string Input,
+        public static int ExecuteProcess(string executablePath, string workingDirectory, string arguments, string Input,
             Action<string> OutputLine)
         {
             using (Process ChildProcess = new())
@@ -70,9 +70,9 @@ namespace K9.Utils
                     }
                 };
 
-                ChildProcess.StartInfo.WorkingDirectory = WorkingDir;
-                ChildProcess.StartInfo.FileName = FileName;
-                ChildProcess.StartInfo.Arguments = string.IsNullOrEmpty(CommandLine) ? "" : CommandLine;
+                ChildProcess.StartInfo.WorkingDirectory = workingDirectory;
+                ChildProcess.StartInfo.FileName = executablePath;
+                ChildProcess.StartInfo.Arguments = string.IsNullOrEmpty(arguments) ? "" : arguments;
                 ChildProcess.StartInfo.UseShellExecute = false;
                 ChildProcess.StartInfo.RedirectStandardOutput = true;
                 ChildProcess.StartInfo.RedirectStandardError = true;

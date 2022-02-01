@@ -8,6 +8,7 @@ using ICSharpCode.SharpZipLib.Core;
 using ICSharpCode.SharpZipLib.Zip;
 using K9.IO;
 using K9.Services.Utils;
+using K9.Utils;
 
 namespace K9.Setup.Verbs
 {
@@ -95,7 +96,7 @@ namespace K9.Setup.Verbs
                             {
                                 StreamUtils.Copy(zipStream, streamWriter, buffer);
                             }
-                            File.SetAttributes(fullZipToPath, (FileAttributes)zipEntry.ExternalFileAttributes);
+                            SetFileFlags(fullZipToPath, zipEntry);
                         }
                         Log.WriteLine($"Extracted {archive.Count} entries in {timer.GetElapsedSeconds()} seconds.",
                             Program.Instance.DefaultLogCategory);
@@ -144,6 +145,34 @@ namespace K9.Setup.Verbs
             }
 
             return true;
+        }
+
+        /// <summary>
+        ///     Set file attributes based on entry value
+        /// </summary>
+        /// <remarks>
+        ///     This only deals with flags that we care about!
+        /// </remarks>
+        /// <param name="filePath"></param>
+        /// <param name="entry"></param>
+        private void SetFileFlags(string filePath, ZipEntry entry)
+        {
+
+
+            // Really all we care about is the executable flag
+            switch (entry.HostSystem)
+            {
+                case 3: // unix based
+                case 7: // macOS
+
+                    // Only restore on platforms that matter
+                    if (entry.ExternalFileAttributes == -2115174400 &&
+                        (PlatformUtil.IsLinux() || PlatformUtil.IsMacOS()))
+                    {
+                        ProcessUtil.SpawnHiddenProcess("chmod", $"+x {filePath}");
+                    }
+                    break;
+            }
         }
     }
 }
