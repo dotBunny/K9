@@ -69,7 +69,7 @@ namespace K9.Unity.Verbs
             Process process = null;
             if (PlatformUtil.IsMacOS())
             {
-                process = StartProcess("open", $"{executable} {trimmedArguments}", logFilePath);
+                process = StartProcess("open", $"{executable} --args {trimmedArguments}", logFilePath);
             }
             else
             {
