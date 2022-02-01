@@ -67,14 +67,14 @@ namespace K9.Unity.Verbs
             }
 
             Process process = null;
-            if (PlatformUtil.IsMacOS())
-            {
-                process = StartProcess("open", $"{executable} --args {trimmedArguments}", logFilePath);
-            }
-            else
-            {
+            // if (PlatformUtil.IsMacOS())
+            // {
+            //     process = StartProcess("open", $"{executable} --args {trimmedArguments}", logFilePath);
+            // }
+            // else
+            // {
                 process = StartProcess(executable, trimmedArguments, logFilePath);
-            }
+            //}
 
             if (process == null)
             {
