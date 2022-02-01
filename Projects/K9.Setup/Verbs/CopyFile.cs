@@ -157,8 +157,13 @@ namespace K9.Setup.Verbs
         /// <param name="entry"></param>
         private void SetFileFlags(string filePath, ZipEntry entry)
         {
-
-
+            // CopyFile --input C:\Users\reapazor\Desktop\ZIPTEST\2021.2.9f1-macOS.zip --output C:\Users\reapazor\Desktop\ZIPTEST\output --extract
+            //-1578303488
+            // if (filePath.Contains("libOpenImageDenoise.1.dylib"))
+            // {
+            //     System.Diagnostics.Debugger.Break();
+            // }
+            Log.WriteLine($"{filePath}: [EXTRA]{entry.ExternalFileAttributes.ToString()} | [FLAGS]{entry.Flags.ToString()} | [HOST]{entry.HostSystem}");
             // Really all we care about is the executable flag
             switch (entry.HostSystem)
             {
