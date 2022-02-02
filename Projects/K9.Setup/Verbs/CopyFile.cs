@@ -2,6 +2,8 @@
 // dotBunny licenses this file to you under the BSL-1.0 license.
 // See the LICENSE file in the project root for more information.
 
+using System;
+using System.Collections.Generic;
 using System.IO;
 using CommandLine;
 using ICSharpCode.SharpZipLib.Core;
@@ -70,75 +72,27 @@ namespace K9.Setup.Verbs
                 if (Extract && upperCaseFilePath.EndsWith(".ZIP"))
                 {
                     Log.WriteLine("Extracting ZIP ...", Program.Instance.DefaultLogCategory);
-                    Timer timer = new();
-                    ZipFile archive = new(inputStream, false);
-                    try
+                    if (PlatformUtil.IsMacOS() || PlatformUtil.IsLinux())
                     {
-                        foreach (ZipEntry zipEntry in archive)
+                        string tempFile = Path.GetTempFileName();
+                        WriteStream(inputStream, tempFile);
+                        Directory.CreateDirectory(OutputPath);
+                        Timer timer = new();
+                        ProcessUtil.ExecuteProcess("unzip", OutputPath, $"{tempFile} -d {OutputPath}", null, s =>
                         {
-                            if (!zipEntry.IsFile)
-                            {
-                                continue;
-                            }
-
-                            string entryFileName = zipEntry.Name;
-                            byte[] buffer = new byte[PlatformUtil.GetBlockSize()];
-                            Stream zipStream = archive.GetInputStream(zipEntry);
-
-                            string fullZipToPath = Path.Combine(OutputPath, entryFileName);
-                            string directoryName = Path.GetDirectoryName(fullZipToPath);
-                            if (directoryName is { Length: > 0 } && !Directory.Exists(directoryName))
-                            {
-                                Directory.CreateDirectory(directoryName);
-                            }
-
-                            using (FileStream streamWriter = File.Create(fullZipToPath))
-                            {
-                                StreamUtils.Copy(zipStream, streamWriter, buffer);
-                            }
-                            SetFileFlags(fullZipToPath, zipEntry);
-                        }
-                        Log.WriteLine($"Extracted {archive.Count} entries in {timer.GetElapsedSeconds()} seconds.",
+                            Console.WriteLine(s);
+                        });
+                        Log.WriteLine($"Extracted archive in {timer.GetElapsedSeconds()} seconds.",
                             Program.Instance.DefaultLogCategory);
                     }
-                    finally
+                    else
                     {
-                        archive.IsStreamOwner = true; // Makes close also shut the underlying stream
-                        archive.Close(); // Ensure we release resources
+                        ExtractStream(inputStream, OutputPath);
                     }
                 }
                 else
                 {
-                    IFileAccessor outputHandler = UriHandler.GetFileAccessor(OutputPath);
-
-                    int bufferSize = outputHandler.GetWriteBufferSize();
-                    using Stream outputFile = outputHandler.GetWriter();
-
-                    long inputStreamLength = inputStream.Length;
-                    byte[] bytes = new byte[bufferSize];
-                    long writtenLength = 0;
-                    Timer timer = new();
-                    while (writtenLength < inputStreamLength)
-                    {
-                        int readAmount = bufferSize;
-                        if (writtenLength + bufferSize > inputStreamLength)
-                        {
-                            readAmount = (int)(inputStreamLength - writtenLength);
-                        }
-
-                        inputStream.Read(bytes, 0, readAmount);
-
-                        // Write read data
-                        outputFile.Write(bytes, 0, readAmount);
-
-                        // Add to our offset
-                        writtenLength += readAmount;
-                    }
-
-                    outputFile.Close();
-                    Log.WriteLine(
-                        $"Wrote {writtenLength} of {inputStreamLength} bytes in {timer.GetElapsedSeconds()} seconds (∼{timer.TransferRate(writtenLength)}).",
-                        Program.Instance.DefaultLogCategory);
+                    WriteStream(inputStream, OutputPath);
                 }
 
                 inputStream.Close();
@@ -147,36 +101,76 @@ namespace K9.Setup.Verbs
             return true;
         }
 
-        /// <summary>
-        ///     Set file attributes based on entry value
-        /// </summary>
-        /// <remarks>
-        ///     This only deals with flags that we care about!
-        /// </remarks>
-        /// <param name="filePath"></param>
-        /// <param name="entry"></param>
-        private void SetFileFlags(string filePath, ZipEntry entry)
+        static void WriteStream(Stream inputStream, string outputPath)
         {
-            // CopyFile --input C:\Users\reapazor\Desktop\ZIPTEST\2021.2.9f1-macOS.zip --output C:\Users\reapazor\Desktop\ZIPTEST\output --extract
-            //-1578303488
-            // if (filePath.Contains("libOpenImageDenoise.1.dylib"))
-            // {
-            //     System.Diagnostics.Debugger.Break();
-            // }
-            Log.WriteLine($"{filePath}: [EXTRA]{entry.ExternalFileAttributes.ToString()} | [FLAGS]{entry.Flags.ToString()} | [HOST]{entry.HostSystem}");
-            // Really all we care about is the executable flag
-            switch (entry.HostSystem)
-            {
-                case 3: // unix based
-                case 7: // macOS
+            IFileAccessor outputHandler = UriHandler.GetFileAccessor(outputPath);
 
-                    // Only restore on platforms that matter
-                    if (entry.ExternalFileAttributes == -2115174400 &&
-                        (PlatformUtil.IsLinux() || PlatformUtil.IsMacOS()))
+            int bufferSize = outputHandler.GetWriteBufferSize();
+            using Stream outputFile = outputHandler.GetWriter();
+
+            long inputStreamLength = inputStream.Length;
+            byte[] bytes = new byte[bufferSize];
+            long writtenLength = 0;
+            Timer timer = new();
+            while (writtenLength < inputStreamLength)
+            {
+                int readAmount = bufferSize;
+                if (writtenLength + bufferSize > inputStreamLength)
+                {
+                    readAmount = (int)(inputStreamLength - writtenLength);
+                }
+
+                inputStream.Read(bytes, 0, readAmount);
+
+                // Write read data
+                outputFile.Write(bytes, 0, readAmount);
+
+                // Add to our offset
+                writtenLength += readAmount;
+            }
+
+            outputFile.Close();
+            Log.WriteLine(
+                $"Wrote {writtenLength} of {inputStreamLength} bytes in {timer.GetElapsedSeconds()} seconds (∼{timer.TransferRate(writtenLength)}).",
+                Program.Instance.DefaultLogCategory);
+        }
+
+        static void ExtractStream(Stream inputStream, string outputPath)
+        {
+            Timer timer = new();
+            ZipFile archive = new(inputStream, false);
+            try
+            {
+                foreach (ZipEntry zipEntry in archive)
+                {
+                    if (!zipEntry.IsFile)
                     {
-                        ProcessUtil.SpawnHiddenProcess("chmod", $"+x {filePath}");
+                        continue;
                     }
-                    break;
+
+                    string entryFileName = zipEntry.Name;
+                    byte[] buffer = new byte[PlatformUtil.GetBlockSize()];
+                    Stream zipStream = archive.GetInputStream(zipEntry);
+
+                    string fullZipToPath = Path.Combine(outputPath, entryFileName);
+                    string directoryName = Path.GetDirectoryName(fullZipToPath);
+                    if (directoryName is { Length: > 0 } && !Directory.Exists(directoryName))
+                    {
+                        Directory.CreateDirectory(directoryName);
+                    }
+
+                    using (FileStream streamWriter = File.Create(fullZipToPath))
+                    {
+                        StreamUtils.Copy(zipStream, streamWriter, buffer);
+                    }
+                }
+                Log.WriteLine($"Extracted {archive.Count} entries in {timer.GetElapsedSeconds()} seconds.",
+                    Program.Instance.DefaultLogCategory);
+            }
+            finally
+            {
+                archive.IsStreamOwner = true; // Makes close also shut the underlying stream
+                archive.Close(); // Ensure we release resources
             }
         }
     }
