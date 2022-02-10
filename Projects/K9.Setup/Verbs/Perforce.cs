@@ -19,7 +19,7 @@ namespace K9.Setup.Verbs
         [Option('p', "password", Required = false, HelpText = "The provided password.")]
         public string Password { get; set; }
 
-        [Option('p', "port", Required = false, HelpText = "The server host:port.",
+        [Option('o', "port", Required = false, HelpText = "The server host:port.",
             Default = Services.Perforce.Config.DefaultPort)]
         public string Port { get; set; }
 

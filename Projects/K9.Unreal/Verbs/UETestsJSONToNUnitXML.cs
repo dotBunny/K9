@@ -14,7 +14,7 @@ namespace K9.Unreal.Verbs
     [Verb("UERunTestsJSONToNUnitXML")]
     public class UERunTestsJSONToNUnitXML : IVerb
     {
-        [Option('i', "inputPath", Required = false, HelpText = "The path to the source file to be converted.")]
+        [Option('i', "inputPath", Required = true, HelpText = "The path to the source file to be converted.")]
         public string InputPath { get; set; }
 
         [Option('o', "outputPath", Required = true, HelpText = "The path to output the converted file.")]

@@ -11,7 +11,7 @@ namespace K9.Unity.Verbs
     [Verb("AddPackage")]
     public class AddPackage : IVerb
     {
-        [Option('m', "manifest", Required = false, HelpText = "The checkout manifest to add to the Unity project's manifest..")]
+        [Option('m', "manifest", Required = true, HelpText = "The Unity project's package manifest.")]
         public string Manifest { get; set; }
 
         [Option('i', "id", Required = true, HelpText = "The package id to add or update.")]

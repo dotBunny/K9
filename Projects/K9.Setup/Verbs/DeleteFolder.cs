@@ -10,7 +10,7 @@ namespace K9.Setup.Verbs
     [Verb("DeleteFolder")]
     public class DeleteFolder : IVerb
     {
-        [Option('f', "folder", Required = false, HelpText = "Path to folder to remove.")]
+        [Option('f', "folder", Required = false, HelpText = "Path to the folder to remove.")]
         public string Folder { get; set; }
 
         public bool CanExecute()

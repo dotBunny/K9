@@ -14,7 +14,7 @@ namespace K9.Unity.Verbs
         [Option('c', "clear", Required = false, Default = true)]
         public bool ClearSettings { get; set; } = true;
 
-        [Option('f', "folder", Required = false, HelpText = "Target Folder")]
+        [Option('f', "folder", Required = true, HelpText = "Target Folder")]
         public string Folder { get; set; }
 
         public bool CanExecute()

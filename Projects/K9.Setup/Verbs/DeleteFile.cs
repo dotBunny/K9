@@ -11,7 +11,7 @@ namespace K9.Setup.Verbs
     [Verb("DeleteFile")]
     public class DeleteFile : IVerb
     {
-        [Option('p', "path", Required = false, HelpText = "Path to file to remove.")]
+        [Option('p', "path", Required = false, HelpText = "Path to the file to remove.")]
         public string Path { get; set; }
 
         public bool CanExecute()

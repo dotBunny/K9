@@ -18,7 +18,7 @@ namespace K9.Setup.Verbs
         [Option('s', "source", Required = true, HelpText = "Source file name")]
         public string SourceFile { get; set; }
 
-        [Option('t', "target", Required = true, HelpText = "Target ID")]
+        [Option('t', "target", Required = true, HelpText = "Target file path")]
         public string FilePath { get; set; }
 
         [Option('o', "overwrite", Required = false, Default = false, HelpText = "Should overwrite?")]
