@@ -92,10 +92,10 @@ namespace K9.Unity.Verbs
                 string versionedHubPath = System.IO.Path.Combine(editorsPath, Version);
                 if (System.IO.Directory.Exists(versionedHubPath))
                 {
-                    string versionedHubExectuable = System.IO.Path.Combine(versionedHubPath, launchPath);
-                    if (System.IO.File.Exists(versionedHubExectuable))
+                    string versionedHubExecutable = System.IO.Path.Combine(versionedHubPath, launchPath);
+                    if (System.IO.File.Exists(versionedHubExecutable))
                     {
-                        RecordFindings(versionedHubExectuable);
+                        RecordFindings(versionedHubExecutable);
                         return true;
                     }
                 }
