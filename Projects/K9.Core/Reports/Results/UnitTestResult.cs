@@ -68,6 +68,16 @@ namespace K9.Reports.Results
             return table;
         }
 
+        public object GetValue()
+        {
+            return Duration;
+        }
+
+        public Type GetValueType()
+        {
+            return typeof(float);
+        }
+
         #endregion
 
         #region IPassFailResult

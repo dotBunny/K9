@@ -2,6 +2,7 @@
 // dotBunny licenses this file to you under the BSL-1.0 license.
 // See the LICENSE file in the project root for more information.
 
+using System;
 using System.Data;
 
 namespace K9.Reports.Results
@@ -34,6 +35,16 @@ namespace K9.Reports.Results
         public string GetName()
         {
             return "Generic Result";
+        }
+
+        public object GetValue()
+        {
+            return "";
+        }
+
+        public Type GetValueType()
+        {
+            return typeof(string);
         }
 
         public DataTable GetTable(bool objectsAsStrings = false)

@@ -2,11 +2,15 @@
 // dotBunny licenses this file to you under the BSL-1.0 license.
 // See the LICENSE file in the project root for more information.
 
+using System;
 using System.Collections.Generic;
 using System.Data;
 using System.IO;
 using System.Linq;
+using System.Runtime.InteropServices;
+using DocumentFormat.OpenXml.Spreadsheet;
 using K9.Reports;
+using K9.Reports.Results;
 
 namespace K9.Services.Google
 {
@@ -44,7 +48,7 @@ namespace K9.Services.Google
             return Core.Settings.Data["GoogleSheets"]["Default"];
         }
 
-        public static bool Post(string configPath, string applicationName, ref List<IResult> results, string documentID = null)
+        public static bool Post(string configPath, string applicationName, ref List<IResult> results, string documentID = null, bool columnFormat = false)
         {
             // Validate Credentials
             if (!File.Exists(configPath))
@@ -78,24 +82,53 @@ namespace K9.Services.Google
             foreach (KeyValuePair<string, List<IResult>> sheet in sortedResults)
             {
                 Sheets google = new(configPath, applicationName, sheet.Key);
-                foreach (IResult r in sheet.Value)
+                if (!columnFormat)
                 {
-                    switch (r.GetResultType())
+                    // Build out a row per response
+                    foreach (IResult r in sheet.Value)
                     {
-                        case ResultType.Updateable:
-                            google.UpdateRows((IUpdateableResult)r);
-                            break;
+                        switch (r.GetResultType())
+                        {
+                            case ResultType.Updateable:
+                                google.UpdateRows((IUpdateableResult)r);
+                                break;
 
-                        // By default we are just going to add rows of data
-                        default:
-                            google.AddRows(r);
-                            break;
+                            // By default we are just going to add rows of data
+                            default:
+                                google.AddRows(r);
+                                break;
+                        }
+                    }
+                }
+                else
+                {
+                    // New branch for column based output
+                    // Build out a row per response
+                    List<object> items = new List<object>();
+                    string sheetname = null;
+
+                    if (sheet.Value[0] is UnitTestResult)
+                    {
+                        UnitTestResult firstResult = (UnitTestResult)sheet.Value[0];
+                        items.Add(firstResult.Timestamp.ToString(Core.TimeFormat));
+                        items.Add(Core.AgentName);
+                        items.Add(Core.Changelist);
+                    }
+
+                    foreach (IResult r in sheet.Value)
+                    {
+                        items.Add(r.GetValue());
+                        sheetname = r.GetSheetName();
+                    }
+
+                    if (sheetname != null)
+                    {
+                        google.AddRow(sheetname, items);
                     }
                 }
 
                 google.Execute();
             }
-
             return true;
         }
     }

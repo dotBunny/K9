@@ -113,6 +113,16 @@ namespace K9.Reports.Results
             return table;
         }
 
+        public object GetValue()
+        {
+            return null;
+        }
+
+        public Type GetValueType()
+        {
+            return typeof(string);
+        }
+
         #endregion
     }
 }

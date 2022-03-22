@@ -68,6 +68,10 @@ namespace K9.Unity.Verbs
         [Option('p', "platform", Required = false, HelpText = "Platform of reports being analyzed.")]
         public string Platform { get; set; }
 
+        [Option('z', "columnformat", Required = false,
+            HelpText = "Build data tables as column based instead of rows.")]
+        public bool ColumnFormat { get; set; }
+
         public bool CanExecute()
         {
             if (!string.IsNullOrEmpty(GetTargetInput()))
@@ -149,7 +153,7 @@ namespace K9.Unity.Verbs
                     ApplicationName ??= Core.Settings.Data["GoogleAPI"]["ApplicationName"];
 
                     Log.WriteLine(
-                        SheetsUtil.Post(credentialsPath, applicationName, ref results, DocumentID)
+                        SheetsUtil.Post(credentialsPath, applicationName, ref results, DocumentID, ColumnFormat)
                             ? "Upload Complete."
                             : "FAILED to upload results.", "GOOGLE");
                 }
