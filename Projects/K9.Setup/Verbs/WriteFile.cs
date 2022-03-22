@@ -42,6 +42,7 @@ namespace K9.Setup.Verbs
             if (!string.IsNullOrEmpty(Content))
             {
                 Content = Content.Replace("___SPACE___", " ");
+                Content = Content.Replace("___TAB___", "\t");
                 if (AllowTrailingLine)
                 {
                     System.IO.File.WriteAllLines(File, Content.Split("___NEWLINE___"));
