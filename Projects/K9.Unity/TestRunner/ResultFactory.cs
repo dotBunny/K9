@@ -3,6 +3,7 @@
 // See the LICENSE file in the project root for more information.
 
 using System;
+using DocumentFormat.OpenXml.Wordprocessing;
 using K9.Reports;
 using K9.Reports.Results;
 using K9.Unity.TestRunner.Report;
@@ -105,11 +106,25 @@ namespace K9.Unity.TestRunner
         {
             float.TryParse(inTestCase.Duration, out float duration);
 
+            // Message Timestamp
+            DateTime timestamp = DateTime.Now;
+            if (inTestCase.EndTime != null)
+            {
+                DateTime.TryParse(inTestCase.EndTime, out timestamp);
+            }
+
+            // Message Name
+            string FullName = inTestCase.FullName;
+            if (string.IsNullOrEmpty(FullName))
+            {
+                FullName = inTestCase.Name;
+            }
+
             UnitTestResult newResult = new()
             {
-                Timestamp = DateTime.Parse(inTestCase.EndTime),
+                Timestamp = timestamp,
                 Category = inTestCase.GetCategory(),
-                FullName = inTestCase.FullName,
+                FullName = FullName,
                 Result = inTestCase.Result,
                 Duration = duration
             };

@@ -8,6 +8,7 @@ using System.Text;
 using System.Xml.Serialization;
 using CommandLine;
 using K9.Reports;
+using K9.Reports.Results;
 using K9.Services.Google;
 using K9.Services.Office;
 using K9.Unity.TestRunner;
@@ -38,6 +39,22 @@ namespace K9.Unity.Verbs
         [Option('g', "google", Required = false,
             HelpText = "Send generated data from tests, if appropriate to Google API.")]
         public bool OutputToGoogle { get; set; }
+
+        [Option('c', "credentials", Required = false,
+            HelpText = "Path to credentials file.")]
+        public string Credentials { get; set; }
+
+        [Option('a', "application", Required = false,
+            HelpText = "Customized application name (used by Google).")]
+        public string ApplicationName { get; set; }
+
+        [Option('d', "document", Required = false,
+            HelpText = "Document ID")]
+        public string DocumentID { get; set; }
+
+        [Option('s', "suite", Required = false,
+            HelpText = "Suite Name")]
+        public string Suite { get; set; }
 
         [Option('x', "xls", Required = false, HelpText = "Update excel documents with generated data.")]
         public bool OutputToExcel { get; set; }
@@ -93,6 +110,16 @@ namespace K9.Unity.Verbs
                 List<IResult> results = testRun.GetTestCases().GetResults();
 
 
+                // Do some tweaking to data
+                foreach (IResult r in results)
+                {
+                    if (r is UnitTestResult && !string.IsNullOrEmpty(Suite))
+                    {
+                        UnitTestResult localResult = (UnitTestResult)r;
+                        localResult.Suite = Suite;
+                    }
+                }
+
                 // Output Report
                 StringBuilder report = new();
                 foreach (IResult r in results)
@@ -114,17 +141,17 @@ namespace K9.Unity.Verbs
 
                 if (OutputToGoogle)
                 {
-                    if (SheetsUtil.Post(
-                        Path.GetFullPath(Path.Combine(Core.WorkspaceRoot,
-                            Core.Settings.Data["GoogleAPI"]["KeyPath"].FixDirectorySeparator())),
-                        Core.Settings.Data["GoogleAPI"]["ApplicationName"], ref results))
-                    {
-                        Log.WriteLine("Upload Complete.", "GOOGLE");
-                    }
-                    else
-                    {
-                        Log.WriteLine("FAILED to upload results.", "GOOGLE");
-                    }
+                    string credentialsPath = Credentials;
+                    Credentials ??= Path.GetFullPath(Path.Combine(Core.WorkspaceRoot,
+                        Core.Settings.Data["GoogleAPI"]["KeyPath"].FixDirectorySeparator()));
+
+                    string applicationName = ApplicationName;
+                    ApplicationName ??= Core.Settings.Data["GoogleAPI"]["ApplicationName"];
+
+                    Log.WriteLine(
+                        SheetsUtil.Post(credentialsPath, applicationName, ref results, DocumentID)
+                            ? "Upload Complete."
+                            : "FAILED to upload results.", "GOOGLE");
                 }
 
                 if (OutputToExcel)
@@ -162,7 +189,6 @@ namespace K9.Unity.Verbs
                 Core.Platform = Platform;
             }
         }
-
 
         public string GetTargetInput()
         {

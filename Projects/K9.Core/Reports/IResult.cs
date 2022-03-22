@@ -16,8 +16,6 @@ namespace K9.Reports
     public interface IResult
     {
         string GetCategory();
-
-
         string GetName();
         ResultType GetResultType();
         string GetSheetName();

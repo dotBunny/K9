@@ -11,6 +11,7 @@ namespace K9.Reports.Results
     {
         public DateTime Timestamp { get; set; }
         public string Category { get; set; }
+        public string Suite { get; set; }
         public string FullName { get; set; }
         public string Result { get; set; }
         public float Duration { get; set; }
@@ -25,7 +26,7 @@ namespace K9.Reports.Results
 
         public string GetSheetName()
         {
-            return $"Unit Tests ({Core.Platform})";
+            return !string.IsNullOrEmpty(Suite) ? $"Unit Tests ({Core.Platform}-{Suite})" : $"Unit Tests ({Core.Platform})";
         }
 
         public string GetCategory()
@@ -48,8 +49,8 @@ namespace K9.Reports.Results
             DataTable table = new();
 
             table.Columns.Add("Timestamp", objectsAsStrings ? typeof(string) : typeof(DateTime));
-
-            table.Columns.Add("Changelist", typeof(int));
+            table.Columns.Add("AgentName", typeof(string));
+            table.Columns.Add("Changelist", typeof(string));
             table.Columns.Add("Test", typeof(string));
             table.Columns.Add("Result", typeof(string));
             table.Columns.Add("Duration", typeof(float));
@@ -57,11 +58,11 @@ namespace K9.Reports.Results
 
             if (objectsAsStrings)
             {
-                table.Rows.Add(Timestamp.ToString(Core.TimeFormat), Core.Changelist, FullName, Result, Duration);
+                table.Rows.Add(Timestamp.ToString(Core.TimeFormat), Core.AgentName, Core.Changelist, FullName, Result, Duration);
             }
             else
             {
-                table.Rows.Add(Timestamp, Core.Changelist, FullName, Result, Duration);
+                table.Rows.Add(Timestamp, Core.AgentName, Core.Changelist, FullName, Result, Duration);
             }
 
             return table;

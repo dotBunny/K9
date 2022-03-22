@@ -25,6 +25,7 @@ namespace K9
         public static string WorkspaceRoot = "Undefined";
         public static string Changelist = "0";
         public static string Platform = "Win64";
+        public static string AgentName;
 
         public static int ExitCode = 0;
 
@@ -82,6 +83,8 @@ namespace K9
             {
                 Platform = "Linux";
             }
+
+            AgentName = Environment.MachineName;
 
             // Handle some possible trickery with our command lines
             OverrideArguments.Clear();

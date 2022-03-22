@@ -44,7 +44,7 @@ namespace K9.Services.Google
             return Core.Settings.Data["GoogleSheets"]["Default"];
         }
 
-        public static bool Post(string configPath, string applicationName, ref List<IResult> results)
+        public static bool Post(string configPath, string applicationName, ref List<IResult> results, string documentID = null)
         {
             // Validate Credentials
             if (!File.Exists(configPath))
@@ -64,7 +64,7 @@ namespace K9.Services.Google
             {
                 if (r != null)
                 {
-                    string sheetID = r.GetGoogleSheetID();
+                    string sheetID = documentID ?? r.GetGoogleSheetID();
                     if (!sortedResults.ContainsKey(sheetID))
                     {
                         sortedResults.Add(sheetID, new List<IResult>());
