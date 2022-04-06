@@ -12,11 +12,14 @@ using K9.Services.Utils;
 
 namespace K9.Unity.Verbs
 {
+    // Must use ---NAME=VALUE
     [Verb("Wrapper")]
     public class Wrapper : IVerb
     {
         private List<string> _workingArguments;
         private string _executablePath;
+        private string _pidPath;
+        private string _logPath;
 
         /// <inheritdoc />
         public bool CanExecute()
@@ -25,8 +28,15 @@ namespace K9.Unity.Verbs
 
             // Remove verb
             _workingArguments.RemoveAt(0);
+
+            // Get and remove executable from whats being passed through
             _executablePath = _workingArguments[0];
             _workingArguments.RemoveAt(0);
+
+            if (Core.OverrideArguments.ContainsKey("LOG"))
+            {
+                _logPath = Core.OverrideArguments["LOG"];
+            }
 
             return File.Exists(_executablePath);
         }
@@ -52,12 +62,12 @@ namespace K9.Unity.Verbs
                 }
                 arguments.Append(' ');
             }
-            int exitCode = LaunchUnity(_executablePath, arguments.ToString());
+            int exitCode = LaunchUnity(_executablePath, arguments.ToString(), _logPath);
             Core.UpdateExitCode(exitCode);
             return (exitCode == 0);
         }
 
-        public int LaunchUnity(string executable, string arguments, string logFilePath = null, bool shouldCleanupLog = false)
+        private int LaunchUnity(string executable, string arguments, string logFilePath = null, bool shouldCleanupLog = false)
         {
             string trimmedArguments = arguments.Trim();
             if (string.IsNullOrEmpty(logFilePath))
@@ -65,56 +75,67 @@ namespace K9.Unity.Verbs
                 logFilePath = Path.GetTempFileName();
                 shouldCleanupLog = true;
             }
-
-            Process process = null;
-            // if (PlatformUtil.IsMacOS())
-            // {
-            //     process = StartProcess("open", $"{executable} --args {trimmedArguments}", logFilePath);
-            // }
-            // else
-            // {
-                process = StartProcess(executable, trimmedArguments, logFilePath);
-            //}
-
-            if (process == null)
+            else if (File.Exists(logFilePath))
             {
-                Log.WriteLine("No process found", "WRAPPER", Log.LogType.Error);
-                return -1;
+                File.Delete(logFilePath);
             }
 
-            using FileStream stream = File.Open( logFilePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite );
-            using StreamReader reader = new ( stream );
-            while ( !process.HasExited )
-            {
-                CaptureStream( reader );
-                System.Threading.Thread.Sleep( 500 );
-            }
+            Process process = StartProcess(executable, trimmedArguments, logFilePath);
+            Console.WriteLine($"##teamcity[setParameter name='PID' value='{process.Id}']");
 
-            System.Threading.Thread.Sleep( 500 );
-            CaptureStream( reader );
-
-            // We dont need it any
-            reader.Close();
-            stream.Close();
-
-            // Early out on the return
-            if (!shouldCleanupLog || !File.Exists(logFilePath))
-            {
-                return process.ExitCode;
-            }
-
+            // Small time to figure out log file
             // Try to delete file, protecting against longer then expected locks
+            bool logFileCreated = false;
             for (int i=0; i< 5; i++ )
             {
-                try
+                if (File.Exists(logFilePath))
                 {
-                    File.Delete( logFilePath );
+                    Log.WriteLine($"Log file found.", "WRAPPER", Log.LogType.Notice);
+                    logFileCreated = true;
                     break;
                 }
-                catch ( Exception)
+                Log.WriteLine($"Waiting on log file ...", "WRAPPER", Log.LogType.Notice);
+                System.Threading.Thread.Sleep( 1000 );
+            }
+
+            // We have a log we have stuff to do
+            if (logFileCreated)
+            {
+                using FileStream stream = File.Open(logFilePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
+                using StreamReader reader = new(stream);
+                while (!process.HasExited)
                 {
-                    Log.WriteLine($"Unable to delete {logFilePath} ({i}).", "WRAPPER", Log.LogType.Notice);
-                    System.Threading.Thread.Sleep( 1000 );
+                    CaptureStream(reader);
+                    System.Threading.Thread.Sleep(500);
+                }
+
+                System.Threading.Thread.Sleep(500);
+                CaptureStream(reader);
+
+                // We dont need it any
+                reader.Close();
+                stream.Close();
+
+                // Early out on the return
+                if (!shouldCleanupLog || !File.Exists(logFilePath))
+                {
+                    return process.ExitCode;
+                }
+
+                // Try to delete file, protecting against longer then expected locks
+                for (int i = 0; i < 5; i++)
+                {
+                    try
+                    {
+                        File.Delete(logFilePath);
+                        Log.WriteLine($"Log file deleted.", "WRAPPER", Log.LogType.Notice);
+                        break;
+                    }
+                    catch (Exception)
+                    {
+                        Log.WriteLine($"Unable to delete {logFilePath} ({i}).", "WRAPPER", Log.LogType.Notice);
+                        System.Threading.Thread.Sleep(1000);
+                    }
                 }
             }
 
