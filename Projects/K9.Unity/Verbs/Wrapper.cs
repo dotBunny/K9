@@ -8,17 +8,14 @@ using System.Diagnostics;
 using System.IO;
 using System.Text;
 using CommandLine;
-using K9.Services.Utils;
 
 namespace K9.Unity.Verbs
 {
-    // Must use ---NAME=VALUE
     [Verb("Wrapper")]
     public class Wrapper : IVerb
     {
         private List<string> _workingArguments;
         private string _executablePath;
-        private string _pidPath;
         private string _logPath;
 
         /// <inheritdoc />
