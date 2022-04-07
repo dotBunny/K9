@@ -65,6 +65,7 @@ namespace K9.IO.FileAccessors
         {
             if (!ValidConnection())
             {
+                Log.WriteLine("Invalid Connection Detected.", Core.LogCategory, Log.LogType.Error);
                 return null;
             }
 
