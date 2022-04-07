@@ -47,21 +47,50 @@ namespace K9.IO.FileAccessors
             _client = new NFSClient(protocol);
             _client.Connect(IPAddress.Parse(address),0,0, Timeout, Encoding.UTF8, true, false);
 
-            // DEBUG EXPORTED DEVICES
-            List<string> devices = _client.GetExportedDevices();
-            // foreach(string )
-            // foreach (string device in _client.GetExportedDevices())
-            // {
-            //     Log.Write(device);
-            // }
-            //
-            // _filePath = filePath;
-            // if (!Connected)
-            // {
-            //     return;
-            // }
-            // _client.MountDevice(share);
+            _filePath = filePath;
+
+            if (!Connected)
+            {
+                Log.WriteLine($"Unable to connect to NFS at {address}.", Core.LogCategory, Log.LogType.Error);
+
+                return;
+            }
+
+            foreach (string device in _client.GetExportedDevices())
+            {
+                string[] split = device.Split('/', 3);
+                if (split[2] == share)
+                {
+                    _client.MountDevice(device);
+                    break;
+                }
+            }
+
+            if (!_client.IsMounted)
+            {
+                Log.WriteLine($"Unable to get reader for {_filePath} as NFS is not mounted.", Core.LogCategory,
+                    Log.LogType.Error);
+            }
         }
+
+        ~NFSFileAccessor()
+        {
+            if (_client == null)
+            {
+                return;
+            }
+
+            if (_client.IsMounted)
+            {
+                _client.UnMountDevice();
+            }
+
+            if (_client.IsConnected)
+            {
+                _client.Disconnect();
+            }
+        }
+
 
         /// <inheritdoc />
         public uint GetBlockSize()
@@ -92,14 +121,14 @@ namespace K9.IO.FileAccessors
         /// <inheritdoc />
         public Stream GetReader()
         {
-            if (!Connected)
+            if (!ValidConnection())
             {
-                Log.WriteLine($"Unable to get reader for {_filePath} as NFS is not connected.", Core.LogCategory, Log.LogType.Error);
                 return null;
             }
-            if (!Mounted)
+            if (!_client.FileExists(_filePath))
             {
-                Log.WriteLine($"Unable to get reader for {_filePath} as NFS is not mounted.", Core.LogCategory, Log.LogType.Error);
+                Log.WriteLine($"Unable to find {_filePath} on NFS.", Core.LogCategory,
+                    Log.LogType.Error);
                 return null;
             }
 
@@ -110,9 +139,6 @@ namespace K9.IO.FileAccessors
 
             // Read the file
             _client.Read(_filePath, ref coalesceStream);
-
-            _client.UnMountDevice();
-            _client.Disconnect();
 
             return coalesceStream;
         }
