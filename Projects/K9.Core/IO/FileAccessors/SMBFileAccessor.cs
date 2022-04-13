@@ -198,10 +198,11 @@ namespace K9.IO.FileAccessors
             // Handle Client
             if (_client != null)
             {
-                if (_connected)
+                if (_loginStatus == NTStatus.STATUS_SUCCESS)
                 {
                     _client.Logoff();
                 }
+                
                 _connected = false;
                 _client.Disconnect();
             }
