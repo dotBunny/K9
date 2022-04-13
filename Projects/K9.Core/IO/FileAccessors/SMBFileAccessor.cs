@@ -4,6 +4,7 @@
 
 using System.IO;
 using System.Net;
+using System.Threading;
 using SMBLibrary;
 using SMBLibrary.Client;
 using FileAttributes = SMBLibrary.FileAttributes;
@@ -12,6 +13,7 @@ namespace K9.IO.FileAccessors
 {
     public class SMBFileAccessor : IFileAccessor
     {
+        private const int CommandDelayMS = 250;
         private readonly SMB2Client _client;
         private readonly string _filePath;
         private readonly ISMBFileStore _fileStore;
@@ -30,8 +32,41 @@ namespace K9.IO.FileAccessors
                 return;
             }
 
+            Thread.Sleep(CommandDelayMS);
+
             _loginStatus = _client.Login(string.Empty, username, password);
-            _fileStore = _client.TreeConnect(share, out _fileStoreStatus);
+
+            // We didnt fully login, this isn't good but we need to figure out if its recoverable.
+            if (_loginStatus != NTStatus.STATUS_SUCCESS)
+            {
+                // Alert
+                Log.WriteLine($"Login Status: {_loginStatus}", "SMB", Log.LogType.Info);
+                for (int i = 10; i > 0; i--)
+                {
+                    // Wait a bit
+                    Thread.Sleep(CommandDelayMS);
+
+                    // Retry login
+                    _loginStatus = _client.Login(string.Empty, username, password);
+
+                    if (_loginStatus == NTStatus.STATUS_SUCCESS)
+                    {
+                        break;
+                    }
+                    Log.WriteLine($"Login Status ({i}): {_loginStatus}", "SMB", Log.LogType.Info);
+                }
+            }
+
+            Thread.Sleep(CommandDelayMS);
+
+            if (_loginStatus == NTStatus.STATUS_SUCCESS)
+            {
+                _fileStore = _client.TreeConnect(share, out _fileStoreStatus);
+            }
+            else
+            {
+                Log.WriteLine($"Failed to authenticate in time.", "SMB", Log.LogType.Info);
+            }
         }
 
         /// <inheritdoc />
@@ -75,10 +110,14 @@ namespace K9.IO.FileAccessors
                 ShareAccess.Read, CreateDisposition.FILE_OPEN,
                 CreateOptions.FILE_NON_DIRECTORY_FILE | CreateOptions.FILE_SYNCHRONOUS_IO_ALERT, null);
 
+            Thread.Sleep(CommandDelayMS);
+
             if (fileCreateStatus == NTStatus.STATUS_SUCCESS && fileStatus == FileStatus.FILE_OPENED)
             {
                 NTStatus fileInfoStatus = _fileStore.GetFileInformation(out FileInformation result, fileHandle,
                     FileInformationClass.FileStandardInformation);
+
+                Thread.Sleep(CommandDelayMS);
 
                 if (fileInfoStatus == NTStatus.STATUS_SUCCESS)
                 {
