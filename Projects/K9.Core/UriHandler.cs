@@ -10,7 +10,6 @@ namespace K9
 {
     public static class UriHandler
     {
-
         public static IFileAccessor GetFileAccessor(string connectionString)
         {
             Uri uri = new(connectionString);
@@ -19,12 +18,6 @@ namespace K9
             {
                 case "SMB":
                     type = IFileAccessor.Type.SMB;
-                    break;
-                case "NFS3":
-                    type = IFileAccessor.Type.NFS3;
-                    break;
-                case "NFS4":
-                    type = IFileAccessor.Type.NFS4;
                     break;
             }
 
@@ -63,10 +56,6 @@ namespace K9
                 {
                     case IFileAccessor.Type.SMB:
                         return new SMBFileAccessor(address, username, password, share, filePath);
-                    case IFileAccessor.Type.NFS3:
-                        return new NFSFileAccessor(NFSFileAccessor.ProtocolVersion.v3, address, share, filePath);
-                    case IFileAccessor.Type.NFS4:
-                        return new NFSFileAccessor(NFSFileAccessor.ProtocolVersion.v4, address, share, filePath);
                 }
             }
             // Default to a system level file stream

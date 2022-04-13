@@ -11,8 +11,6 @@ namespace K9.IO
         public enum Type
         {
             Default,
-            NFS3,
-            NFS4,
             SMB
         }
         public uint GetBlockSize();
