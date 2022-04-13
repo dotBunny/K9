@@ -13,7 +13,7 @@ namespace K9.IO.FileAccessors
 {
     public class SMBFileAccessor : IFileAccessor
     {
-        private const int CommandDelayMS = 250;
+        private const int CommandDelay = 250;
         private readonly SMB2Client _client;
         private readonly string _filePath;
         private readonly ISMBFileStore _fileStore;
@@ -32,7 +32,10 @@ namespace K9.IO.FileAccessors
                 return;
             }
 
-            Thread.Sleep(CommandDelayMS);
+            Thread.Sleep(CommandDelay);
+
+            // Start in a state of perpetual unknown
+            _loginStatus = NTStatus.STATUS_PENDING;
 
             _loginStatus = _client.Login(string.Empty, username, password);
 
@@ -44,7 +47,7 @@ namespace K9.IO.FileAccessors
                 for (int i = 10; i > 0; i--)
                 {
                     // Wait a bit
-                    Thread.Sleep(CommandDelayMS);
+                    Thread.Sleep(CommandDelay);
 
                     // Retry login
                     _loginStatus = _client.Login(string.Empty, username, password);
@@ -57,7 +60,7 @@ namespace K9.IO.FileAccessors
                 }
             }
 
-            Thread.Sleep(CommandDelayMS);
+            Thread.Sleep(CommandDelay);
 
             if (_loginStatus == NTStatus.STATUS_SUCCESS)
             {
@@ -110,14 +113,14 @@ namespace K9.IO.FileAccessors
                 ShareAccess.Read, CreateDisposition.FILE_OPEN,
                 CreateOptions.FILE_NON_DIRECTORY_FILE | CreateOptions.FILE_SYNCHRONOUS_IO_ALERT, null);
 
-            Thread.Sleep(CommandDelayMS);
+            Thread.Sleep(CommandDelay);
 
             if (fileCreateStatus == NTStatus.STATUS_SUCCESS && fileStatus == FileStatus.FILE_OPENED)
             {
                 NTStatus fileInfoStatus = _fileStore.GetFileInformation(out FileInformation result, fileHandle,
                     FileInformationClass.FileStandardInformation);
 
-                Thread.Sleep(CommandDelayMS);
+                Thread.Sleep(CommandDelay);
 
                 if (fileInfoStatus == NTStatus.STATUS_SUCCESS)
                 {
@@ -202,7 +205,7 @@ namespace K9.IO.FileAccessors
                 {
                     _client.Logoff();
                 }
-                
+
                 _connected = false;
                 _client.Disconnect();
             }
