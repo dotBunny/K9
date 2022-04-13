@@ -13,7 +13,8 @@ namespace K9.IO.FileAccessors
 {
     public class SMBFileAccessor : IFileAccessor
     {
-        private const int CommandDelay = 250;
+        private const int ShortCommandDelay = 250;
+        private const int LongCommandDelay = 500;
         private readonly SMB2Client _client;
         private readonly string _filePath;
         private readonly ISMBFileStore _fileStore;
@@ -23,31 +24,36 @@ namespace K9.IO.FileAccessors
 
         public SMBFileAccessor(string address, string username, string password, string share, string filePath)
         {
+            // Initialize our starting states
+            _loginStatus = NTStatus.STATUS_PENDING;
+            _fileStoreStatus = NTStatus.STATUS_PENDING;
             _filePath = filePath;
+
+            // Try connecting
             _client = new SMB2Client();
             _connected = _client.Connect(IPAddress.Parse(address), SMBTransportType.DirectTCPTransport);
 
+            // Base level fail just cant happen - sorry.
             if (!_connected)
             {
                 return;
             }
 
-            Thread.Sleep(CommandDelay);
+            // Lets wait a slight bit before we do anything
+            Thread.Sleep(ShortCommandDelay);
 
-            // Start in a state of perpetual unknown
-            _loginStatus = NTStatus.STATUS_PENDING;
-
+            // First try on the login
             _loginStatus = _client.Login(string.Empty, username, password);
 
             // We didnt fully login, this isn't good but we need to figure out if its recoverable.
             if (_loginStatus != NTStatus.STATUS_SUCCESS)
             {
                 // Alert
-                Log.WriteLine($"Login Status: {_loginStatus}", "SMB", Log.LogType.Info);
+                Log.WriteLine($"Login [{username}]: {_loginStatus}", "SMB", Log.LogType.Info);
                 for (int i = 10; i > 0; i--)
                 {
                     // Wait a bit
-                    Thread.Sleep(CommandDelay);
+                    Thread.Sleep(ShortCommandDelay);
 
                     // Retry login
                     _loginStatus = _client.Login(string.Empty, username, password);
@@ -56,19 +62,40 @@ namespace K9.IO.FileAccessors
                     {
                         break;
                     }
-                    Log.WriteLine($"Login Status ({i}): {_loginStatus}", "SMB", Log.LogType.Info);
+                    Log.WriteLine($"Login [{username}] ({i}): {_loginStatus}", "SMB", Log.LogType.Info);
                 }
             }
 
-            Thread.Sleep(CommandDelay);
-
-            if (_loginStatus == NTStatus.STATUS_SUCCESS)
-            {
-                _fileStore = _client.TreeConnect(share, out _fileStoreStatus);
-            }
-            else
+            // If we haven't logged in were done here.
+            if (_loginStatus != NTStatus.STATUS_SUCCESS)
             {
                 Log.WriteLine($"Failed to authenticate in time.", "SMB", Log.LogType.Info);
+                return;
+            }
+
+            // Wait a bit till our next call
+            Thread.Sleep(ShortCommandDelay);
+
+            // Best case this works, again first try!
+            _fileStore = _client.TreeConnect(share, out _fileStoreStatus);
+            if (_fileStoreStatus != NTStatus.STATUS_SUCCESS)
+            {
+                // Alert
+                Log.WriteLine($"File Store [{share}]: {_fileStoreStatus}", "SMB", Log.LogType.Info);
+                for (int i = 10; i > 0; i--)
+                {
+                    // Wait a bit
+                    Thread.Sleep(LongCommandDelay);
+
+                    // Retry accessing share
+                    _fileStore = _client.TreeConnect(share, out _fileStoreStatus);
+
+                    if (_fileStoreStatus == NTStatus.STATUS_SUCCESS)
+                    {
+                        break;
+                    }
+                    Log.WriteLine($"File Store [{share}]: {_fileStoreStatus}", "SMB", Log.LogType.Info);
+                }
             }
         }
 
@@ -113,14 +140,14 @@ namespace K9.IO.FileAccessors
                 ShareAccess.Read, CreateDisposition.FILE_OPEN,
                 CreateOptions.FILE_NON_DIRECTORY_FILE | CreateOptions.FILE_SYNCHRONOUS_IO_ALERT, null);
 
-            Thread.Sleep(CommandDelay);
+            Thread.Sleep(ShortCommandDelay);
 
             if (fileCreateStatus == NTStatus.STATUS_SUCCESS && fileStatus == FileStatus.FILE_OPENED)
             {
                 NTStatus fileInfoStatus = _fileStore.GetFileInformation(out FileInformation result, fileHandle,
                     FileInformationClass.FileStandardInformation);
 
-                Thread.Sleep(CommandDelay);
+                Thread.Sleep(ShortCommandDelay);
 
                 if (fileInfoStatus == NTStatus.STATUS_SUCCESS)
                 {
