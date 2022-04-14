@@ -223,7 +223,10 @@ namespace K9.IO.FileAccessors
 
         private void Cleanup()
         {
-            _fileStore?.Disconnect();
+            if (_fileStoreStatus == NTStatus.STATUS_SUCCESS)
+            {
+                _fileStore?.Disconnect();
+            }
 
             // Handle Client
             if (_client != null)
