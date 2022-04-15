@@ -186,8 +186,8 @@ namespace K9.IO.FileAccessors
                             if (retryCount > 0)
                             {
                                 Log.WriteLine($"Retrying request due to {readFileStatus.ToString()} response at {bytesRead} reading offset.", "SMB");
-
                                 retryCount--;
+                                Thread.Sleep(ShortCommandDelay);
                             }
                             else
                             {
