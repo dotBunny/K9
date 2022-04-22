@@ -158,6 +158,7 @@ namespace K9.IO.FileAccessors
                     long bytesRead = 0;
 
                     Timer timer = new();
+                    int retryCount = 10;
                     while (bytesRead < fileInfo.EndOfFile)
                     {
                         NTStatus readFileStatus = _fileStore.ReadFile(out byte[] data, fileHandle, bytesRead,
@@ -182,12 +183,20 @@ namespace K9.IO.FileAccessors
                         }
                         else
                         {
-
-                            Log.WriteLine(readFileStatus.ToString(), "SMB");
-                            _fileStore.CloseFile(fileHandle);
-                            stream.Dispose();
-                            Cleanup();
-                            return null;
+                            if (retryCount > 0)
+                            {
+                                Log.WriteLine($"Retrying request due to {readFileStatus.ToString()} response at {bytesRead} reading offset.", "SMB");
+                                retryCount--;
+                                Thread.Sleep(ShortCommandDelay);
+                            }
+                            else
+                            {
+                                Log.WriteLine(readFileStatus.ToString(), "SMB");
+                                _fileStore.CloseFile(fileHandle);
+                                stream.Dispose();
+                                Cleanup();
+                                return null;
+                            }
                         }
                     }
 
