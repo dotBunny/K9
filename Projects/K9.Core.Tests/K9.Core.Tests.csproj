@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net5.0</TargetFramework>
+    <TargetFramework>net6.0</TargetFramework>
 
     <IsPackable>false</IsPackable>
 
@@ -19,13 +19,13 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="nunit" Version="3.13.2"/>
-    <PackageReference Include="NUnit3TestAdapter" Version="4.0.0"/>
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.11.0"/>
+    <PackageReference Include="nunit" Version="3.13.2" />
+    <PackageReference Include="NUnit3TestAdapter" Version="4.0.0" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.11.0" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\K9.Core\K9.Core.csproj"/>
+    <ProjectReference Include="..\K9.Core\K9.Core.csproj" />
   </ItemGroup>
 
 </Project>

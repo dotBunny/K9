@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net5.0</TargetFramework>
+    <TargetFramework>net6.0</TargetFramework>
 
     <IsPackable>false</IsPackable>
 
@@ -19,24 +19,24 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="nunit" Version="3.13.2"/>
-    <PackageReference Include="NUnit3TestAdapter" Version="4.0.0"/>
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.11.0"/>
+    <PackageReference Include="nunit" Version="3.13.2" />
+    <PackageReference Include="NUnit3TestAdapter" Version="4.0.0" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.11.0" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\K9.Unity\K9.Unity.csproj"/>
+    <ProjectReference Include="..\K9.Unity\K9.Unity.csproj" />
   </ItemGroup>
 
   <ItemGroup>
-    <None Remove="Content\testrun-performance.xml"/>
+    <None Remove="Content\testrun-performance.xml" />
   </ItemGroup>
 
   <ItemGroup>
-    <None Remove="Content\unityTestResults-Performance.xml"/>
-    <EmbeddedResource Include="Content\unityTestResults-Performance.xml"/>
-    <None Remove="Content\unityTestResults-UnitTests.xml"/>
-    <EmbeddedResource Include="Content\unityTestResults-UnitTests.xml"/>
+    <None Remove="Content\unityTestResults-Performance.xml" />
+    <EmbeddedResource Include="Content\unityTestResults-Performance.xml" />
+    <None Remove="Content\unityTestResults-UnitTests.xml" />
+    <EmbeddedResource Include="Content\unityTestResults-UnitTests.xml" />
   </ItemGroup>
 
 </Project>
