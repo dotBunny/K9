@@ -87,7 +87,7 @@ namespace K9.Setup.Verbs
                     }
                     else
                     {
-                        ExtractStream(inputStream, OutputPath);
+                        Compression.ExtractStream(inputStream, OutputPath);
                     }
                 }
                 else
@@ -135,43 +135,6 @@ namespace K9.Setup.Verbs
                 Program.Instance.DefaultLogCategory);
         }
 
-        static void ExtractStream(Stream inputStream, string outputPath)
-        {
-            Timer timer = new();
-            ZipFile archive = new(inputStream, false);
-            try
-            {
-                foreach (ZipEntry zipEntry in archive)
-                {
-                    if (!zipEntry.IsFile)
-                    {
-                        continue;
-                    }
 
-                    string entryFileName = zipEntry.Name;
-                    byte[] buffer = new byte[PlatformUtil.GetBlockSize()];
-                    Stream zipStream = archive.GetInputStream(zipEntry);
-
-                    string fullZipToPath = Path.Combine(outputPath, entryFileName);
-                    string directoryName = Path.GetDirectoryName(fullZipToPath);
-                    if (directoryName is { Length: > 0 } && !Directory.Exists(directoryName))
-                    {
-                        Directory.CreateDirectory(directoryName);
-                    }
-
-                    using (FileStream streamWriter = File.Create(fullZipToPath))
-                    {
-                        StreamUtils.Copy(zipStream, streamWriter, buffer);
-                    }
-                }
-                Log.WriteLine($"Extracted {archive.Count} entries in {timer.GetElapsedSeconds()} seconds.",
-                    Program.Instance.DefaultLogCategory);
-            }
-            finally
-            {
-                archive.IsStreamOwner = true; // Makes close also shut the underlying stream
-                archive.Close(); // Ensure we release resources
-            }
-        }
     }
 }

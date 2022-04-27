@@ -33,8 +33,4 @@
     <ProjectReference Include="..\K9.Core\K9.Core.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <PackageReference Include="SharpZipLib" Version="1.3.3" />
-  </ItemGroup>
-
 </Project>
