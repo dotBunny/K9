@@ -16,7 +16,7 @@ public class KillProcess : IVerb
 
     [Option('p', "pid", Required = false, HelpText = "PID of process to attempt to kill.")]
     public string Pid { get; set; }
-    [Option('f', "pids", Required = false, HelpText = "Path to file of PIDs")]
+    [Option('f', "file", Required = false, HelpText = "Path to file of PIDs")]
     public string PidsPath { get; set; }
 
     private int _singlePID = -1;
