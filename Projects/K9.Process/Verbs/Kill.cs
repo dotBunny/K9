@@ -51,11 +51,20 @@ public class Kill : IVerb
 
                 if(int.TryParse(cleaned, out int targetPid))
                 {
-                    Log.WriteLine($"Kill {targetPid}", Program.Instance.DefaultLogCategory);
-                    System.Diagnostics.Process process = System.Diagnostics.Process.GetProcessById(targetPid);
-                    process.Kill(true);
+                    try
+                    {
+                        System.Diagnostics.Process process = System.Diagnostics.Process.GetProcessById(targetPid);
+                        if (!process.HasExited)
+                        {
+                            Log.WriteLine($"Killing {targetPid}", Program.Instance.DefaultLogCategory);
+                            process.Kill(true);
+                        }
+                    }
+                    catch
+                    {
+                        Log.WriteLine($"{targetPid} was not available.", Program.Instance.DefaultLogCategory);
+                    }
                 }
-
             }
         }
         return true;
