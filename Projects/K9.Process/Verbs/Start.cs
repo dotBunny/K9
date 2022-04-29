@@ -68,12 +68,12 @@ public class Start : IVerb
             if (argument.Contains(' '))
             {
                 arguments.Append('"');
-                arguments.Append(argument.Replace("___INDEX___", i.ToString()));
+                arguments.Append(argument);
                 arguments.Append('"');
             }
             else
             {
-                arguments.Append(argument.Replace("___INDEX___", i.ToString()));
+                arguments.Append(argument);
             }
 
             arguments.Append(' ');
@@ -87,7 +87,7 @@ public class Start : IVerb
             process.StartInfo.FileName = _executablePath;
             process.StartInfo.WindowStyle = ProcessWindowStyle.Normal;
             process.StartInfo.ErrorDialog = false;
-            process.StartInfo.Arguments = arguments.ToString();
+            process.StartInfo.Arguments = arguments.ToString().Replace("___INDEX___", i.ToString());
             process.StartInfo.CreateNoWindow = false;
 
             Log.WriteLine($"Launching Process #{i} ...", Program.Instance.DefaultLogCategory);
