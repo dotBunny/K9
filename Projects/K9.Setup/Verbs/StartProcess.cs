@@ -68,12 +68,12 @@ public class StartProcess : IVerb
             if (argument.Contains(' '))
             {
                 arguments.Append('"');
-                arguments.Append(argument.Replace("#i#", i.ToString()));
+                arguments.Append(argument.Replace("___INDEX___", i.ToString()));
                 arguments.Append('"');
             }
             else
             {
-                arguments.Append(argument.Replace("#i#", i.ToString()));
+                arguments.Append(argument.Replace("___INDEX___", i.ToString()));
             }
 
             arguments.Append(' ');
