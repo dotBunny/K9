@@ -4,6 +4,7 @@
 
 using System;
 using System.IO;
+using K9.IO;
 
 namespace K9.Utils
 {
@@ -116,6 +117,40 @@ namespace K9.Utils
                     writer.Write(lines[lines.Length - 1]);
                 }
             }
+        }
+
+        public static void WriteStream(Stream inputStream, string outputPath)
+        {
+            IFileAccessor outputHandler = UriHandler.GetFileAccessor(outputPath);
+
+            int bufferSize = outputHandler.GetWriteBufferSize();
+            using Stream outputFile = outputHandler.GetWriter();
+
+            long inputStreamLength = inputStream.Length;
+            byte[] bytes = new byte[bufferSize];
+            long writtenLength = 0;
+            Timer timer = new();
+            while (writtenLength < inputStreamLength)
+            {
+                int readAmount = bufferSize;
+                if (writtenLength + bufferSize > inputStreamLength)
+                {
+                    readAmount = (int)(inputStreamLength - writtenLength);
+                }
+
+                inputStream.Read(bytes, 0, readAmount);
+
+                // Write read data
+                outputFile.Write(bytes, 0, readAmount);
+
+                // Add to our offset
+                writtenLength += readAmount;
+            }
+
+            outputFile.Close();
+            Log.WriteLine(
+                $"Wrote {writtenLength} of {inputStreamLength} bytes in {timer.GetElapsedSeconds()} seconds (∼{timer.TransferRate(writtenLength)}).",
+                "FILE");
         }
     }
 }

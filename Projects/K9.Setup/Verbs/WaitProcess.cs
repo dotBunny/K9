@@ -11,7 +11,7 @@ using CommandLine;
 
 namespace K9.Setup.Verbs;
 
-[Verb("KillProcess")]
+[Verb("WaitProcess")]
 public class WaitProcess : IVerb
 {
     private const int WaitTime = 10000;

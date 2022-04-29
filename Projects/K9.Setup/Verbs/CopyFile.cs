@@ -71,28 +71,11 @@ namespace K9.Setup.Verbs
 
                 if (Extract && upperCaseFilePath.EndsWith(".ZIP"))
                 {
-                    Log.WriteLine("Extracting ZIP ...", Program.Instance.DefaultLogCategory);
-                    if (PlatformUtil.IsMacOS() || PlatformUtil.IsLinux())
-                    {
-                        string tempFile = Path.GetTempFileName();
-                        WriteStream(inputStream, tempFile);
-                        Directory.CreateDirectory(OutputPath);
-                        Timer timer = new();
-                        ProcessUtil.ExecuteProcess("unzip", OutputPath, $"{tempFile} -d {OutputPath}", null, s =>
-                        {
-                            Console.WriteLine(s);
-                        });
-                        Log.WriteLine($"Extracted archive in {timer.GetElapsedSeconds()} seconds.",
-                            Program.Instance.DefaultLogCategory);
-                    }
-                    else
-                    {
-                        Compression.ExtractStream(inputStream, OutputPath);
-                    }
+                    Compression.ExtractStream(inputStream, OutputPath);
                 }
                 else
                 {
-                    WriteStream(inputStream, OutputPath);
+                    FileUtil.WriteStream(inputStream, OutputPath);
                 }
 
                 inputStream.Close();
@@ -101,39 +84,7 @@ namespace K9.Setup.Verbs
             return true;
         }
 
-        static void WriteStream(Stream inputStream, string outputPath)
-        {
-            IFileAccessor outputHandler = UriHandler.GetFileAccessor(outputPath);
 
-            int bufferSize = outputHandler.GetWriteBufferSize();
-            using Stream outputFile = outputHandler.GetWriter();
-
-            long inputStreamLength = inputStream.Length;
-            byte[] bytes = new byte[bufferSize];
-            long writtenLength = 0;
-            Timer timer = new();
-            while (writtenLength < inputStreamLength)
-            {
-                int readAmount = bufferSize;
-                if (writtenLength + bufferSize > inputStreamLength)
-                {
-                    readAmount = (int)(inputStreamLength - writtenLength);
-                }
-
-                inputStream.Read(bytes, 0, readAmount);
-
-                // Write read data
-                outputFile.Write(bytes, 0, readAmount);
-
-                // Add to our offset
-                writtenLength += readAmount;
-            }
-
-            outputFile.Close();
-            Log.WriteLine(
-                $"Wrote {writtenLength} of {inputStreamLength} bytes in {timer.GetElapsedSeconds()} seconds (∼{timer.TransferRate(writtenLength)}).",
-                Program.Instance.DefaultLogCategory);
-        }
 
 
     }
