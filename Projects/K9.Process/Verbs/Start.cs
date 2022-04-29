@@ -8,10 +8,10 @@ using System.IO;
 using System.Text;
 using CommandLine;
 
-namespace K9.Setup.Verbs;
+namespace K9.Process.Verbs;
 
-[Verb("StartProcess")]
-public class StartProcess : IVerb
+[Verb("Start")]
+public class Start : IVerb
 {
     public int Count = 1;
     public string PidFile;
@@ -82,7 +82,7 @@ public class StartProcess : IVerb
         List<int> pids = new List<int>();
         for (int i = 0; i < Count; i++)
         {
-            Process process = new();
+            System.Diagnostics.Process process = new();
             process.StartInfo.WorkingDirectory = Directory.GetCurrentDirectory();
             process.StartInfo.FileName = _executablePath;
             process.StartInfo.WindowStyle = ProcessWindowStyle.Normal;
@@ -90,14 +90,13 @@ public class StartProcess : IVerb
             process.StartInfo.Arguments = arguments.ToString();
             process.StartInfo.CreateNoWindow = false;
 
-            Log.WriteLine($"Launching Process #{i} ...", "WRAPPER", Log.LogType.ExternalProcess);
-            Log.WriteLine($"{process.StartInfo.FileName} {process.StartInfo.Arguments}", "WRAPPER",
-                Log.LogType.ExternalProcess);
+            Log.WriteLine($"Launching Process #{i} ...", Program.Instance.DefaultLogCategory);
+            Log.WriteLine($"{process.StartInfo.FileName} {process.StartInfo.Arguments}");
             process.Start();
 
             int pid = process.Id;
             pids.Add(pid);
-            Log.WriteLine($"PID {pid}", "WRAPPER", Log.LogType.ExternalProcess);
+            Log.WriteLine($"PID {pid}", Program.Instance.DefaultLogCategory);
         }
 
         // Write PIDs

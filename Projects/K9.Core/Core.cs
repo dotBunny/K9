@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
+using CommandLine;
 using K9.Services.Utils;
 
 namespace K9
@@ -216,6 +217,16 @@ namespace K9
 
             // Update exit code
             UpdateExitCode(e.HResult);
+        }
+
+        public static Parser GetDefaultParser(bool ignoreUnknown = false)
+        {
+            Parser parser = new(config =>
+            {
+                config.CaseInsensitiveEnumValues = true;
+                config.IgnoreUnknownArguments = ignoreUnknown; // Allows for Wrapper to work
+            });
+            return parser;
         }
     }
 }

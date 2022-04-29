@@ -4,15 +4,15 @@
 
 using System;
 using CommandLine;
-using K9.Setup.Verbs;
+using K9.Process.Verbs;
 using K9.Utils;
 
-namespace K9.Setup
+namespace K9.Process
 {
     internal class Program : IProgram
     {
         public static Program Instance;
-        public string DefaultLogCategory => "K9.SETUP";
+        public string DefaultLogCategory => "K9.PROCESS";
 
         private static void Main(string[] args)
         {
@@ -25,18 +25,12 @@ namespace K9.Setup
                 Parser parser = Core.GetDefaultParser(true);
 
                 ParserResult<object> results =
-                    parser.ParseArguments<Perforce, SetEnvironmentVariable, WriteFile, DeleteFolder, DeleteFile,
-                        CopyFile, Checkout, Zip>(Core.Arguments);
+                    parser.ParseArguments<Start, Kill, Wait>(Core.Arguments);
 
                 bool newResult = results.MapResult(
-                    (Perforce perforce) => perforce.CanExecute() && perforce.Execute(),
-                    (SetEnvironmentVariable env) => env.CanExecute() && env.Execute(),
-                    (WriteFile write) => write.CanExecute() && write.Execute(),
-                    (DeleteFolder deleteFolder) => deleteFolder.CanExecute() && deleteFolder.Execute(),
-                    (DeleteFile deleteFile) => deleteFile.CanExecute() && deleteFile.Execute(),
-                    (CopyFile copy) => copy.CanExecute() && copy.Execute(),
-                    (Checkout checkout) => checkout.CanExecute() && checkout.Execute(),
-                    (Zip zip) => zip.CanExecute() && zip.Execute(),
+                    (Start start) => start.CanExecute() && start.Execute(),
+                    (Kill kill) => kill.CanExecute() && kill.Execute(),
+                    (Wait wait) => wait.CanExecute() && wait.Execute(),
                     _ => false);
 
                 if (!newResult)

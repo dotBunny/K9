@@ -22,7 +22,7 @@ namespace K9.Setup
                 Instance = new Program();
                 Core.Init(Instance);
 
-                Parser parser = new(Settings => Settings.CaseInsensitiveEnumValues = true);
+                Parser parser = Core.GetDefaultParser();
 
                 ParserResult<object> results =
                     parser.ParseArguments<Upload, Download, Delete>(

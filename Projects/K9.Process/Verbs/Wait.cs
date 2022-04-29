@@ -1,18 +1,15 @@
 ﻿// Copyright (c) 2018-2021 dotBunny Inc.
 // dotBunny licenses this file to you under the BSL-1.0 license.
 // See the LICENSE file in the project root for more information.
-using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
-using System.Text;
 using System.Threading;
 using CommandLine;
 
-namespace K9.Setup.Verbs;
+namespace K9.Process.Verbs;
 
-[Verb("WaitProcess")]
-public class WaitProcess : IVerb
+[Verb("Wait")]
+public class Wait : IVerb
 {
     private const int WaitTime = 10000;
 
@@ -38,10 +35,10 @@ public class WaitProcess : IVerb
     {
         if (_singlePID != -1)
         {
-            Process singleProcess = Process.GetProcessById(_singlePID);
+            System.Diagnostics.Process singleProcess = System.Diagnostics.Process.GetProcessById(_singlePID);
             if (!singleProcess.HasExited)
             {
-                Log.WriteLine($"Waiting on {_singlePID} ...", "PROCESS", Log.LogType.ExternalProcess);
+                Log.WriteLine($"Waiting on {_singlePID} ...", Program.Instance.DefaultLogCategory);
                 while (!singleProcess.HasExited)
                 {
                     Thread.Sleep(WaitTime);
@@ -53,7 +50,7 @@ public class WaitProcess : IVerb
             // Read file
             string[] lines = File.ReadAllLines(PidsPath);
             int lineCount = lines.Length;
-            List<Process> processes = new List<Process>(lineCount);
+            List<System.Diagnostics.Process> processes = new (lineCount);
             for (int i = 0; i < lineCount; i++)
             {
                 string cleaned = lines[i].Trim();
@@ -65,10 +62,10 @@ public class WaitProcess : IVerb
                 if(int.TryParse(cleaned, out int targetPid))
                 {
 
-                    Process process = Process.GetProcessById(targetPid);
+                    System.Diagnostics.Process process = System.Diagnostics.Process.GetProcessById(targetPid);
                     if (!process.HasExited)
                     {
-                        Log.WriteLine($"Found {targetPid}", "PROCESS", Log.LogType.ExternalProcess);
+                        Log.WriteLine($"Found {targetPid}", Program.Instance.DefaultLogCategory);
                         processes.Add(process);
                     }
                 }
@@ -77,10 +74,10 @@ public class WaitProcess : IVerb
             while (true)
             {
                 int waitCount = processes.Count;
-                Log.WriteLine($"Waiting on {waitCount} process ...");
+                Log.WriteLine($"Waiting on {waitCount} process ...", Program.Instance.DefaultLogCategory);
                 for (int i = waitCount - 1; i >= 0; i--)
                 {
-                    Process p = processes[i];
+                    System.Diagnostics.Process p = processes[i];
                     if (p.HasExited)
                     {
                         processes.RemoveAt(i);

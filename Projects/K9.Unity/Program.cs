@@ -22,11 +22,7 @@ namespace K9.Unity
                 Instance = new Program();
                 Core.Init(Instance);
 
-                Parser parser = new(Settings =>
-                {
-                    Settings.CaseInsensitiveEnumValues = true;
-                    Settings.IgnoreUnknownArguments = true; // Allows for Wrapper to work
-                });
+                Parser parser = Core.GetDefaultParser(true);
 
                 ParserResult<object> results = parser.ParseArguments<VersionControlSettings, TestResults, AddPackage, RemovePackage, RemotePackages, FindEditor, Wrapper>(Core.Arguments);
 

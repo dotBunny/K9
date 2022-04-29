@@ -1,19 +1,15 @@
 ﻿// Copyright (c) 2018-2021 dotBunny Inc.
 // dotBunny licenses this file to you under the BSL-1.0 license.
 // See the LICENSE file in the project root for more information.
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
+
 using System.IO;
-using System.Text;
 using CommandLine;
 
-namespace K9.Setup.Verbs;
+namespace K9.Process.Verbs;
 
-[Verb("KillProcess")]
-public class KillProcess : IVerb
+[Verb("Kill")]
+public class Kill : IVerb
 {
-
     [Option('p', "pid", Required = false, HelpText = "PID of process to attempt to kill.")]
     public string Pid { get; set; }
     [Option('f', "file", Required = false, HelpText = "Path to file of PIDs")]
@@ -24,7 +20,6 @@ public class KillProcess : IVerb
     /// <inheritdoc />
     public bool CanExecute()
     {
-
         if (!string.IsNullOrEmpty(PidsPath))
         {
             return File.Exists(PidsPath);
@@ -37,8 +32,8 @@ public class KillProcess : IVerb
     {
         if (_singlePID != -1)
         {
-            Log.WriteLine($"Kill {_singlePID}", "PROCESS", Log.LogType.ExternalProcess);
-            Process singleProcess = Process.GetProcessById(_singlePID);
+            Log.WriteLine($"Kill {_singlePID}", Program.Instance.DefaultLogCategory);
+            System.Diagnostics.Process singleProcess = System.Diagnostics.Process.GetProcessById(_singlePID);
             singleProcess.Kill(true);
         }
         else
@@ -56,8 +51,8 @@ public class KillProcess : IVerb
 
                 if(int.TryParse(cleaned, out int targetPid))
                 {
-                    Log.WriteLine($"Kill {targetPid}", "PROCESS", Log.LogType.ExternalProcess);
-                    Process process = Process.GetProcessById(targetPid);
+                    Log.WriteLine($"Kill {targetPid}", Program.Instance.DefaultLogCategory);
+                    System.Diagnostics.Process process = System.Diagnostics.Process.GetProcessById(targetPid);
                     process.Kill(true);
                 }
 

@@ -22,7 +22,7 @@ namespace K9.Unreal
                 Instance = new Program();
                 Core.Init(Instance);
 
-                Parser parser = new(Settings => Settings.CaseInsensitiveEnumValues = true);
+                Parser parser = Core.GetDefaultParser();
 
                 ParserResult<UERunTestsJSONToNUnitXML> results =
                     parser.ParseArguments<UERunTestsJSONToNUnitXML>(Core.Arguments);
