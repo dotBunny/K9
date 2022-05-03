@@ -25,9 +25,17 @@ public class Wait : IVerb
     {
         if (!string.IsNullOrEmpty(PidsPath))
         {
-            return File.Exists(PidsPath);
+            bool exists = File.Exists(PidsPath);
+            Log.WriteLine($"Unable to find pid file at {PidsPath}.", Program.Instance.DefaultLogCategory);
+            return exists;
         }
-        return int.TryParse(Pid, out _singlePID);
+
+        if (int.TryParse(Pid, out _singlePID))
+        {
+            return true;
+        }
+        Log.WriteLine($"Unable to parse PID {_singlePID}.", Program.Instance.DefaultLogCategory);
+        return false;
     }
 
     /// <inheritdoc />
@@ -61,7 +69,6 @@ public class Wait : IVerb
 
                 if(int.TryParse(cleaned, out int targetPid))
                 {
-
                     System.Diagnostics.Process process = System.Diagnostics.Process.GetProcessById(targetPid);
                     if (!process.HasExited)
                     {

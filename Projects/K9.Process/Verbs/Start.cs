@@ -50,11 +50,14 @@ public class Start : IVerb
             }
             else
             {
+                Log.WriteLine($"Working folder not found.", Program.Instance.DefaultLogCategory);
                 return false;
             }
         }
 
-        return File.Exists(_executablePath);
+        bool hasExecutable = File.Exists(_executablePath);
+        Log.WriteLine($"Unable to find executable at {_executablePath}.", Program.Instance.DefaultLogCategory);
+        return hasExecutable;
     }
 
     /// <inheritdoc />
