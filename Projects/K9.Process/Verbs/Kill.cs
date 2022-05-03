@@ -23,7 +23,10 @@ public class Kill : IVerb
         if (!string.IsNullOrEmpty(PidsPath))
         {
             bool exists = File.Exists(PidsPath);
-            Log.WriteLine($"Unable to find pid file at {PidsPath}.", Program.Instance.DefaultLogCategory);
+            if (!exists)
+            {
+                Log.WriteLine($"Unable to find pid file at {PidsPath}.", Program.Instance.DefaultLogCategory);
+            }
             return exists;
         }
 
