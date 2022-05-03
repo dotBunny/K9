@@ -82,6 +82,8 @@ public class Start : IVerb
             arguments.Append(' ');
         }
 
+        Log.WriteLine($"Starting {Count} Processes ...", Program.Instance.DefaultLogCategory);
+
         List<int> pids = new List<int>();
         for (int i = 0; i < Count; i++)
         {
@@ -110,6 +112,7 @@ public class Start : IVerb
             // we can assume the index is the line in the file
             pidsLines.Add(pids[i].ToString());
         }
+        Log.WriteLine($"Writing PID file  to {PidFile} ...", Program.Instance.DefaultLogCategory);
         File.WriteAllLines(PidFile, pidsLines);
 
         return pidCount == Count;
