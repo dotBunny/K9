@@ -50,7 +50,7 @@ public class Start : IVerb
             }
             else
             {
-                Log.WriteLine($"Working folder not found.", Program.Instance.DefaultLogCategory);
+                Log.WriteLine("Working folder not found.", Program.Instance.DefaultLogCategory);
                 return false;
             }
         }
