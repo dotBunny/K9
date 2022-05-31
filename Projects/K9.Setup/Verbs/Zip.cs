@@ -64,6 +64,13 @@ namespace K9.Setup.Verbs
                 Log.WriteLine("No files to add to zip", Program.Instance.DefaultLogCategory, Log.LogType.Notice);
                 return true;
             }
+
+            // Handle Extraction
+            if (!string.IsNullOrEmpty(ExtractFolder))
+            {
+                Compression.ExtractZip(Target, ExtractFolder);
+                return true;
+            }
             throw new NotImplementedException();
         }
     }
