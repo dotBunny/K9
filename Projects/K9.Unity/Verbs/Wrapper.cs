@@ -35,7 +35,15 @@ namespace K9.Unity.Verbs
                 _logPath = Core.OverrideArguments["LOG"];
             }
 
-            return File.Exists(_executablePath);
+            bool foundExecutable = File.Exists(_executablePath);
+            if (foundExecutable)
+            {
+                return true;
+            }
+
+            Log.WriteLine($"Unable to find executable @ {_executablePath}.", "WRAPPER", Log.LogType.Error);
+            Core.UpdateExitCode(-1, true);
+            return false;
         }
 
         /// <inheritdoc />

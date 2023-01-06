@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
+using System.Text;
 using CommandLine;
 using K9.Services.Utils;
 
@@ -45,14 +46,46 @@ namespace K9
             string[] args = Environment.GetCommandLineArgs();
             foreach (string arg in args)
             {
-                // Quoted Argument
-                if (arg.StartsWith("\"") && arg.EndsWith("\""))
+                // Quoted Argument that do not need to be
+                if (arg.StartsWith("\"") && arg.EndsWith("\"") && !arg.Contains(' '))
                 {
                     Arguments.Add(arg.Substring(1, arg.Length - 2));
                 }
                 else
                 {
                     Arguments.Add(arg);
+                }
+            }
+
+            // Look for arguments that come in that need to be spliced into one with a quote
+            int argCount = Arguments.Count - 1;
+            List<int> removeIndices = new List<int>();
+            if (argCount >= 2)
+            {
+                for (int i = 0; i < argCount; i++)
+                {
+                    if (Arguments[i].StartsWith("\"") && !Arguments[i].EndsWith("\""))
+                    {
+                        StringBuilder newArg = new StringBuilder();
+                        newArg.Append(Arguments[i]);
+                        for (int j = i + 1; j < argCount; j++)
+                        {
+                            newArg.Append(' ');
+                            newArg.Append(Arguments[j]);
+                            removeIndices.Add(j);
+                            if (!Arguments[j].StartsWith("\"") && Arguments[j].EndsWith("\""))
+                            {
+                                Arguments[i] = newArg.ToString();
+                                i = j;
+                                break;
+                            }
+                        }
+                    }
+                }
+                // Post remove
+                foreach (int i in removeIndices)
+                {
+                    Arguments.RemoveAt(i);
                 }
             }
 
