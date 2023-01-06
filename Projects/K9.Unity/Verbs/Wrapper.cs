@@ -54,12 +54,19 @@ namespace K9.Unity.Verbs
             for (int i = 0; i < workingCount; i++)
             {
                 string argument = _workingArguments[i];
-                if (argument.Contains(' '))
+                if (argument.Contains(' ') && !argument.StartsWith("\"") && !argument.EndsWith("\""))
                 {
-                    arguments.Append('"');
-                    arguments.Append(argument);
-                    arguments.Append('"');
-
+                    if (argument.StartsWith("--") && argument.Contains('=') && argument.EndsWith("\""))
+                    {
+                        // this is most likely one of our arguments
+                        arguments.Append(argument);
+                    }
+                    else
+                    {
+                        arguments.Append('"');
+                        arguments.Append(argument);
+                        arguments.Append('"');
+                    }
                 }
                 else
                 {
