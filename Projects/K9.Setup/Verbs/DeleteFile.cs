@@ -23,7 +23,12 @@ namespace K9.Setup.Verbs
         {
             if (File.Exists(Path))
             {
+                Log.WriteLine($"Deleting {Path} ...");
                 FileUtil.ForceDeleteFile(Path);
+            }
+            else
+            {
+                Log.WriteLine($"Unable to find {Path}.");
             }
 
             return true;

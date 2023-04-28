@@ -22,7 +22,12 @@ namespace K9.Setup.Verbs
         {
             if (Directory.Exists(Folder))
             {
+                Log.WriteLine($"Deleting {Folder} ...");
                 Directory.Delete(Folder, true);
+            }
+            else
+            {
+                Log.WriteLine($"Folder {Folder} was not found.");
             }
 
             return true;
