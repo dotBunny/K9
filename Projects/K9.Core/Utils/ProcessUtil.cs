@@ -15,7 +15,7 @@ namespace K9.Utils
         
         public static void SetupEnvironmentVariables(this Process process)
         {
-            process.StartInfo.EnvironmentVariables.Add("DOTNET_CLI_TELEMETRY_OPTOUT", "1");
+            process.StartInfo.EnvironmentVariables["DOTNET_CLI_TELEMETRY_OPTOUT"] = "true";
         }
 
         public static bool SpawnProcess(string executablePath, string arguments)

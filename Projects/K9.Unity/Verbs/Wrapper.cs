@@ -8,6 +8,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Text;
 using CommandLine;
+using K9.Utils;
 
 namespace K9.Unity.Verbs
 {
@@ -173,6 +174,7 @@ namespace K9.Unity.Verbs
             string passthroughArguments = $"{arguments} -logFile {logFilePath}";
 
             Process process = new();
+            process.SetupEnvironmentVariables();
             process.StartInfo.WorkingDirectory = Directory.GetCurrentDirectory();
             process.StartInfo.FileName = executable;
             process.StartInfo.WindowStyle = ProcessWindowStyle.Normal;

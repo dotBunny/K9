@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2018-2021 dotBunny Inc.
+// Copyright (c) 2018-2021 dotBunny Inc.
 // dotBunny licenses this file to you under the BSL-1.0 license.
 // See the LICENSE file in the project root for more information.
 using System;
@@ -7,6 +7,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Text;
 using CommandLine;
+using K9.Utils;
 
 namespace K9.Process.Verbs;
 
@@ -88,6 +89,7 @@ public class Start : IVerb
         for (int i = 0; i < Count; i++)
         {
             System.Diagnostics.Process process = new();
+            process.SetupEnvironmentVariables();
             process.StartInfo.WorkingDirectory = Directory.GetCurrentDirectory();
             process.StartInfo.FileName = _executablePath;
             process.StartInfo.WindowStyle = ProcessWindowStyle.Normal;
