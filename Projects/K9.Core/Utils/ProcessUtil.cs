@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2018-2021 dotBunny Inc.
+// Copyright (c) 2018-2021 dotBunny Inc.
 // dotBunny licenses this file to you under the BSL-1.0 license.
 // See the LICENSE file in the project root for more information.
 
@@ -10,12 +10,19 @@ using System.Text;
 
 namespace K9.Utils
 {
-    public class ProcessUtil
+    public static class ProcessUtil
     {
+        
+        public static void SetupEnvironmentVariables(this Process process)
+        {
+            process.StartInfo.EnvironmentVariables.Add("DOTNET_CLI_TELEMETRY_OPTOUT", "1");
+        }
+
         public static bool SpawnProcess(string executablePath, string arguments)
         {
             using (Process ChildProcess = new())
             {
+                ChildProcess.SetupEnvironmentVariables();
                 ChildProcess.StartInfo.FileName = executablePath;
                 ChildProcess.StartInfo.Arguments = string.IsNullOrEmpty(arguments) ? "" : arguments;
                 ChildProcess.StartInfo.UseShellExecute = false;
@@ -27,6 +34,7 @@ namespace K9.Utils
         {
             using (Process ChildProcess = new())
             {
+                ChildProcess.SetupEnvironmentVariables();
                 ChildProcess.StartInfo.FileName = executablePath;
                 ChildProcess.StartInfo.Arguments = string.IsNullOrEmpty(arguments) ? "" : arguments;
                 ChildProcess.StartInfo.UseShellExecute = false;
@@ -70,6 +78,7 @@ namespace K9.Utils
                     }
                 };
 
+                ChildProcess.SetupEnvironmentVariables();
                 ChildProcess.StartInfo.WorkingDirectory = workingDirectory;
                 ChildProcess.StartInfo.FileName = executablePath;
                 ChildProcess.StartInfo.Arguments = string.IsNullOrEmpty(arguments) ? "" : arguments;
