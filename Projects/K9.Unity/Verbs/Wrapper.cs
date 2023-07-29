@@ -15,20 +15,33 @@ namespace K9.Unity.Verbs
     public class Wrapper : IVerb
     {
         private List<string> _workingArguments;
-        private string _executablePath;
+        private string _executablePath = null;
         private string _logPath;
 
         /// <inheritdoc />
         public bool CanExecute()
         {
-            _workingArguments = new (Core.Arguments.ToArray());
+            _workingArguments = new(Core.Arguments.ToArray());
 
             // Remove verb
             _workingArguments.RemoveAt(0);
 
-            // Get and remove executable from whats being passed through
-            _executablePath = _workingArguments[0];
-            _workingArguments.RemoveAt(0);
+            // Check for environment from B4
+            if (Core.OverrideArguments.ContainsKey("B4"))
+            {                
+                string unityEnvironment = Environment.GetEnvironmentVariable("UNITY_EDITOR", EnvironmentVariableTarget.User);
+                if (unityEnvironment != null)
+                {                    
+                    _executablePath = unityEnvironment;
+                }
+            }
+
+            // Get and remove executable from whats being passed through (if not grabbing env)
+            if (_executablePath == null)
+            { 
+                _executablePath = _workingArguments[0];
+                _workingArguments.RemoveAt(0);
+            }
 
             if (Core.OverrideArguments.ContainsKey("LOG"))
             {
