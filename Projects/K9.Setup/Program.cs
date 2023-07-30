@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2018-2021 dotBunny Inc.
+// Copyright (c) 2018-2021 dotBunny Inc.
 // dotBunny licenses this file to you under the BSL-1.0 license.
 // See the LICENSE file in the project root for more information.
 
@@ -26,7 +26,7 @@ namespace K9.Setup
 
                 ParserResult<object> results =
                     parser.ParseArguments<Perforce, SetEnvironmentVariable, WriteFile, DeleteFolder, DeleteFile,
-                        CopyFile, Checkout, Zip>(Core.Arguments);
+                        CopyFile, CopyFolder, Checkout, Zip>(Core.Arguments);
 
                 bool newResult = results.MapResult(
                     (Perforce perforce) => perforce.CanExecute() && perforce.Execute(),
@@ -35,6 +35,7 @@ namespace K9.Setup
                     (DeleteFolder deleteFolder) => deleteFolder.CanExecute() && deleteFolder.Execute(),
                     (DeleteFile deleteFile) => deleteFile.CanExecute() && deleteFile.Execute(),
                     (CopyFile copy) => copy.CanExecute() && copy.Execute(),
+                    (CopyFolder copyFolder) => copyFolder.CanExecute() && copyFolder.Execute(),
                     (Checkout checkout) => checkout.CanExecute() && checkout.Execute(),
                     (Zip zip) => zip.CanExecute() && zip.Execute(),
                     _ => false);
