@@ -56,7 +56,8 @@ namespace K9.Unity.Verbs
             {
                 string relativePath = Path.GetRelativePath(Input, doNotShipFolders[i]);
                 string newPath = Path.Combine(Input, Output, relativePath);
-                FileUtil.EnsureFolderHierarchyExists(newPath);
+
+
                 Directory.Move(doNotShipFolders[i], newPath);
             }
             return true;
