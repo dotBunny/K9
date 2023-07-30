@@ -8,6 +8,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.InteropServices;
 using System.Text;
 using K9.Services.Utils;
 using K9.Utils;
@@ -16,6 +17,18 @@ namespace K9.Services.Perforce
 {
     public class P4
     {
+        public static string GetExecutablePath()
+        {
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+            {
+                return "p4.exe";
+            }
+            else
+            {
+                return "p4";
+            }
+        }
+
         public delegate bool HandleOutputDelegate(OutputLine Line);
 
         public delegate bool HandleRecordDelegate(Dictionary<string, string> Tags);
@@ -940,11 +953,9 @@ namespace K9.Services.Perforce
         private bool RunCommand(string CommandLine, OutputLine.OutputChannel Channel, out List<string> Lines,
             CommandOptions Options)
         {
-            string FullCommandLine = GetFullCommandLine(CommandLine, Options);
-            Log.WriteLine(string.Format("p4.exe {0}", FullCommandLine), "P4");
-
+            string FullCommandLine = GetFullCommandLine(CommandLine, Options);           
             List<string> RawOutputLines;
-            if (ProcessUtil.ExecuteProcess("p4.exe", null, FullCommandLine, null, out RawOutputLines) != 0 &&
+            if (ProcessUtil.ExecuteProcess(GetExecutablePath(), null, FullCommandLine, null, out RawOutputLines) != 0 &&
                 !Options.HasFlag(CommandOptions.IgnoreExitCode))
             {
                 Lines = null;
@@ -994,8 +1005,7 @@ namespace K9.Services.Perforce
             string FullCommandLine = GetFullCommandLine(CommandLine, Options);
 
             bool bResult = true;
-            Log.WriteLine(string.Format("p4.exe {0}", FullCommandLine), "P4");
-            if (ProcessUtil.ExecuteProcess("p4.exe", null, FullCommandLine, Input,
+            if (ProcessUtil.ExecuteProcess(GetExecutablePath(), null, FullCommandLine, Input,
                     Line => { bResult &= PerforceUtil.ParseCommandOutput(Line, HandleOutput, Options); }) != 0 &&
                 !Options.HasFlag(CommandOptions.IgnoreExitCode))
             {
@@ -1069,7 +1079,7 @@ namespace K9.Services.Perforce
             using (Process Process = new())
             {
                 Process.SetupEnvironmentVariables();
-                Process.StartInfo.FileName = "p4.exe";
+                Process.StartInfo.FileName = GetExecutablePath();
                 Process.StartInfo.Arguments =
                     GetFullCommandLine("-G " + CommandLine, Options | CommandOptions.NoChannels);
 

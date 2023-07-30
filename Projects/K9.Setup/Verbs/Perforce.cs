@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2018-2021 dotBunny Inc.
+// Copyright (c) 2018-2021 dotBunny Inc.
 // dotBunny licenses this file to you under the BSL-1.0 license.
 // See the LICENSE file in the project root for more information.
 
@@ -67,7 +67,7 @@ namespace K9.Setup.Verbs
             List<string> outputLines = new();
 
             Log.WriteLine("SET P4CONFIG=" + Services.Perforce.Config.FileName, Program.Instance.DefaultLogCategory);
-            int p4ConfigCode = ProcessUtil.ExecuteProcess("p4.exe", workspaceRoot,
+            int p4ConfigCode = ProcessUtil.ExecuteProcess(Services.Perforce.P4.GetExecutablePath(), workspaceRoot,
                 "set P4CONFIG=" + Services.Perforce.Config.FileName, null,
                 out outputLines);
             foreach (string Line in outputLines)
@@ -83,7 +83,7 @@ namespace K9.Setup.Verbs
             }
 
             Log.WriteLine("SET P4IGNORE=" + Services.Perforce.Config.P4Ignore, Program.Instance.DefaultLogCategory);
-            int p4IgnoreCode = ProcessUtil.ExecuteProcess("p4.exe", workspaceRoot,
+            int p4IgnoreCode = ProcessUtil.ExecuteProcess(Services.Perforce.P4.GetExecutablePath(), workspaceRoot,
                 "set P4IGNORE=" + Services.Perforce.Config.P4Ignore, null,
                 out outputLines);
             foreach (string Line in outputLines)
@@ -101,7 +101,7 @@ namespace K9.Setup.Verbs
 
             Log.WriteLine("SET net.parallel.max=" + Services.Perforce.Config.MaxParallelConnections,
                 Program.Instance.DefaultLogCategory);
-            int p4MaxConnectionsCode = ProcessUtil.ExecuteProcess("p4.exe", workspaceRoot,
+            int p4MaxConnectionsCode = ProcessUtil.ExecuteProcess(Services.Perforce.P4.GetExecutablePath(), workspaceRoot,
                 "set net.parallel.max=" + Services.Perforce.Config.MaxParallelConnections, null,
                 out outputLines);
 
