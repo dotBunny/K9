@@ -1,9 +1,10 @@
-﻿// Copyright (c) 2018-2021 dotBunny Inc.
+// Copyright (c) 2018-2021 dotBunny Inc.
 // dotBunny licenses this file to you under the BSL-1.0 license.
 // See the LICENSE file in the project root for more information.
 
 using System;
 using System.IO;
+using System.Runtime.CompilerServices;
 using K9.IO;
 
 namespace K9.Utils
@@ -13,6 +14,22 @@ namespace K9.Utils
         public static void AlwaysWrite(string outputPath, string contents)
         {
             File.WriteAllText(outputPath, contents);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static void EnsureFileFolderHierarchyExists(string filePath)
+        {
+            string targetDirectory = Path.GetDirectoryName(filePath);
+            EnsureFolderHierarchyExists(targetDirectory);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static void EnsureFolderHierarchyExists(string folderPath)
+        {
+            if (!string.IsNullOrEmpty(folderPath) && !Directory.Exists(folderPath))
+            {
+                Directory.CreateDirectory(folderPath);
+            }
         }
 
         public static void ForceDeleteFile(string filePath)

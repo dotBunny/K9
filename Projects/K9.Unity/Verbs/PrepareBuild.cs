@@ -1,9 +1,10 @@
-// Copyright (c) 2018-2021 dotBunny Inc.
+// Copyright (c) 2018-2023 dotBunny Inc.
 // dotBunny licenses this file to you under the BSL-1.0 license.
 // See the LICENSE file in the project root for more information.
 
 using System.IO;
 using CommandLine;
+using K9.Utils;
 
 namespace K9.Unity.Verbs
 {
@@ -43,6 +44,7 @@ namespace K9.Unity.Verbs
             {
                 string relativePath = Path.GetRelativePath(Input, debugSymbols[i]);
                 string newPath = Path.Combine(Input, Output, relativePath);
+                FileUtil.EnsureFileFolderHierarchyExists(newPath);
                 File.Move(debugSymbols[i], newPath, true);
             }
 
@@ -54,6 +56,7 @@ namespace K9.Unity.Verbs
             {
                 string relativePath = Path.GetRelativePath(Input, doNotShipFolders[i]);
                 string newPath = Path.Combine(Input, Output, relativePath);
+                FileUtil.EnsureFolderHierarchyExists(newPath);
                 Directory.Move(doNotShipFolders[i], newPath);
             }
             return true;
