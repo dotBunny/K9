@@ -38,6 +38,7 @@ namespace K9.Setup
                     (CopyFolder copyFolder) => copyFolder.CanExecute() && copyFolder.Execute(),
                     (Checkout checkout) => checkout.CanExecute() && checkout.Execute(),
                     (Zip zip) => zip.CanExecute() && zip.Execute(),
+                    (CompressFolder compressFolder) => compressFolder.CanExecute() && compressFolder.Execute(),
                     _ => false);
 
                 if (!newResult)
