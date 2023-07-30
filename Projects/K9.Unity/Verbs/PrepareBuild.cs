@@ -37,29 +37,30 @@ namespace K9.Unity.Verbs
         {
             Directory.CreateDirectory(Output);
 
+            // Move DoNotShip Folders
+            string[] doNotShipFolders = Directory.GetDirectories(Input, "*_DoNotShip", SearchOption.AllDirectories);
+            int doNotShipFoldersCount = doNotShipFolders.Length;
+            for (int i = 0; i < doNotShipFoldersCount; i++)
+            {
+                string relativePath = Path.GetRelativePath(Input, doNotShipFolders[i]);
+                string newPath = Path.Combine(Output, relativePath);
+
+                Directory.Move(doNotShipFolders[i], newPath);
+            }
+
             // Move Symbols
             string[] debugSymbols = Directory.GetFiles(Input, "*.pdb", SearchOption.AllDirectories);
             int debugSymbolCount = debugSymbols.Length;
             for(int i = 0; i < debugSymbolCount; i++)
             {
                 string relativePath = Path.GetRelativePath(Input, debugSymbols[i]);
-                string newPath = Path.Combine(Input, Output, relativePath);
+                string newPath = Path.Combine(Output, relativePath);
                 FileUtil.EnsureFileFolderHierarchyExists(newPath);
                 File.Move(debugSymbols[i], newPath, true);
             }
 
 
-            // Move DoNotShip Folders
-            string[] doNotShipFolders = Directory.GetDirectories(Input, "*_DoNotShip", SearchOption.AllDirectories);
-            int doNotShipFoldersCount = doNotShipFolders.Length;
-            for(int i = 0; i < doNotShipFoldersCount; i++)
-            {
-                string relativePath = Path.GetRelativePath(Input, doNotShipFolders[i]);
-                string newPath = Path.Combine(Input, Output, relativePath);
-
-
-                Directory.Move(doNotShipFolders[i], newPath);
-            }
+           
             return true;
         }
     }
