@@ -16,7 +16,7 @@ namespace K9.Setup.Verbs
         [Option('i', "input", Required = true, HelpText = "Input root.")]
         public string InputFolder { get; set; }
 
-        [Option('o', "ouput", Required = true, HelpText = "Output file path.")]
+        [Option('o', "output", Required = true, HelpText = "Output file path.")]
         public string OutputPath { get; set; }
 
         public bool CanExecute()
@@ -26,6 +26,8 @@ namespace K9.Setup.Verbs
 
         public bool Execute()
         {
+            FileUtil.EnsureFileFolderHierarchyExists(OutputPath);
+
             // Figure out built-in zip compressor
             if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
             {

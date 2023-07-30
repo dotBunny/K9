@@ -16,7 +16,7 @@ namespace K9.Setup.Verbs
         [Option('i', "input", Required = true, HelpText = "Input file")]
         public string InputFile { get; set; }
 
-        [Option('o', "ouput", Required = true, HelpText = "Output folder path.")]
+        [Option('o', "output", Required = true, HelpText = "Output folder path.")]
         public string OutputFolder { get; set; }
 
         public bool CanExecute()
