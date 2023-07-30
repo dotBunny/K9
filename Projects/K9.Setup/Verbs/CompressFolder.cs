@@ -38,7 +38,7 @@ namespace K9.Setup.Verbs
             }
             else
             {
-                return ProcessUtil.ExecuteProcess("zip", InputFolder, $"-vr {OutputPath} {InputFolder} -x \"*.DS_Store\"", null, Line =>
+                return ProcessUtil.ExecuteProcessShell("zip", InputFolder, $"-R {OutputPath} {InputFolder} -x \"*.DS_Store\"", null, Line =>
                 {
                     Console.WriteLine(Line);
                 }) == 0;
