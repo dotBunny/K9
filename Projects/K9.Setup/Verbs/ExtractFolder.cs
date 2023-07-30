@@ -41,7 +41,7 @@ namespace K9.Setup.Verbs
             }
             else
             {
-                return ProcessUtil.ExecuteProcess("unzip", OutputFolder, $"{InputFile} -d {OutputFolder}", null, Line =>
+                return ProcessUtil.ExecuteProcess("tar", OutputFolder, $"{InputFile} -d {OutputFolder}", null, Line =>
                 {
                     Console.WriteLine(Line);
                 }) == 0;
