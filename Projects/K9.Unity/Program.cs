@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2018-2021 dotBunny Inc.
+// Copyright (c) 2018-2021 dotBunny Inc.
 // dotBunny licenses this file to you under the BSL-1.0 license.
 // See the LICENSE file in the project root for more information.
 
@@ -24,8 +24,7 @@ namespace K9.Unity
 
                 Parser parser = Core.GetDefaultParser(true);
 
-                ParserResult<object> results = parser.ParseArguments<VersionControlSettings, TestResults, AddPackage, RemovePackage, RemotePackages, FindEditor, Wrapper>(Core.Arguments);
-
+                ParserResult<object> results = parser.ParseArguments<VersionControlSettings, TestResults, AddPackage, RemovePackage, RemotePackages, FindEditor, PrepareBuild, Wrapper>(Core.Arguments);
 
                 bool newResult = results.MapResult(
                     (VersionControlSettings vcs) => vcs.CanExecute() && vcs.Execute(),
@@ -34,6 +33,7 @@ namespace K9.Unity
                     (RemovePackage removePackage) => removePackage.CanExecute() && removePackage.Execute(),
                     (RemotePackages remotePackages) => remotePackages.CanExecute() && remotePackages.Execute(),
                     (FindEditor findEditor) => findEditor.CanExecute() && findEditor.Execute(),
+                    (PrepareBuild prepareBuild) => prepareBuild.CanExecute() &&  prepareBuild.Execute(),
                     (Wrapper wrapper) => wrapper.CanExecute() && wrapper.Execute(),
                     _ => false);
 
