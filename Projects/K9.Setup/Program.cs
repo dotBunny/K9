@@ -26,7 +26,7 @@ namespace K9.Setup
 
                 ParserResult<object> results =
                     parser.ParseArguments<Perforce, SetEnvironmentVariable, WriteFile, DeleteFolder, DeleteFile,
-                        CopyFile, CopyFolder, Checkout, Zip>(Core.Arguments);
+                        CopyFile, CopyFolder, Checkout, Zip, CompressFolder, ExtractFolder>(Core.Arguments);
 
                 bool newResult = results.MapResult(
                     (Perforce perforce) => perforce.CanExecute() && perforce.Execute(),
@@ -39,6 +39,7 @@ namespace K9.Setup
                     (Checkout checkout) => checkout.CanExecute() && checkout.Execute(),
                     (Zip zip) => zip.CanExecute() && zip.Execute(),
                     (CompressFolder compressFolder) => compressFolder.CanExecute() && compressFolder.Execute(),
+                    (ExtractFolder extractFolder) => extractFolder.CanExecute() && extractFolder.Execute(),
                     _ => false);
 
                 if (!newResult)
