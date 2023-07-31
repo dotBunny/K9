@@ -10,8 +10,8 @@ using K9.Utils;
 
 namespace K9.Setup.Verbs
 {
-    [Verb("ExtractFolder")]
-    public class ExtractFolder : IVerb
+    [Verb("ExtractToFolder")]
+    public class ExtractToFolder : IVerb
     {
         [Option('i', "input", Required = true, HelpText = "Input file")]
         public string InputFile { get; set; }
@@ -39,9 +39,16 @@ namespace K9.Setup.Verbs
                     Console.WriteLine(Line);
                 }) == 0;
             }
+            else if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
+            {
+                return ProcessUtil.ExecuteProcess("ditto", OutputFolder, $"-xk  {InputFile} {OutputFolder}", null, Line =>
+                {
+                    Console.WriteLine(Line);
+                }) == 0;
+            }
             else
             {
-                return ProcessUtil.ExecuteProcess("tar", OutputFolder, $"{InputFile} -d {OutputFolder}", null, Line =>
+                return ProcessUtil.ExecuteProcess("tar", OutputFolder, $"-xf  {InputFile} -d {OutputFolder}", null, Line =>
                 {
                     Console.WriteLine(Line);
                 }) == 0;

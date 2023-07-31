@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2018-2021 dotBunny Inc.
+// Copyright (c) 2018-2021 dotBunny Inc.
 // dotBunny licenses this file to you under the BSL-1.0 license.
 // See the LICENSE file in the project root for more information.
 
@@ -24,12 +24,13 @@ namespace K9.TeamCity
 
                 Parser parser = Core.GetDefaultParser();
 
-                ParserResult<object> results = parser.ParseArguments<BuildChangelist, SetParameter, CompareImage>(Core.Arguments);
+                ParserResult<object> results = parser.ParseArguments<BuildChangelist, SetParameter, CompareImage, ExtractArtifacts>(Core.Arguments);
 
                 bool newResult = results.MapResult(
                     (BuildChangelist changelist) => changelist.CanExecute() && changelist.Execute(),
                     (SetParameter param) => param.CanExecute() && param.Execute(),
                     (CompareImage compareImage) => compareImage.CanExecute() && compareImage.Execute(),
+                    (ExtractArtifacts extractArtifacts) => extractArtifacts.CanExecute() && extractArtifacts.Execute(),
                     _ => false);
 
                 if (!newResult)

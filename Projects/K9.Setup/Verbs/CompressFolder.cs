@@ -37,10 +37,17 @@ namespace K9.Setup.Verbs
                     Console.WriteLine(Line);
                 }) == 0;
             }
-            else
+            else if(RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
             {
                 // Mac we'll use the specific mac command to ensure the folders maintain flags
                 return ProcessUtil.ExecuteProcess("ditto", InputFolder, $"-c -k --sequesterRsrc {InputFolder} {OutputPath}", null, Line =>
+                {
+                    Console.WriteLine(Line);
+                }) == 0;
+            }
+            else
+            {
+                return ProcessUtil.ExecuteProcess("tar", InputFolder, $"-acf {OutputPath} *", null, Line =>
                 {
                     Console.WriteLine(Line);
                 }) == 0;
