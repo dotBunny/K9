@@ -40,7 +40,7 @@ namespace K9.Setup.Verbs
             else
             {
                 // Mac we'll use the specific mac command to ensure the folders maintain flags
-                return ProcessUtil.ExecuteProcess("zip", InputFolder, $"-r -q -b {InputFolder} {OutputPath} *", null, Line =>
+                return ProcessUtil.ExecuteProcess("ditto", InputFolder, $"-c -k --sequesterRsrc {InputFolder} {OutputPath}", null, Line =>
                 {
                     Console.WriteLine(Line);
                 }) == 0;
