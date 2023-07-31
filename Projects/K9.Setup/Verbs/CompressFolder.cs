@@ -31,14 +31,14 @@ namespace K9.Setup.Verbs
             // Figure out built-in zip compressor
             if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
             {
-                return ProcessUtil.ExecuteProcess("tar.exe", InputFolder, $"-a -c -f {OutputPath} *", null, Line =>
+                return ProcessUtil.ExecuteProcess("tar.exe", InputFolder, $"-a -c -f {OutputPath} {InputFolder}\\*", null, Line =>
                 {
                     Console.WriteLine(Line);
                 }) == 0;
             }
             else
             {
-                return ProcessUtil.ExecuteProcess("tar", InputFolder, $"-a -c -f {OutputPath} *", null, Line =>
+                return ProcessUtil.ExecuteProcess("tar", InputFolder, $"-a -c -f {OutputPath} {InputFolder}/*", null, Line =>
                 {
                     Console.WriteLine(Line);
                 }) == 0;
