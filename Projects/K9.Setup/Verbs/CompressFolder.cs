@@ -31,14 +31,16 @@ namespace K9.Setup.Verbs
             // Figure out built-in zip compressor
             if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
             {
-                return ProcessUtil.ExecuteProcess("tar.exe", InputFolder, $"-a -c -f {OutputPath} -C {InputFolder}", null, Line =>
+                // Windows seems auto relative
+                return ProcessUtil.ExecuteProcess("tar.exe", InputFolder, $"-acf {OutputPath} *", null, Line =>
                 {
                     Console.WriteLine(Line);
                 }) == 0;
             }
             else
             {
-                return ProcessUtil.ExecuteProcess("tar", InputFolder, $"-a -c -f {OutputPath} -C {InputFolder}", null, Line =>
+                // Move to folder first to get relative
+                return ProcessUtil.ExecuteProcess("tar", InputFolder, $"-C {InputFolder} -acf {OutputPath} {InputFolder} . ", null, Line =>
                 {
                     Console.WriteLine(Line);
                 }) == 0;
