@@ -40,7 +40,7 @@ namespace K9.Setup.Verbs
             else
             {
                 // Move to folder first to get relative
-                return ProcessUtil.ExecuteProcess("tar", InputFolder, $"-C {InputFolder} -acf {OutputPath} {InputFolder} .", null, Line =>
+                return ProcessUtil.ExecuteProcess("tar", InputFolder, $"-C {InputFolder} -acf {OutputPath} .", null, Line =>
                 {
                     Console.WriteLine(Line);
                 }) == 0;
