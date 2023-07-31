@@ -31,7 +31,7 @@ namespace K9.Setup.Verbs
             // Figure out built-in zip compressor
             if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
             {
-                // Windows seems auto relative
+                // Windows OK using tar to generate zip files without issue
                 return ProcessUtil.ExecuteProcess("tar.exe", InputFolder, $"-acf {OutputPath} *", null, Line =>
                 {
                     Console.WriteLine(Line);
@@ -39,8 +39,8 @@ namespace K9.Setup.Verbs
             }
             else
             {
-                // Move to folder first to get relative
-                return ProcessUtil.ExecuteProcess("tar", InputFolder, $"-C {InputFolder} -acf {OutputPath} .", null, Line =>
+                // Mac we'll use the specific mac command to ensure the folders maintain flags
+                return ProcessUtil.ExecuteProcess("zip", InputFolder, $"-r -q -b {InputFolder} {OutputPath} *", null, Line =>
                 {
                     Console.WriteLine(Line);
                 }) == 0;
