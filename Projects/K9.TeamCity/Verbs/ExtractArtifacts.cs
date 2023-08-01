@@ -48,6 +48,8 @@ namespace K9.TeamCity.Verbs
                 FileUtil.EnsureFolderHierarchyExists(OutputFolder);FileUtil.EnsureFolderHierarchyExists(OutputFolder);
             }
 
+            int returnValue = 0;
+
             for (int i = 0; i < fileCount; i++)
             {
                 // Build naming
@@ -61,30 +63,30 @@ namespace K9.TeamCity.Verbs
                 FileUtil.EnsureFolderHierarchyExists(targetFolder);
 
                 Log.WriteLine($"Uncompressing {currentFile} to {targetFolder} ...", "TEAMCITY");
+
                 if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
                 {
-                    return ProcessUtil.ExecuteProcess("tar.exe", targetFolder, $"-xf {currentFile} -C {targetFolder}", null, Line =>
+                    returnValue = ProcessUtil.ExecuteProcess("tar.exe", targetFolder, $"-xf {currentFile} -C {targetFolder}", null, Line =>
                     {
                         System.Console.WriteLine(Line);
-                    }) == 0;
+                    });
                 }
                 else if(RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
                 {
-                    return ProcessUtil.ExecuteProcess("ditto", targetFolder, $"-x -k {currentFile} {targetFolder}", null, Line =>
+                    returnValue = ProcessUtil.ExecuteProcess("ditto", targetFolder, $"-x -k {currentFile} {targetFolder}", null, Line =>
                     {
                         System.Console.WriteLine(Line);
-                    }) == 0;
+                    });
                 }
                 else
                 {
-                    return ProcessUtil.ExecuteProcess("tar", targetFolder, $"-xf {currentFile} -C {targetFolder}", null, Line =>
+                    returnValue = ProcessUtil.ExecuteProcess("tar", targetFolder, $"-xf {currentFile} -C {targetFolder}", null, Line =>
                     {
                         System.Console.WriteLine(Line);
-                    }) == 0;
+                    });
                 }
-
             }
-            return true;
+            return returnValue == 0;
         }
     }
 }
