@@ -34,7 +34,7 @@ namespace K9.Setup.Verbs
 
             if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
             {
-                return ProcessUtil.ExecuteProcess("tar.exe", OutputFolder, $"-xf {InputFile} {OutputFolder}", null, Line =>
+                return ProcessUtil.ExecuteProcess("tar.exe", OutputFolder, $"-xf {InputFile} -C {OutputFolder}", null, Line =>
                 {
                     Console.WriteLine(Line);
                 }) == 0;
@@ -48,7 +48,7 @@ namespace K9.Setup.Verbs
             }
             else
             {
-                return ProcessUtil.ExecuteProcess("tar", OutputFolder, $"-xf  {InputFile} -d {OutputFolder}", null, Line =>
+                return ProcessUtil.ExecuteProcess("tar", OutputFolder, $"-xf  {InputFile} -C {OutputFolder}", null, Line =>
                 {
                     Console.WriteLine(Line);
                 }) == 0;

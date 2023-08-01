@@ -60,9 +60,10 @@ namespace K9.TeamCity.Verbs
                 string targetFolder = Path.GetFullPath(Path.Combine(OutputFolder, folderName, subFolderName));
                 FileUtil.EnsureFolderHierarchyExists(targetFolder);
 
+                Log.WriteLine($"Uncompressing {currentFile} to {targetFolder} ...", "TEAMCITY");
                 if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
                 {
-                    return ProcessUtil.ExecuteProcess("tar.exe", targetFolder, $"-xf {currentFile} {targetFolder}", null, Line =>
+                    return ProcessUtil.ExecuteProcess("tar.exe", targetFolder, $"-xf {currentFile} -C {targetFolder}", null, Line =>
                     {
                         System.Console.WriteLine(Line);
                     }) == 0;
@@ -76,7 +77,7 @@ namespace K9.TeamCity.Verbs
                 }
                 else
                 {
-                    return ProcessUtil.ExecuteProcess("tar", targetFolder, $"-xf {currentFile} {targetFolder}", null, Line =>
+                    return ProcessUtil.ExecuteProcess("tar", targetFolder, $"-xf {currentFile} -C {targetFolder}", null, Line =>
                     {
                         System.Console.WriteLine(Line);
                     }) == 0;
