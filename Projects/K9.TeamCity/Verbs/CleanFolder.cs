@@ -78,14 +78,14 @@ namespace K9.TeamCity.Verbs
             for(int i = 0; i < filesToDeleteCount; i++)
             {
                 string path = filesToDelete[i];
-                Log.WriteLine($"Removing {path}", "TEAMCITY");
+                Log.WriteLine($"Removing File: {path} ...", "TEAMCITY");
                 FileUtil.ForceDeleteFile(path);
             }
 
             for (int i = 0; i < directoriesToDeleteCount; i++)
             {
                 string path = directoriesToDelete[i];
-                Log.WriteLine($"Removing {path}", "TEAMCITY");
+                Log.WriteLine($"Removing Directory: {path} ...", "TEAMCITY");
                 Directory.Delete(path, true);
             }
 
