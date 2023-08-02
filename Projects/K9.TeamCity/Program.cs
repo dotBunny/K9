@@ -24,13 +24,14 @@ namespace K9.TeamCity
 
                 Parser parser = Core.GetDefaultParser();
 
-                ParserResult<object> results = parser.ParseArguments<BuildChangelist, SetParameter, CompareImage, ExtractArtifacts>(Core.Arguments);
+                ParserResult<object> results = parser.ParseArguments<BuildChangelist, SetParameter, CompareImage, ExtractArtifacts, CleanFolder>(Core.Arguments);
 
                 bool newResult = results.MapResult(
                     (BuildChangelist changelist) => changelist.CanExecute() && changelist.Execute(),
                     (SetParameter param) => param.CanExecute() && param.Execute(),
                     (CompareImage compareImage) => compareImage.CanExecute() && compareImage.Execute(),
                     (ExtractArtifacts extractArtifacts) => extractArtifacts.CanExecute() && extractArtifacts.Execute(),
+                    (CleanFolder cleanFolder) => cleanFolder.CanExecute() && cleanFolder.Execute(),
                     _ => false);
 
                 if (!newResult)

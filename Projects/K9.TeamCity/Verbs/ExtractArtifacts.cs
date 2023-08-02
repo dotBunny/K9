@@ -5,7 +5,6 @@
 using System.IO;
 using System.Runtime.InteropServices;
 using CommandLine;
-using DocumentFormat.OpenXml.Wordprocessing;
 using K9.Utils;
 
 namespace K9.TeamCity.Verbs
@@ -29,9 +28,6 @@ namespace K9.TeamCity.Verbs
 
         public string OutputFolder { get; set; }
 
-        // get files from target folder
-        // figure out build config name (0) and sub folder (3)
-        //%system.teamcity.buildConfName%_%build.number%_%build.vcs.number%_Symbols.zip
         public bool CanExecute()
         {
             return Directory.Exists(InputFolder);

@@ -4,7 +4,6 @@
 
 using System.IO;
 using CommandLine;
-using K9.IO;
 
 using K9.Utils;
 
