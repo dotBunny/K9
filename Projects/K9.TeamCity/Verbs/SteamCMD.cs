@@ -61,7 +61,7 @@ namespace K9.TeamCity.Verbs
                 SearchQuery emailQuery = new SearchQuery();
                 emailQuery.And(SearchQuery.FromContains("noreply@steampowered.com"));
                 emailQuery.And(SearchQuery.SubjectContains("Your Steam account"));
-                emailQuery.And(SearchQuery.NotSeen);
+                emailQuery.And(SearchQuery.NotDeleted);
 
                 IList<UniqueId> messages = inbox.Search(emailQuery);
                 Log.WriteLine($"Found {messages.Count} viable messages.", "STEAM");
@@ -76,7 +76,7 @@ namespace K9.TeamCity.Verbs
                         code = plainMessage.Substring(loginCodeIndex).Trim().Substring(0, 5);
 
                         // We've found the code, mark it seen
-                        inbox.AddFlags(id, MessageFlags.Seen, true);
+                        inbox.AddFlags(id, MessageFlags.Deleted, true);
                         break;
                     }
                 }
@@ -93,7 +93,7 @@ namespace K9.TeamCity.Verbs
             string code = null;
             m_LoginState = LoginState.Idle;
 
-            Utils.ProcessUtil.ExecuteProcess(SteamCommand, SteamWorkingDirectory, $"+login {SteamUsername} {SteamPassword} +info +quit", "quit", HandleLogin);
+            Utils.ProcessUtil.ExecuteProcess(SteamCommand, SteamWorkingDirectory, $"\"+login {SteamUsername} {SteamPassword} +info +quit\"", "quit", HandleLogin);
 
             // We aren't logged in
             if (m_LoginState != LoginState.OK)
@@ -128,7 +128,7 @@ namespace K9.TeamCity.Verbs
                     if (code != null)
                     {
                         Log.WriteLine($"Login Attempt #{loginAttempt} ...", "STEAM");
-                        Utils.ProcessUtil.ExecuteProcess(SteamCommand, SteamWorkingDirectory, $"+login {SteamUsername} {SteamPassword} {code} +set_steam_guard_code {code} +quit", "quit", HandleLogin);
+                        Utils.ProcessUtil.ExecuteProcess(SteamCommand, SteamWorkingDirectory, $"\"+login {SteamUsername} {SteamPassword} {code} +set_steam_guard_code {code} +quit\"", "quit", HandleLogin);
                         loginAttempt++;
 
                         if (m_LoginState == LoginState.OK)
@@ -143,7 +143,7 @@ namespace K9.TeamCity.Verbs
             {
                 Log.WriteLine("Upload", "STEAM");
                 // Execute the actual command
-                return K9.Utils.ProcessUtil.ExecuteProcess(SteamCommand, SteamWorkingDirectory, $"+login {SteamUsername} {SteamPassword} +run_app_build {SteamAppBuild} +quit", "quit", Line =>
+                return K9.Utils.ProcessUtil.ExecuteProcess(SteamCommand, SteamWorkingDirectory, $"\"+login {SteamUsername} {SteamPassword} +run_app_build {SteamAppBuild} +quit\"", "quit", Line =>
                 {
                     Log.WriteLine(Line, "STEAM", Log.LogType.ExternalProcess);
                 }) == 0;
