@@ -24,7 +24,7 @@ namespace K9.TeamCity
 
                 Parser parser = Core.GetDefaultParser();
 
-                ParserResult<object> results = parser.ParseArguments<BuildChangelist, SetParameter, CompareImage, ExtractArtifacts, CleanFolder>(Core.Arguments);
+                ParserResult<object> results = parser.ParseArguments<BuildChangelist, SetParameter, CompareImage, ExtractArtifacts, CleanFolder, SteamCMD>(Core.Arguments);
 
                 bool newResult = results.MapResult(
                     (BuildChangelist changelist) => changelist.CanExecute() && changelist.Execute(),
@@ -32,6 +32,7 @@ namespace K9.TeamCity
                     (CompareImage compareImage) => compareImage.CanExecute() && compareImage.Execute(),
                     (ExtractArtifacts extractArtifacts) => extractArtifacts.CanExecute() && extractArtifacts.Execute(),
                     (CleanFolder cleanFolder) => cleanFolder.CanExecute() && cleanFolder.Execute(),
+                    (SteamCMD steamCMD) => steamCMD.CanExecute() && steamCMD.Execute(),
                     _ => false);
 
                 if (!newResult)
