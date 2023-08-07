@@ -96,7 +96,7 @@ namespace K9.TeamCity.Verbs
 
             Utils.ProcessUtil.ExecuteProcess(SteamCommand, SteamWorkingDirectory, $"\"+login {SteamUsername} {SteamPassword} +info +quit\"", "quit", HandleLogin);
 
-            if (IsFatal())
+            if (m_LoginState == LoginState.Failed)
             {
                 return false;
             }
@@ -153,7 +153,6 @@ namespace K9.TeamCity.Verbs
         enum LoginState
         {
             Idle,
-            InvalidStoredAuth,
             SteamGuardCode,
             Failed,
             OK
@@ -173,7 +172,9 @@ namespace K9.TeamCity.Verbs
             }
             else if (cleanLine.StartsWith($"Logging in user '{SteamUsername}' to Steam Public...FAILED (Invalid Login Auth Code)"))
             {
-                m_LoginState = LoginState.InvalidStoredAuth;
+                // This doesnt kill automatically for some reason so we need to
+                System.Diagnostics.Process.GetProcessById(processID).Kill();
+                m_LoginState = LoginState.SteamGuardCode;
             }
             else if (cleanLine.StartsWith($"Logging in user '{SteamUsername}' to Steam Public...FAILED(Rate Limit Exceeded)"))
             {
@@ -183,21 +184,6 @@ namespace K9.TeamCity.Verbs
             {
                 m_LoginState = LoginState.OK;
             }
-
-            if(IsFatal())
-            {
-                Log.WriteLine("An error occured. Killing process.", "STEAM");
-                System.Diagnostics.Process.GetProcessById(processID).Kill();
-            }
-        }
-
-        bool IsFatal()
-        {
-            if(m_LoginState == LoginState.InvalidStoredAuth || m_LoginState == LoginState.Failed)
-            {
-                return true;
-            }
-            return false;
         }
     }
 }
