@@ -93,8 +93,9 @@ namespace K9.TeamCity.Verbs
             Log.WriteLine("Check Authentication ...", "STEAM");
             string code = null;
             m_LoginState = LoginState.Idle;
-
-            Utils.ProcessUtil.ExecuteProcess(SteamCommand, SteamWorkingDirectory, $"\"+login {SteamUsername} {SteamPassword} +info +quit\"", null, HandleLogin);
+            string loginCommand = $"+login {SteamUsername} {SteamPassword} +info +quit";
+            Log.WriteLine(loginCommand, "STEAM");
+            Utils.ProcessUtil.ExecuteProcess(SteamCommand, SteamWorkingDirectory, loginCommand, null, HandleLogin);
 
             if (m_LoginState == LoginState.Failed)
             {
@@ -130,7 +131,8 @@ namespace K9.TeamCity.Verbs
                 if (code != null)
                 {
                     Log.WriteLine($"Attempt SteamGuard Authentication ...", "STEAM");
-                    Utils.ProcessUtil.ExecuteProcess(SteamCommand, SteamWorkingDirectory, $"\"+login {SteamUsername} {SteamPassword} {code} +set_steam_guard_code {code} +quit\"", null, HandleLogin);
+                    string steamGuardAuthCommand = $"+login {SteamUsername} {SteamPassword} {code} +set_steam_guard_code {code} +quit";
+                    Utils.ProcessUtil.ExecuteProcess(SteamCommand, SteamWorkingDirectory, steamGuardAuthCommand, null, HandleLogin);
                     if (m_LoginState != LoginState.OK)
                     {
                         Log.WriteLine($"SteamGuard Authentication FAILED", "STEAM");
@@ -141,10 +143,13 @@ namespace K9.TeamCity.Verbs
             if(m_LoginState == LoginState.OK)
             {
                 Log.WriteLine("Run App Build ...", "STEAM");
+                string runAppBuildCommand = $"+login {SteamUsername} {SteamPassword} +run_app_build {SteamAppBuild} +quit";
+                Log.WriteLine(runAppBuildCommand, "STEAM");
+
                 // Execute the actual command
-                return Utils.ProcessUtil.ExecuteProcess(SteamCommand, SteamWorkingDirectory, $"\"+login {SteamUsername} {SteamPassword} +run_app_build {SteamAppBuild} +quit\"", null, (ProcessID, Line) =>
+                return Utils.ProcessUtil.ExecuteProcess(SteamCommand, SteamWorkingDirectory, runAppBuildCommand, null, (ProcessID, Line) =>
                 {
-                    Log.WriteLine(Line, "STEAM", Log.LogType.ExternalProcess);
+                    Log.WriteLine(Line, $"STEAM ({ProcessID})", Log.LogType.ExternalProcess);
                 }) == 0;
             }
             return false;
