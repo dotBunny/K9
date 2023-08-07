@@ -5,10 +5,12 @@
 using System.Collections.Generic;
 using System.IO;
 using CommandLine;
+using DocumentFormat.OpenXml.Math;
 using MailKit;
 using MailKit.Net.Imap;
 using MailKit.Search;
 using MimeKit;
+using TeamCitySharp.DomainEntities;
 
 namespace K9.TeamCity.Verbs
 {
@@ -36,7 +38,7 @@ namespace K9.TeamCity.Verbs
         [Option(longName: "steam-build", Required = true, HelpText = "Steam app build definition")]
         public string SteamAppBuild{ get; set; }
         [Option(longName: "steam-dir", Required = true, HelpText = "Steam app working directory")]
-        public string SteamWorkingDirectory { get; set; }
+        public string SteamWorkingDirectory { get; set; }        
 
 
         public bool CanExecute()
@@ -89,61 +91,61 @@ namespace K9.TeamCity.Verbs
         public bool Execute()
         {
             // Login run
-            Log.WriteLine("Check Auth", "STEAM");
+            Log.WriteLine("Check Authentication ...", "STEAM");
             string code = null;
             m_LoginState = LoginState.Idle;
 
             Utils.ProcessUtil.ExecuteProcess(SteamCommand, SteamWorkingDirectory, $"\"+login {SteamUsername} {SteamPassword} +info +quit\"", "quit", HandleLogin);
 
-            // We aren't logged in
-            if (m_LoginState != LoginState.OK)
+            if(m_LoginState == LoginState.Failed)
+            {
+                Log.WriteLine("Command Failed.", "STEAM");
+                return false;
+            }
+
+
+            if (m_LoginState == LoginState.SteamGuardCode)
             {
                 Log.WriteLine("Waiting 30 seconds ...", "STEAM");
                 System.Threading.Thread.Sleep(30000);
 
-                int loginAttempt = 1;
-                while (loginAttempt < LoginAttemptLimit)
+                int tryCount = 0;
+                if (string.IsNullOrEmpty(code))
                 {
-                    int tryCount = 0;
-                    if(string.IsNullOrEmpty(code))
+                    while (tryCount < EmailRetryCount)
                     {
-                        while (tryCount < EmailRetryCount)
+                        Log.WriteLine($"Check for SteamGuard Email #{tryCount} ...", "STEAM");
+                        code = GetSteamGuardCode();
+                        if (!string.IsNullOrEmpty(code))
                         {
-                            Log.WriteLine($"Check for SteamGuard Email #{tryCount} ...", "STEAM");
-                            code = GetSteamGuardCode();
-                            if (!string.IsNullOrEmpty(code))
-                            {
-                                Log.WriteLine($"Found Code {code}", "STEAM");
-                                break;
-                            }
-                            else
-                            {
-                                Log.WriteLine("Waiting 5 seconds ...", "STEAM");
-                                System.Threading.Thread.Sleep(5000);
-                            }
-                            tryCount++;
-                        }
-                    }
-
-                    if (code != null)
-                    {
-                        Log.WriteLine($"Login Attempt #{loginAttempt} ...", "STEAM");
-                        Utils.ProcessUtil.ExecuteProcess(SteamCommand, SteamWorkingDirectory, $"\"+login {SteamUsername} {SteamPassword} {code} +set_steam_guard_code {code} +quit\"", "quit", HandleLogin);
-                        loginAttempt++;
-
-                        if (m_LoginState == LoginState.OK)
-                        {
+                            Log.WriteLine($"Found Code {code}", "STEAM");
                             break;
                         }
+                        else
+                        {
+                            Log.WriteLine("Waiting 30 seconds ...", "STEAM");
+                            System.Threading.Thread.Sleep(30000);
+                        }
+                        tryCount++;
+                    }
+                }
+
+                if (code != null)
+                {
+                    Log.WriteLine($"Attempt SteamGuard Authentication ...", "STEAM");
+                    Utils.ProcessUtil.ExecuteProcess(SteamCommand, SteamWorkingDirectory, $"\"+login {SteamUsername} {SteamPassword} {code} +set_steam_guard_code {code} +quit\"", "quit", HandleLogin);
+                    if (m_LoginState != LoginState.OK)
+                    {
+                        Log.WriteLine($"SteamGuard Authentication FAILED", "STEAM");
                     }
                 }
             }
 
             if(m_LoginState == LoginState.OK)
             {
-                Log.WriteLine("Upload", "STEAM");
+                Log.WriteLine("Run App Build ...", "STEAM");
                 // Execute the actual command
-                return K9.Utils.ProcessUtil.ExecuteProcess(SteamCommand, SteamWorkingDirectory, $"\"+login {SteamUsername} {SteamPassword} +run_app_build {SteamAppBuild} +quit\"", "quit", Line =>
+                return Utils.ProcessUtil.ExecuteProcess(SteamCommand, SteamWorkingDirectory, $"\"+login {SteamUsername} {SteamPassword} +run_app_build {SteamAppBuild} +quit\"", "quit", Line =>
                 {
                     Log.WriteLine(Line, "STEAM", Log.LogType.ExternalProcess);
                 }) == 0;
@@ -154,9 +156,6 @@ namespace K9.TeamCity.Verbs
         enum LoginState
         {
             Idle,
-            Attempt,
-            SteamGuardEmail,
-            NeedsAuthentication,
             SteamGuardCode,
             Failed,
             OK
@@ -167,26 +166,16 @@ namespace K9.TeamCity.Verbs
         {
             Log.WriteLine(logline, "STEAM", Log.LogType.ExternalProcess);
             string cleanLine = logline.Trim();
-
-            if (cleanLine.StartsWith($"Logging in user '{SteamUsername}' to Steam Public..."))
-            {
-                m_LoginState = LoginState.Attempt;
-            }
-            else if (cleanLine.StartsWith("This computer has not been authenticated for your account using Steam Guard."))
-            {
-                m_LoginState = LoginState.NeedsAuthentication;
-            }
-            else if (cleanLine.StartsWith("Please check your email for the message from Steam"))
-            {
-                m_LoginState = LoginState.SteamGuardEmail;
-            }
-            else if (cleanLine.StartsWith("Steam Guard code:FAILED"))
-            {
-                m_LoginState = LoginState.Failed;
-            }
-            else if (cleanLine.StartsWith("Steam Guard code:"))
+            if (
+                cleanLine.StartsWith("This computer has not been authenticated for your account using Steam Guard.") ||
+                cleanLine.StartsWith("Please check your email for the message from Steam") ||
+                cleanLine.StartsWith("Steam Guard code:FAILED (Account Logon Denied)"))
             {
                 m_LoginState = LoginState.SteamGuardCode;
+            }
+            else if (cleanLine.StartsWith($"Logging in user '{SteamUsername}' to Steam Public...FAILED(Rate Limit Exceeded)"))
+            {
+                m_LoginState = LoginState.Failed;
             }
             else if (cleanLine.StartsWith("Waiting for user info...OK"))
             {
