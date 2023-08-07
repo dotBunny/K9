@@ -1006,7 +1006,7 @@ namespace K9.Services.Perforce
 
             bool bResult = true;
             if (ProcessUtil.ExecuteProcess(GetExecutablePath(), null, FullCommandLine, Input,
-                    Line => { bResult &= PerforceUtil.ParseCommandOutput(Line, HandleOutput, Options); }) != 0 &&
+                    (ProcessID, Line) => { bResult &= PerforceUtil.ParseCommandOutput(Line, HandleOutput, Options); }) != 0 &&
                 !Options.HasFlag(CommandOptions.IgnoreExitCode))
             {
                 bResult = false;

@@ -47,20 +47,20 @@ namespace K9.Utils
         public static int ExecuteProcess(string executablePath, string workingDirectory, string arguments, string Input,
             TextWriter Log)
         {
-            return ExecuteProcess(executablePath, workingDirectory, arguments, Input, Line => Log.WriteLine(Line));
+            return ExecuteProcess(executablePath, workingDirectory, arguments, Input, (ProcessID, Line) => Log.WriteLine(Line));
         }
 
         public static int ExecuteProcess(string executablePath, string workingDirectory, string arguments, string Input,
             out List<string> OutputLines)
         {
             List<string> output = new();
-            int returnValue = ExecuteProcess(executablePath, workingDirectory, arguments, Input, Line => output.Add(Line));
+            int returnValue = ExecuteProcess(executablePath, workingDirectory, arguments, Input, (ProcessID, Line) => output.Add(Line));
             OutputLines = output;
             return returnValue;
         }
 
         public static int ExecuteProcess(string executablePath, string workingDirectory, string arguments, string Input,
-            Action<string> OutputLine)
+            Action<int, string> OutputLine)
         {
             using (Process ChildProcess = new())
             {
@@ -72,7 +72,7 @@ namespace K9.Utils
                     {
                         lock (LockObject)
                         {
-                            OutputLine(y.Data.TrimEnd());
+                            OutputLine(ChildProcess.Id, y.Data.TrimEnd());
                         }
                     }
                 };

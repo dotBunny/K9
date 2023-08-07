@@ -28,7 +28,7 @@ namespace K9.Services
         {
             string output = null;
             ProcessUtil.ExecuteProcess(GetExecutablePath(), checkoutFolder,
-                "status -sb", null, Line =>
+                "status -sb", null, (ProcessID, Line) =>
                 {
                     if (!string.IsNullOrEmpty(Line))
                     {
@@ -47,7 +47,7 @@ namespace K9.Services
         {
             string output = null;
             ProcessUtil.ExecuteProcess(GetExecutablePath(), checkoutFolder,
-                "status -sb", null, Line =>
+                "status -sb", null, (ProcessID, Line) =>
                 {
                     if (!string.IsNullOrEmpty(Line))
                     {
@@ -70,7 +70,7 @@ namespace K9.Services
 
             // Get status of the repository
             ProcessUtil.ExecuteProcess(GetExecutablePath(), checkoutFolder,
-                $"rev-parse HEAD", null, Line =>
+                $"rev-parse HEAD", null, (ProcessID, Line) =>
                 {
                     Log.WriteLine(Line, "GIT", Log.LogType.ExternalProcess);
                     output.Add(Line);
@@ -108,7 +108,7 @@ namespace K9.Services
 
             Log.WriteLine($"{commandLineBuilder}{uri} {checkoutFolder}", "GIT");
             ProcessUtil.ExecuteProcess(executablePath, Directory.GetParent(checkoutFolder).GetPathWithCorrectCase(),
-                $"{commandLineBuilder}{uri} {checkoutFolder}", null, Line =>
+                $"{commandLineBuilder}{uri} {checkoutFolder}", null, (ProcessID, Line) =>
                 {
                     Log.WriteLine(Line, "GIT", Log.LogType.ExternalProcess);
                 });
@@ -118,7 +118,7 @@ namespace K9.Services
             {
                 Log.WriteLine($"Checkout Commit {commit}", "GIT", Log.LogType.ExternalProcess);
                 ProcessUtil.ExecuteProcess(executablePath, checkoutFolder,
-                    $"checkout {commit}", null, Line =>
+                    $"checkout {commit}", null, (ProcessID, Line) =>
                     {
                         Log.WriteLine(Line, "GIT", Log.LogType.ExternalProcess);
                     });
@@ -141,7 +141,7 @@ namespace K9.Services
 
             Log.WriteLine("Initialize Submodules", "GIT", Log.LogType.ExternalProcess);
             ProcessUtil.ExecuteProcess(GetExecutablePath(), checkoutFolder,
-                commandLineBuilder.ToString(), null, Line =>
+                commandLineBuilder.ToString(), null, (ProcessID, Line) =>
                 {
                     Log.WriteLine(Line, "GIT", Log.LogType.ExternalProcess);
                 });
@@ -165,7 +165,7 @@ namespace K9.Services
                 Log.LogType.ExternalProcess);
 
             ProcessUtil.ExecuteProcess(GetExecutablePath(), checkoutFolder,
-                commandLineBuilder.ToString().Trim(), null, Line =>
+                commandLineBuilder.ToString().Trim(), null, (ProcessID, Line) =>
                 {
                     Log.WriteLine(Line, "GIT", Log.LogType.ExternalProcess);
                 });
@@ -179,12 +179,12 @@ namespace K9.Services
 
             // Get status of the repository
             ProcessUtil.ExecuteProcess(executablePath, checkoutFolder,
-                $"fetch origin", null, Line =>
+                $"fetch origin", null, (ProcessID, Line) =>
                 {
                     Log.WriteLine(Line, "GIT", Log.LogType.ExternalProcess);
                 });
             ProcessUtil.ExecuteProcess(executablePath, checkoutFolder,
-                "status -uno --long", null, Line =>
+                "status -uno --long", null, (ProcessID, Line) =>
                 {
                     Log.WriteLine(Line, "GIT", Log.LogType.ExternalProcess);
                     output.Add(Line);
@@ -214,7 +214,7 @@ namespace K9.Services
             if (detached)
             {
                 ProcessUtil.ExecuteProcess(executablePath, checkoutFolder,
-                    $"reset --hard", null, Line =>
+                    $"reset --hard", null, (ProcessID, Line) =>
                     {
                         Log.WriteLine(Line, "GIT");
                     });
@@ -222,14 +222,14 @@ namespace K9.Services
                 if (branch != null)
                 {
                     ProcessUtil.ExecuteProcess(executablePath, checkoutFolder,
-                        $"switch {branch}", null, Line =>
+                        $"switch {branch}", null, (ProcessID, Line) =>
                         {
                             Log.WriteLine(Line, "GIT");
                         });
                 }
 
                 ProcessUtil.ExecuteProcess(executablePath, checkoutFolder,
-                    "pull", null, Line =>
+                    "pull", null, (ProcessID, Line) =>
                     {
                         Log.WriteLine(Line, "GIT");
                     });
@@ -237,7 +237,7 @@ namespace K9.Services
                 if (commit != null)
                 {
                     ProcessUtil.ExecuteProcess(executablePath, checkoutFolder,
-                        $"checkout {commit}", null, Line =>
+                        $"checkout {commit}", null, (ProcessID, Line) =>
                         {
                             Log.WriteLine(Line, "GIT");
                         });
@@ -254,12 +254,12 @@ namespace K9.Services
                 Log.WriteLine($"{checkoutFolder} needs updating, resetting as it could not be cleanly updated.", "CHECKOUT");
 
                 ProcessUtil.ExecuteProcess(executablePath, checkoutFolder,
-                    "reset --hard", null, Line =>
+                    "reset --hard", null, (ProcessID, Line) =>
                     {
                         Log.WriteLine(Line, "GIT");
                     });
                 ProcessUtil.ExecuteProcess(executablePath, checkoutFolder,
-                    "pull", null, Line =>
+                    "pull", null, (ProcessID, Line) =>
                     {
                         Log.WriteLine(Line, "GIT");
                     });
@@ -270,7 +270,7 @@ namespace K9.Services
                 Log.WriteLine($"Fast-forwarding {checkoutFolder}.", "CHECKOUT");
 
                 ProcessUtil.ExecuteProcess(executablePath, checkoutFolder,
-                    "pull", null, Line =>
+                    "pull", null, (ProcessID, Line) =>
                     {
                         Log.WriteLine(Line, "GIT");
                     });

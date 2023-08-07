@@ -34,21 +34,21 @@ namespace K9.Setup.Verbs
 
             if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
             {
-                return ProcessUtil.ExecuteProcess("tar.exe", OutputFolder, $"-xf {InputFile} -C {OutputFolder}", null, Line =>
+                return ProcessUtil.ExecuteProcess("tar.exe", OutputFolder, $"-xf {InputFile} -C {OutputFolder}", null, (ProcessID, Line) =>
                 {
                     Console.WriteLine(Line);
                 }) == 0;
             }
             else if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
             {
-                return ProcessUtil.ExecuteProcess("ditto", OutputFolder, $"-xk  {InputFile} {OutputFolder}", null, Line =>
+                return ProcessUtil.ExecuteProcess("ditto", OutputFolder, $"-xk  {InputFile} {OutputFolder}", null, (ProcessID, Line) =>
                 {
                     Console.WriteLine(Line);
                 }) == 0;
             }
             else
             {
-                return ProcessUtil.ExecuteProcess("tar", OutputFolder, $"-xf  {InputFile} -C {OutputFolder}", null, Line =>
+                return ProcessUtil.ExecuteProcess("tar", OutputFolder, $"-xf  {InputFile} -C {OutputFolder}", null, (ProcessID, Line) =>
                 {
                     Console.WriteLine(Line);
                 }) == 0;

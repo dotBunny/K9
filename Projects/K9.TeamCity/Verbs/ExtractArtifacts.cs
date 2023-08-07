@@ -62,21 +62,21 @@ namespace K9.TeamCity.Verbs
 
                 if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
                 {
-                    returnValue = ProcessUtil.ExecuteProcess("tar.exe", targetFolder, $"-xf {currentFile} -C {targetFolder}", null, Line =>
+                    returnValue = ProcessUtil.ExecuteProcess("tar.exe", targetFolder, $"-xf {currentFile} -C {targetFolder}", null, (ProcessID, Line) =>
                     {
                         System.Console.WriteLine(Line);
                     });
                 }
                 else if(RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
                 {
-                    returnValue = ProcessUtil.ExecuteProcess("ditto", targetFolder, $"-x -k {currentFile} {targetFolder}", null, Line =>
+                    returnValue = ProcessUtil.ExecuteProcess("ditto", targetFolder, $"-x -k {currentFile} {targetFolder}", null, (ProcessID, Line) =>
                     {
                         System.Console.WriteLine(Line);
                     });
                 }
                 else
                 {
-                    returnValue = ProcessUtil.ExecuteProcess("tar", targetFolder, $"-xf {currentFile} -C {targetFolder}", null, Line =>
+                    returnValue = ProcessUtil.ExecuteProcess("tar", targetFolder, $"-xf {currentFile} -C {targetFolder}", null, (ProcessID, Line) =>
                     {
                         System.Console.WriteLine(Line);
                     });

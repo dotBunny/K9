@@ -32,7 +32,7 @@ namespace K9.Setup.Verbs
             if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
             {
                 // Windows OK using tar to generate zip files without issue
-                return ProcessUtil.ExecuteProcess("tar.exe", InputFolder, $"-acf {OutputPath} *", null, Line =>
+                return ProcessUtil.ExecuteProcess("tar.exe", InputFolder, $"-acf {OutputPath} *", null, (ProcessID, Line) =>
                 {
                     Console.WriteLine(Line);
                 }) == 0;
@@ -40,14 +40,14 @@ namespace K9.Setup.Verbs
             else if(RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
             {
                 // Mac we'll use the specific mac command to ensure the folders maintain flags
-                return ProcessUtil.ExecuteProcess("ditto", InputFolder, $"-c -k --sequesterRsrc {InputFolder} {OutputPath}", null, Line =>
+                return ProcessUtil.ExecuteProcess("ditto", InputFolder, $"-c -k --sequesterRsrc {InputFolder} {OutputPath}", null, (ProcessID, Line) =>
                 {
                     Console.WriteLine(Line);
                 }) == 0;
             }
             else
             {
-                return ProcessUtil.ExecuteProcess("tar", InputFolder, $"-acf {OutputPath} *", null, Line =>
+                return ProcessUtil.ExecuteProcess("tar", InputFolder, $"-acf {OutputPath} *", null, (ProcessID, Line) =>
                 {
                     Console.WriteLine(Line);
                 }) == 0;

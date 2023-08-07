@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2018-2021 dotBunny Inc.
+// Copyright (c) 2018-2021 dotBunny Inc.
 // dotBunny licenses this file to you under the BSL-1.0 license.
 // See the LICENSE file in the project root for more information.
 
@@ -76,7 +76,7 @@ public static class Compression
             FileUtil.WriteStream(inputStream, tempFile);
             Directory.CreateDirectory(outputPath);
             Timer timer = new();
-            ProcessUtil.ExecuteProcess("unzip", outputPath, $"{tempFile} -d {outputPath}", null, s =>
+            ProcessUtil.ExecuteProcess("unzip", outputPath, $"{tempFile} -d {outputPath}", null, (processID,s) =>
             {
                 Console.WriteLine(s);
             });
