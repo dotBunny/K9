@@ -94,7 +94,7 @@ namespace K9.TeamCity.Verbs
             string code = null;
             m_LoginState = LoginState.Idle;
 
-            Utils.ProcessUtil.ExecuteProcess(SteamCommand, SteamWorkingDirectory, $"\"+login {SteamUsername} {SteamPassword} +info +quit\"", "quit", HandleLogin);
+            Utils.ProcessUtil.ExecuteProcess(SteamCommand, SteamWorkingDirectory, $"\"+login {SteamUsername} {SteamPassword} +info +quit\"", null, HandleLogin);
 
             if (m_LoginState == LoginState.Failed)
             {
@@ -130,7 +130,7 @@ namespace K9.TeamCity.Verbs
                 if (code != null)
                 {
                     Log.WriteLine($"Attempt SteamGuard Authentication ...", "STEAM");
-                    Utils.ProcessUtil.ExecuteProcess(SteamCommand, SteamWorkingDirectory, $"\"+login {SteamUsername} {SteamPassword} {code} +set_steam_guard_code {code} +quit\"", "quit", HandleLogin);
+                    Utils.ProcessUtil.ExecuteProcess(SteamCommand, SteamWorkingDirectory, $"\"+login {SteamUsername} {SteamPassword} {code} +set_steam_guard_code {code} +quit\"", null, HandleLogin);
                     if (m_LoginState != LoginState.OK)
                     {
                         Log.WriteLine($"SteamGuard Authentication FAILED", "STEAM");
@@ -142,7 +142,7 @@ namespace K9.TeamCity.Verbs
             {
                 Log.WriteLine("Run App Build ...", "STEAM");
                 // Execute the actual command
-                return Utils.ProcessUtil.ExecuteProcess(SteamCommand, SteamWorkingDirectory, $"\"+login {SteamUsername} {SteamPassword} +run_app_build {SteamAppBuild} +quit\"", "quit", (ProcessID, Line) =>
+                return Utils.ProcessUtil.ExecuteProcess(SteamCommand, SteamWorkingDirectory, $"\"+login {SteamUsername} {SteamPassword} +run_app_build {SteamAppBuild} +quit\"", null, (ProcessID, Line) =>
                 {
                     Log.WriteLine(Line, "STEAM", Log.LogType.ExternalProcess);
                 }) == 0;
@@ -165,24 +165,25 @@ namespace K9.TeamCity.Verbs
             string cleanLine = logline.Trim();
             if (
                 cleanLine.StartsWith("This computer has not been authenticated for your account using Steam Guard.") ||
-                cleanLine.StartsWith("Please check your email for the message from Steam") ||
-                cleanLine.StartsWith("Steam Guard code:FAILED (Account Logon Denied)"))
+                cleanLine.StartsWith("Please check your email for the message from Steam"))
             {
                 m_LoginState = LoginState.SteamGuardCode;
             }
-            else if (cleanLine.StartsWith($"Logging in user '{SteamUsername}' to Steam Public...FAILED (Invalid Login Auth Code)"))
+            else if (cleanLine.StartsWith($"Logging in user '{SteamUsername}' to Steam Public...FAILED (Invalid Login Auth Code)") ||
+                 cleanLine.StartsWith("Steam Guard code:FAILED (Account Logon Denied)"))
             {
-                // This doesnt kill automatically for some reason so we need to
                 System.Diagnostics.Process.GetProcessById(processID).Kill();
                 m_LoginState = LoginState.SteamGuardCode;
             }
             else if (cleanLine.StartsWith($"Logging in user '{SteamUsername}' to Steam Public...FAILED(Rate Limit Exceeded)"))
             {
                 m_LoginState = LoginState.Failed;
+                System.Diagnostics.Process.GetProcessById(processID).Kill();
             }
             else if (cleanLine.StartsWith("Waiting for user info...OK"))
             {
                 m_LoginState = LoginState.OK;
+                System.Diagnostics.Process.GetProcessById(processID).Kill();
             }
         }
     }
