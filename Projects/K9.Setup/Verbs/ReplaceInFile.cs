@@ -14,10 +14,10 @@ namespace K9.Setup.Verbs
         [Option('i', "input", Required = true, HelpText = "The target file path")]
         public string Input { get; set; }
 
-        [Option('r', "replace", Required = true, HelpText = "Regex based search")]
-        public string ReplaceRegex { get; set; }
+        [Option('r', "replace", Required = true, HelpText = "Exact search to replace all of in file.")]
+        public string Replace { get; set; }
 
-        [Option('w', "with", Required = true, HelpText = "The folder root to copy to.")]
+        [Option('w', "with", Required = true, HelpText = "The text to replace with")]
         public string Content { get; set; }
 
         public bool CanExecute()
@@ -32,13 +32,8 @@ namespace K9.Setup.Verbs
         public bool Execute()
         {
             string fileContent = File.ReadAllText(Input);
-
-            Regex regex = new Regex(ReplaceRegex, RegexOptions.Compiled);
-
-            string updatedContent = regex.Replace(fileContent, Content);
-
+            string updatedContent = fileContent.Replace(Replace, Content);
             File.WriteAllText(Input, updatedContent);
-
             return fileContent != updatedContent;
         }
     }
