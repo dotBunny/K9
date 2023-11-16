@@ -29,15 +29,19 @@ namespace K9.TeamCity.Verbs
 
             string[] directories = Directory.GetDirectories(InputFolder, "*", SearchOption.TopDirectoryOnly);
             int directoryCount = directories.Length;
+            Log.WriteLine($"Found {directoryCount} Directories", "TEAMCITY");
             List<string> directoriesToDelete = new List<string>(directoryCount);
 
             string[] files = Directory.GetFiles(InputFolder, "*", SearchOption.TopDirectoryOnly);
             int filesCount = files.Length;
+            Log.WriteLine($"Found {filesCount} Files", "TEAMCITY");
+
             List<string> filesToDelete = new List<string>(filesCount);
 
             SafeQuery ??= string.Empty;
             string[] filters = SafeQuery.Split(",", System.StringSplitOptions.RemoveEmptyEntries);
             int filtersCount = filters.Length;
+            Log.WriteLine($"Filtering based on {filtersCount} filters ...", "TEAMCITY");
 
             // Handle Directories
             for(int i = 0; i < directoryCount; i++)
@@ -76,12 +80,16 @@ namespace K9.TeamCity.Verbs
             int directoriesToDeleteCount = directoriesToDelete.Count;
             int filesToDeleteCount = filesToDelete.Count;
 
+
+            Log.WriteLine($"Deleting {filesToDeleteCount} Fils ...", "TEAMCITY");
             for(int i = 0; i < filesToDeleteCount; i++)
             {
                 string path = filesToDelete[i];
                 Log.WriteLine($"Removing File: {path} ...", "TEAMCITY");
                 FileUtil.ForceDeleteFile(path);
             }
+
+            Log.WriteLine($"Deleting {directoriesToDeleteCount} Directories ...", "TEAMCITY");
 
             for (int i = 0; i < directoriesToDeleteCount; i++)
             {
