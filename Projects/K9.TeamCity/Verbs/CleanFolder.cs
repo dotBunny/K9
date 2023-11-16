@@ -25,7 +25,7 @@ namespace K9.TeamCity.Verbs
 
         public bool Execute()
         {
-            if (!Directory.Exists(InputFolder))
+            if (!Directory.Exists(InputFolder) && !File.Exists(InputFolder))
             {
                 Log.WriteLine($"Unable to find {InputFolder}. Must not exist?", "TEAMCITY");
                 return true;
