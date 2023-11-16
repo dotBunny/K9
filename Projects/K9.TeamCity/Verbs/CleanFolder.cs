@@ -25,7 +25,11 @@ namespace K9.TeamCity.Verbs
 
         public bool Execute()
         {
-            if (!Directory.Exists(InputFolder)) return true;
+            if (!Directory.Exists(InputFolder))
+            {
+                Log.WriteLine($"Unable to find {InputFolder}. Must not exist?", "TEAMCITY");
+                return true;
+            }
 
             string[] directories = Directory.GetDirectories(InputFolder, "*", SearchOption.TopDirectoryOnly);
             int directoryCount = directories.Length;
