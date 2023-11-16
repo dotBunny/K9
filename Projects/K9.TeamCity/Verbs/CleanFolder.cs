@@ -35,6 +35,7 @@ namespace K9.TeamCity.Verbs
             int filesCount = files.Length;
             List<string> filesToDelete = new List<string>(filesCount);
 
+            SafeQuery ??= string.Empty;
             string[] filters = SafeQuery.Split(",", System.StringSplitOptions.RemoveEmptyEntries);
             int filtersCount = filters.Length;
 
