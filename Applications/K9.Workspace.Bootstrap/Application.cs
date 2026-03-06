@@ -166,7 +166,8 @@ namespace K9.Workspace.Bootstrap
             List<string> parsedFiles = new(foundCount);
             for (int i = 0; i < foundCount; i++)
             {
-                if (projectFiles[i].EndsWith("Bootstrap.csproj")) continue;
+                // Ignore self
+                if (projectFiles[i].EndsWith("K9.Workspace.Bootstrap.csproj")) continue;
 
                 // Might be a bad way to
                 if (projectFiles[i].StartsWith(sharedFolder)) continue;
@@ -201,10 +202,8 @@ namespace K9.Workspace.Bootstrap
                 return;
             }
 
-            // TODO: Update path to new path?
-
             // We need to run this process elevated, the main executable is bundled to ensure its elevated, but the library is not.
-            string args = $"{Path.Combine(workspaceRoot, "K9", "Binaries", "DotNET", "K9.Workspace.Setup.dll")} no-source no-build";
+            string args = $"{Path.Combine(workspaceRoot, "K9", "Binaries", "K9.Workspace.Setup.dll")} no-source no-build";
             if (s_QuietMode)
             {
                 args += " quiet";
