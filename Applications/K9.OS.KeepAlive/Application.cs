@@ -3,11 +3,10 @@
 
 using System.Diagnostics;
 using K9.Core;
-using KeepAlive;
 
-namespace K9
+namespace K9.OS.KeepAlive
 {
-    internal class KeepAlive
+    internal class Application
     {
         static bool s_Alive = true;
         static DateTime s_LastHeartbeat;

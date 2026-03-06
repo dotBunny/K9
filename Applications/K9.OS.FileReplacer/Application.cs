@@ -3,11 +3,10 @@
 
 using K9.Core;
 using K9.Core.Utils;
-using K9.OS.FileReplacer;
 
-namespace K9.OS
+namespace K9.OS.FileReplacer
 {
-    internal class FileReplacer
+    internal class Application
     {
         static void Main()
         {

@@ -3,7 +3,7 @@
 
 using K9.Core;
 
-namespace ScreenResolution
+namespace K9.OS.ScreenResolution
 {
     public class ScreenResolutionConfig()
     {        

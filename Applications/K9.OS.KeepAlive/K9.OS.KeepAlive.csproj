@@ -1,17 +1,22 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
+    <StartupObject>K9.OS.KeepAlive.Application</StartupObject>
+    <AssemblyName>K9.OS.KeepAlive</AssemblyName>
     <OutputType>Exe</OutputType>
     <TargetFramework>net8.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
-    <AppendRuntimeIdentifierToOutputPath>false</AppendRuntimeIdentifierToOutputPath>
-    <StartupObject>K9.FileReplacer</StartupObject>
+    <AppendRuntimeIdentifierToOutputPath>false</AppendRuntimeIdentifierToOutputPath>    
     <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
     <ProduceReferenceAssembly>False</ProduceReferenceAssembly>
     <Configurations>Debug;Release;Workspace</Configurations>
+    <Authors>dotBunny</Authors>
+    <Company>dotBunny Inc.</Company>
+    <RepositoryUrl>https://github.com/dotBunny/K9</RepositoryUrl>
   </PropertyGroup>
+
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
     <IsPublishable>False</IsPublishable>

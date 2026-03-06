@@ -39,9 +39,9 @@ namespace K9
                 SettingsProvider settings = new(workspaceRoot);
 
                 Log.AddLogOutput(new FileLogOutput(settings.LogsFolder, "K9"));
-                
+
                 // Try to find the desired execution
-                string[] programFolderCommands = Directory.GetFiles(K9DefaultsFolder, $"*{Commands.Extension}", SearchOption.AllDirectories);
+                string[] programFolderCommands = Directory.GetFiles(settings.K9DefaultsFolder, $"*{Commands.Extension}", SearchOption.AllDirectories);
                 string[] projectFolderCommands = Directory.GetFiles(settings.ProjectsFolder, $"*{Commands.Extension}", SearchOption.AllDirectories);
 
                 CommandMap map = new();
@@ -150,7 +150,7 @@ namespace K9
                 ["K9Temp"] = settings.TempFile,
 
                 // Some things UE uses
-                ["COMPUTERNAME"] = System.Environment.MachineName             
+                ["COMPUTERNAME"] = System.Environment.MachineName
             };
 
             // P4 Config

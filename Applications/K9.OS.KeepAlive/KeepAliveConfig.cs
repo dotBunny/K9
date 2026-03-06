@@ -5,7 +5,7 @@ using System.Text.Json.Serialization;
 using System.Text.Json;
 using K9.Core;
 
-namespace KeepAlive
+namespace K9.OS.KeepAlive
 {
     public class KeepAliveConfig
     {

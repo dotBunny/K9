@@ -3,7 +3,7 @@
 
 using System.Runtime.InteropServices;
 
-namespace ScreenResolution;
+namespace K9.OS.ScreenResolution;
 
 public class WindowsDisplayPlatform
 {

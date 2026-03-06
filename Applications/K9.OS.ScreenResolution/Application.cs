@@ -1,13 +1,12 @@
 // Copyright dotBunny Inc. All Rights Reserved.
 // See the LICENSE file at the repository root for more information.
 
-using ScreenResolution;
 using K9.Core;
 using K9.Core.Modules;
 
-namespace K9
+namespace K9.OS.ScreenResolution
 {
-    internal class ScreenResolution
+    internal class Application
     {
         static void Main()
         {

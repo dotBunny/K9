@@ -31,8 +31,9 @@ namespace K9.Core
         public readonly string K9Folder;
 
         public readonly string K9ToolboxFolder;
+        
         public readonly string K9DotNETFolder;
-        public readonly string K9ProgramsFolder;
+        public readonly string K9DefaultsFolder;
 
 
         public readonly string K9WorkspaceSettingsFile;

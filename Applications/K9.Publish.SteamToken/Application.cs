@@ -4,7 +4,6 @@
 using K9.Core;
 using K9.Core.IO;
 using K9.Core.Utils;
-using SteamToken;
 
 namespace K9.Publish.SteamToken
 {

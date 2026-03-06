@@ -19,13 +19,13 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "OS", "OS", "{E4CCF069-9072-4D74-B000-2D2ABB660091}"
 EndProject
 
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "K9.OS.KeepAlive", "Applications\OS\K9.OS.KeepAlive\K9.OS.KeepAlive.csproj", "{8BE7026A-5BDB-4E99-A21B-808FABB7BDDB}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "K9.OS.KeepAlive", "Applications\K9.OS.KeepAlive\K9.OS.KeepAlive.csproj", "{8BE7026A-5BDB-4E99-A21B-808FABB7BDDB}"
 EndProject
 
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "K9.OS.FileReplacer", "Applications\OS\K9.OS.FileReplacer\K9.OS.FileReplacer.csproj", "{AE0A613D-F669-4962-9B32-ED94F94DA2A7}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "K9.OS.FileReplacer", "Applications\K9.OS.FileReplacer\K9.OS.FileReplacer.csproj", "{AE0A613D-F669-4962-9B32-ED94F94DA2A7}"
 EndProject
 
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "K9.OS.ScreenResolution", "Applications\OS\K9.OS.ScreenResolution\K9.OS.ScreenResolution.csproj", "{017D95FC-4A2E-43A6-BD1A-C954B54D8391}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "K9.OS.ScreenResolution", "Applications\K9.OS.ScreenResolution\K9.OS.ScreenResolution.csproj", "{017D95FC-4A2E-43A6-BD1A-C954B54D8391}"
 EndProject
 
 # Publish Projects (E4CCF069-9072-4D74-B000-2D2ABB660092)
@@ -34,7 +34,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Publish", "Publish", "{E4CC
 EndProject
 
 
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "K9.Publish.SteamToken", "Applications\Publish\K9.Publish.SteamToken\K9.Publish.SteamToken.csproj", "{8509E9D9-A5CA-4A55-B1E5-64E602DEC8F4}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "K9.Publish.SteamToken", "Applications\K9.Publish.SteamToken\K9.Publish.SteamToken.csproj", "{8509E9D9-A5CA-4A55-B1E5-64E602DEC8F4}"
 EndProject
 
 
@@ -58,7 +58,7 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Unreal", "Unreal", "{E4CCF069-9072-4D74-B000-2D2ABB660096}"
 EndProject
 
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "K9.Unreal.Types", "Applications\Unreal\K9.Unreal.Types\K9.Unreal.Types.csproj", "{254F8EE5-1B23-4735-AB5C-E242497430F0}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "K9.Unreal.Types", "Applications\K9.Unreal.Types\K9.Unreal.Types.csproj", "{254F8EE5-1B23-4735-AB5C-E242497430F0}"
 EndProject
 
 # Workspace Projects (E4CCF069-9072-4D74-B000-2D2ABB660097)
@@ -66,13 +66,13 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Workspace", "Workspace", "{E4CCF069-9072-4D74-B000-2D2ABB660097}"
 EndProject
 
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "K9.Workspace.Bootstrap", "Applications\Workspace\K9.Workspace.Bootstrap\K9.Workspace.Bootstrap.csproj", "{E23B4740-A5BA-46F1-9D98-90D766D55624}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "K9.Workspace.Bootstrap", "Applications\K9.Workspace.Bootstrap\K9.Workspace.Bootstrap.csproj", "{E23B4740-A5BA-46F1-9D98-90D766D55624}"
 EndProject
 
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "K9.Workspace.Setup", "Applications\Workspace\K9.Workspace.Setup\K9.Workspace.Setup.csproj", "{A1D68E21-DD4A-49E5-98F4-C9348EF57110}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "K9.Workspace.Setup", "Applications\K9.Workspace.Setup\K9.Workspace.Setup.csproj", "{A1D68E21-DD4A-49E5-98F4-C9348EF57110}"
 EndProject
 
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "K9.Workspace.Reset", "Applications\Workspace\K9.Workspace.Reset\K9.Workspace.Reset.csproj", "{13787904-BC4A-41D4-A3DA-5A3320BE35C4}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "K9.Workspace.Reset", "Applications\K9.Workspace.Reset\K9.Workspace.Reset.csproj", "{13787904-BC4A-41D4-A3DA-5A3320BE35C4}"
 EndProject
 
 

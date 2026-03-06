@@ -395,6 +395,7 @@ FodyWeavers.xsd
 *.msp
 
 # JetBrains Rider
+.idea/
 *.sln.iml
 
 # K9 Tooling
