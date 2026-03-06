@@ -28,7 +28,7 @@ namespace K9.Workspace.Bootstrap
         {
             try
             {
-                Assembly? assembly = Assembly.GetAssembly(typeof(Bootstrap));
+                Assembly? assembly = Assembly.GetAssembly(typeof(Application));
 
                 if (assembly != null)
                     Console.WriteLine($"K9 Bootstrap {assembly.GetName().Version}");
@@ -168,7 +168,7 @@ namespace K9.Workspace.Bootstrap
             {
                 if (projectFiles[i].EndsWith("Bootstrap.csproj")) continue;
 
-                // Might be a bad way to 
+                // Might be a bad way to
                 if (projectFiles[i].StartsWith(sharedFolder)) continue;
 
                 parsedFiles.Add(projectFiles[i]);
