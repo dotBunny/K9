@@ -1,4 +1,4 @@
-# dotBunny EditorConfig (modified Roslyn)
+# dotBunny EditorConfig (modified Roslyn) 2026
 root = true
 
 # Don't use tabs for indentation.
@@ -8,6 +8,8 @@ charset = utf-8
 indent_style = space
 insert_final_newline = false
 trim_trailing_whitespace = true
+spelling_wordlist=wordlist.dic
+
 
 # Visual Studio Solution files (why!! TAB why!!)
 [*.sln]
@@ -50,17 +52,17 @@ trim_trailing_whitespace = false
 [*.cs]
 indent_size = 4
 
-# IDE0055: Fix formatting
-dotnet_diagnostic.IDE0055.severity = warning
-
 # Sort using and Import directives with System.* appearing first
 dotnet_sort_system_directives_first = true
 dotnet_separate_import_directive_groups = false
 # Avoid "this." and "Me." if not necessary
-dotnet_style_qualification_for_field = false:refactoring
-dotnet_style_qualification_for_property = false:refactoring
-dotnet_style_qualification_for_method = false:refactoring
-dotnet_style_qualification_for_event = false:refactoring
+dotnet_style_qualification_for_field = false:warning
+dotnet_style_qualification_for_property = false:warning
+dotnet_style_qualification_for_method = false:warning
+dotnet_style_qualification_for_event = false:warning
+
+# Remove default modifiers
+dotnet_style_require_accessibility_modifiers = never:warning
 
 # Use language keywords instead of framework type names for type references
 dotnet_style_predefined_type_for_locals_parameters_members = true:suggestion

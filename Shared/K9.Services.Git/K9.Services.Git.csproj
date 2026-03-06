@@ -1,0 +1,36 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <AssemblyName>K9.Services.Git</AssemblyName>    
+    <TargetFramework>netstandard2.1</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+    <AppendRuntimeIdentifierToOutputPath>false</AppendRuntimeIdentifierToOutputPath>    
+    <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
+    <ProduceReferenceAssembly>False</ProduceReferenceAssembly>
+    <Configurations>Debug;Release;Workspace</Configurations>
+    <Authors>dotBunny</Authors>
+    <Company>dotBunny Inc.</Company>
+    <RepositoryUrl>https://github.com/dotBunny/K9</RepositoryUrl>
+    <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
+    <AssemblyVersion>1.0.0.0</AssemblyVersion>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <IsPublishable>False</IsPublishable>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <IsPublishable>False</IsPublishable>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Workspace|AnyCPU'">
+    <IsPublishable>False</IsPublishable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\K9.Core\K9.Core.csproj" />
+  </ItemGroup>
+
+</Project>

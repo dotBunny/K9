@@ -4,9 +4,14 @@ A collection of functionality useful for automation in Game Development.
 ## Disclaimer
 K9 is by no means the most optimized battle-ready code, nor is it meant to be. It is a finite set of functionality to augment and enhance existing automation and build systems.
 
-## Usages
-A limited set of examples are available on the [wiki](https://github.com/dotBunny/K9/wiki).
+## Requirements
 
-## License
-K9 is licensed under the [BSL-1.0 License](https://choosealicense.com/licenses/bsl-1.0/).
-> A copy of this license can be found at the root of the project in the `LICENSE` file.
+### Git
+Git needs to be accessible from your command prompt; some Git clients do not add Git to the `PATH` so it may be easier  to just use the installers found at: https://git-scm.com/download/.
+
+### .NET SDK 8.0
+The bootstrapped build requires the installation of the .NET 8.0 SDK, which can be found at: https://dotnet.microsoft.com/en-us/download/dotnet/8.0
+
+## Development
+
+> It is important to keep your IDE building in `DEBUG` mode when actively developing as both `K9.Workspace.Bootstrap` and `K9.Workspace.Setup` have destructive actions which will wipe out any changes to the source code if ran in `RELEASE` or `WORKSPACE` mode.

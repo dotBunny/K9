@@ -1,0 +1,167 @@
+// Copyright dotBunny Inc. All Rights Reserved.
+// See the LICENSE file at the repository root for more information.
+
+using K9;
+using K9.Core;
+using K9.Core.Loggers;
+using K9.Core.Utils;
+using K9.Services.Perforce;
+using static K9.CommandMap;
+
+namespace K9
+{
+    internal class Application
+    {
+        static void Main()
+        {
+            using ConsoleApplication framework = new(
+            new K9.Core.ConsoleApplicationSettings()
+            {
+                DefaultLogCategory = "K9",
+                LogOutputs = [new K9.Core.Loggers.ConsoleLogOutput()],
+                PauseOnExit = false,
+                DisplayHeader = false,
+                DisplayRuntime = false
+            });
+
+            try
+            {
+                // Find our root
+                string? workspaceRoot = PerforceUtil.GetWorkspaceRoot();
+                if (workspaceRoot == null)
+                {
+                    Log.WriteLine("Unable to find workspace root.", ILogOutput.LogType.Error);
+                    framework.Environment.UpdateExitCode(1, true);
+                    return;
+                }
+
+                // Try to standardize our file/locations, etc.
+                SettingsProvider settings = new(workspaceRoot);
+
+                Log.AddLogOutput(new FileLogOutput(settings.LogsFolder, "K9"));
+                
+                // Try to find the desired execution
+                string[] programFolderCommands = Directory.GetFiles(K9DefaultsFolder, $"*{Commands.Extension}", SearchOption.AllDirectories);
+                string[] projectFolderCommands = Directory.GetFiles(settings.ProjectsFolder, $"*{Commands.Extension}", SearchOption.AllDirectories);
+
+                CommandMap map = new();
+
+                // Parse Programs
+                int programFolderCommandsCount = programFolderCommands.Length;
+                for(int i = 0; i < programFolderCommandsCount; i++)
+                {
+                    Commands? c = Commands.Get(programFolderCommands[i]);
+                    if(c == null)
+                    {
+                        Log.WriteLine($"Unable to parse {programFolderCommands[i]}.", "JSON", ILogOutput.LogType.Error);
+                        continue;
+                    }
+                    else if(c.Actions == null || c.Actions.Length == 0)
+                    {
+                        Log.WriteLine($"No actions found in {programFolderCommands[i]}.", "JSON", ILogOutput.LogType.Info);
+                        continue;
+                    }
+
+                    map.AddCommands(c);
+                }
+
+                // Parse Project
+                int projectFolderCommandsCount = projectFolderCommands.Length;
+                for (int i = 0; i < projectFolderCommandsCount; i++)
+                {
+                    Commands? c = Commands.Get(projectFolderCommands[i]);
+                    if (c == null)
+                    {
+                        Log.WriteLine($"Unable to parse {projectFolderCommands[i]}.", "JSON", ILogOutput.LogType.Error);
+                        continue;
+                    }
+                    else if(c.Actions == null || c.Actions.Length == 0)
+                    {
+                        Log.WriteLine($"No actions found in {projectFolderCommands[i]}.", "JSON", ILogOutput.LogType.Info);
+                        continue;
+                    }
+
+                    map.AddCommands(c);
+                }
+
+                if(!map.HasCommands())
+                {
+                    Log.WriteLine($"No actions found.", "JSON", ILogOutput.LogType.Info);
+                    return;
+                }
+
+                if (framework.Arguments.BaseArguments.Contains("help") || framework.Arguments.BaseArguments.Count == 0)
+                {
+                    Log.WriteLine(map.GetOutput(), "K9", ILogOutput.LogType.Info);
+                }
+                else
+                {
+                    CommandMapAction? action = map.GetAction(framework.Arguments.ToString());
+                    if (action != null && action.Command != null)
+                    {
+                        string? arguments = action.Arguments;
+                        if (arguments != null)
+                        {
+                            arguments = settings.ReplaceKeywords(arguments);
+                        }
+
+                        string? workingDirectory = action.WorkingDirectory;
+                        if(workingDirectory != null)
+                        {
+                            workingDirectory = settings.ReplaceKeywords(workingDirectory);
+                        }
+
+
+                        // We cant actually just run batch files they have to be ran from a command prompt
+                        string? command = settings.ReplaceKeywords(action.Command);
+                        if(action.Command.EndsWith(".bat"))
+                        {
+                            arguments = $"/K {command} {arguments}";
+                            command = "cmd.exe";
+                        }
+
+                        // K9 will exit immediately following this 'start'.
+                        ProcessUtil.SpawnWithEnvironment(command, arguments, workingDirectory, GetEnvironmentVariables(settings));
+                    }
+                    else
+                    {
+                        Log.WriteLine($"Unable to find valid command for query `{framework.Arguments}`.", "K9", ILogOutput.LogType.Error);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                framework.ExceptionHandler(ex);
+            }
+        }
+
+        static Dictionary<string, string> GetEnvironmentVariables(SettingsProvider settings)
+        {
+            Dictionary<string, string> returnData = new()
+            {
+                // Universal flag that this was launched from K9
+                ["K9"] = "1",
+
+                ["DOTNET_CLI_TELEMETRY_OPTOUT"] = "true",
+
+                // Our own few things
+                ["Workspace"] = settings.RootFolder,
+                ["BatchFiles"] = settings.BuildBatchFilesFolder,
+                ["K9Temp"] = settings.TempFile,
+
+                // Some things UE uses
+                ["COMPUTERNAME"] = System.Environment.MachineName             
+            };
+
+            // P4 Config
+            if (File.Exists(settings.P4ConfigFile))
+            {
+                PerforceConfig config = new(settings.P4ConfigFile);
+                returnData["P4CLIENT"] = config.Client;
+                returnData["P4PORT"] = config.Port;
+            }
+
+            return returnData;
+        }
+    }
+}

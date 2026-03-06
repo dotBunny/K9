@@ -1,0 +1,37 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <StartupObject>K9.Publish.SteamToken.Application</StartupObject>
+    <AssemblyName>K9.Publish.SteamToken</AssemblyName>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+    <AppendRuntimeIdentifierToOutputPath>false</AppendRuntimeIdentifierToOutputPath>    
+    <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
+    <ProduceReferenceAssembly>False</ProduceReferenceAssembly>
+    <Configurations>Debug;Release;Workspace</Configurations>
+    <Authors>dotBunny</Authors>
+    <Company>dotBunny Inc.</Company>
+    <RepositoryUrl>https://github.com/dotBunny/K9</RepositoryUrl>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <IsPublishable>False</IsPublishable>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <IsPublishable>False</IsPublishable>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Workspace|AnyCPU'">
+    <IsPublishable>False</IsPublishable>
+    <OutputPath>..\..\..\..\..\Binaries\DotNET</OutputPath>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\Shared\K9.Core\K9.Core.csproj" />
+  </ItemGroup>
+
+</Project>
