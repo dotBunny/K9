@@ -1,6 +1,5 @@
-// Copyright (c) 2018-2021 dotBunny Inc.
-// dotBunny licenses this file to you under the BSL-1.0 license.
-// See the LICENSE file in the project root for more information.
+// Copyright dotBunny Inc. All Rights Reserved.
+// See the LICENSE file at the repository root for more information.
 
 using System;
 using System.Collections.Generic;
@@ -29,17 +28,17 @@ namespace K9.Unity.Verbs
 
             // Check for environment from B4
             if (Core.OverrideArguments.ContainsKey("B4"))
-            {                
+            {
                 string unityEnvironment = Environment.GetEnvironmentVariable("UNITY_EDITOR", EnvironmentVariableTarget.User);
                 if (unityEnvironment != null)
-                {                    
+                {
                     _executablePath = unityEnvironment;
                 }
             }
 
             // Get and remove executable from whats being passed through (if not grabbing env)
             if (_executablePath == null)
-            { 
+            {
                 _executablePath = _workingArguments[0];
                 _workingArguments.RemoveAt(0);
             }

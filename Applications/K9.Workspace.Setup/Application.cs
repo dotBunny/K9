@@ -178,7 +178,7 @@ static class Application
             Log.WriteLine("Restarting of terminals required to pickup new environment variables.", ILogOutput.LogType.Info);
         }
 
-        ProcessLogOutput processLogOutput = new();
+        ProcessLogOutput processLogOutput = new(ILogOutput.LogType.ExternalProcess);
 
         ProcessUtil.Execute("dotnet", settings.RootFolder, "dev-certs https --trust", null, processLogOutput.GetAction());
 
@@ -258,7 +258,7 @@ static class Application
                     string gitDependencies = Path.Combine(settings.RootFolder, "Engine", "Binaries", "DotNET", "GitDependencies", "win-x64", "GitDependencies.exe");
                     Log.WriteLine($"Running {gitDependencies} ...");
 
-                    ProcessLogOutput processLogOutput = new();
+                    ProcessLogOutput processLogOutput = new(ILogOutput.LogType.ExternalProcess);
                     ProcessUtil.Execute(gitDependencies, settings.RootFolder, "--force", null,
                         processLogOutput.GetAction());
                 }

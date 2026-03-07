@@ -1,12 +1,14 @@
 // Copyright dotBunny Inc. All Rights Reserved.
 // See the LICENSE file at the repository root for more information.
 
+using System;
+using System.IO;
 using K9.Core;
 using K9.Core.Utils;
 
 namespace K9.Publish.SteamToken
 {
-    public class SteamTokenConfig()
+    public class SteamTokenConfig
     {
         public bool ForceFlag;
 
@@ -30,25 +32,25 @@ namespace K9.Publish.SteamToken
 
         public static SteamTokenConfig Get(ConsoleApplication framework)
         {
-            SteamTokenConfig config = new SteamTokenConfig();
+            SteamTokenConfig config = new();
 
-            // Should we force operations
+            // Should we force operations?
             config.ForceFlag = framework.Arguments.BaseArguments.Contains("FORCE");
 
             // Network Share Settings
-            if (framework.Arguments.OverrideArguments.ContainsKey("NETWORK-USERNAME"))
+            if (framework.Arguments.HasOverrideArgument("NETWORK-USERNAME"))
             {
                 config.NetworkUsername = framework.Arguments.OverrideArguments["NETWORK-USERNAME"];
             }
-            if (framework.Arguments.OverrideArguments.ContainsKey("NETWORK-PASSWORD"))
+            if (framework.Arguments.HasOverrideArgument("NETWORK-PASSWORD"))
             {
                 config.NetworkPassword = framework.Arguments.OverrideArguments["NETWORK-PASSWORD"];
             }
-            if (framework.Arguments.OverrideArguments.ContainsKey("NETWORK-DRIVE"))
+            if (framework.Arguments.HasOverrideArgument("NETWORK-DRIVE"))
             {
                 config.NetworkDrive = framework.Arguments.OverrideArguments["NETWORK-DRIVE"];
             }
-            if (framework.Arguments.OverrideArguments.ContainsKey("NETWORK-SHARE"))
+            if (framework.Arguments.HasOverrideArgument("NETWORK-SHARE"))
             {
                 config.NetworkShare = framework.Arguments.OverrideArguments["NETWORK-SHARE"];
             }
@@ -63,12 +65,12 @@ namespace K9.Publish.SteamToken
                 });
             }
 
-            if (framework.Arguments.OverrideArguments.ContainsKey("TOKEN-TARGET"))
+            if (framework.Arguments.HasOverrideArgument("TOKEN-TARGET"))
             {
                 config.TokenTarget = framework.Arguments.OverrideArguments["TOKEN-TARGET"];
             }
 
-            if (framework.Arguments.OverrideArguments.ContainsKey("TOKEN-FOLDER"))
+            if (framework.Arguments.HasOverrideArgument("TOKEN-FOLDER"))
             {
                 config.TokenFolder = framework.Arguments.OverrideArguments["TOKEN-FOLDER"];
             }
@@ -78,7 +80,7 @@ namespace K9.Publish.SteamToken
                 throw (new DirectoryNotFoundException($"Unable to reach the token folder @ {config.TokenFolder}"));
             }
 
-            if (framework.Arguments.OverrideArguments.ContainsKey("INSTALL-PACKAGE"))
+            if (framework.Arguments.HasOverrideArgument("INSTALL-PACKAGE"))
             {
                 config.InstallPackage = framework.Arguments.OverrideArguments["INSTALL-PACKAGE"];
             }
@@ -88,27 +90,27 @@ namespace K9.Publish.SteamToken
                 throw (new DirectoryNotFoundException($"Unable to reach the install package @ {config.InstallPackage}"));
             }
 
-            if (framework.Arguments.OverrideArguments.ContainsKey("INSTALL-LOCATION"))
+            if (framework.Arguments.HasOverrideArgument("INSTALL-LOCATION"))
             {
                 config.InstallLocation = framework.Arguments.OverrideArguments["INSTALL-LOCATION"];
             }
 
-            if (framework.Arguments.OverrideArguments.ContainsKey("TOKEN"))
+            if (framework.Arguments.HasOverrideArgument("TOKEN"))
             {
                 config.Token = framework.Arguments.OverrideArguments["TOKEN"];
             }
 
-            if (framework.Arguments.OverrideArguments.ContainsKey("RETRYCOUNT"))
+            if (framework.Arguments.HasOverrideArgument("RETRYCOUNT"))
             {
                 int.TryParse(framework.Arguments.OverrideArguments["RETRYCOUNT"], out config.RetryCount);
             }
 
             if (config.RetryCount < 0)
             {
-                throw new ArgumentOutOfRangeException("Retry count must not be negative.");
+                throw new Exception("Retry count must not be negative.");
             }
 
-            if (framework.Arguments.OverrideArguments.ContainsKey("APPBUILD"))
+            if (framework.Arguments.HasOverrideArgument("APPBUILD"))
             {
                 config.AppBuild = framework.Arguments.OverrideArguments["APPBUILD"];
                 if (!File.Exists(config.AppBuild))
