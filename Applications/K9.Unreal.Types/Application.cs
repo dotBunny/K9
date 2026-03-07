@@ -11,7 +11,7 @@ using K9.Services.Perforce;
 
 namespace K9.Unreal.Types;
 
-static class Application
+internal static class Application
 {
     public enum FileType
     {

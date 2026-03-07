@@ -1,33 +1,29 @@
 // Copyright dotBunny Inc. All Rights Reserved.
 // See the LICENSE file at the repository root for more information.
 
-using System;
-using System.Diagnostics;
-using System.Diagnostics.Contracts;
-using System.Runtime.InteropServices.Marshalling;
+
 using System.Text;
 
-using K9.Core;
 
 namespace K9
 {
     public class CommandMap
     {
-        readonly Dictionary<string, CommandMapAction> m_Map = [];
+        readonly Dictionary<string, CommandMapAction> _map = [];
 
         public bool HasCommands()
         {
-            return m_Map.Count > 0;
+            return _map.Count > 0;
         }
 
         public class CommandMapAction
         {
-            public string? Command;
-            public string? Description;
-            public string? WorkingDirectory;
-            public string? Arguments;
+            public string? Command { get; set; }
+            public string? Description { get; set; }
+            public string? WorkingDirectory { get; set; }
+            public string? Arguments { get; set; }
 
-            public Dictionary<string, CommandMapAction> Children = [];
+            public Dictionary<string, CommandMapAction> Children { get; set; } = [];
 
             public CommandMapAction(Commands.CommandVerb action)
             {
@@ -36,24 +32,28 @@ namespace K9
                 WorkingDirectory = action.WorkingDirectory;
                 Arguments = action.Arguments;
 
-                if(action.Actions != null && action.Actions.Length > 0)
+                if (action.Actions is not { Length: > 0 })
                 {
-                    int count = action.Actions.Length;
-            
-                    for(int i = 0; i < count; i++)
+                    return;
+                }
+
+                int count = action.Actions.Length;
+
+                for(int i = 0; i < count; i++)
+                {
+                    Commands.CommandVerb childAction = action.Actions[i];
+                    if (childAction.Identifier == null)
                     {
-                        Commands.CommandVerb childAction = action.Actions[i];
-                        if (childAction.Identifier != null)
-                        {
-                            if (!Children.TryGetValue(childAction.Identifier, out CommandMapAction? value))
-                            {
-                               Children.Add(childAction.Identifier, new CommandMapAction(childAction));
-                            }
-                            else
-                            {
-                               value.Append(childAction);
-                            }
-                        }
+                        continue;
+                    }
+
+                    if (!Children.TryGetValue(childAction.Identifier, out CommandMapAction? value))
+                    {
+                        Children.Add(childAction.Identifier, new CommandMapAction(childAction));
+                    }
+                    else
+                    {
+                        value.Append(childAction);
                     }
                 }
             }
@@ -64,30 +64,34 @@ namespace K9
                 WorkingDirectory = action.WorkingDirectory;
                 Arguments = action.Arguments;
 
-                if (action.Actions != null && action.Actions.Length > 0)
+                if (action.Actions is not { Length: > 0 })
                 {
-                    int count = action.Actions.Length;
+                    return;
+                }
 
-                    for (int i = 0; i < count; i++)
+                int count = action.Actions.Length;
+
+                for (int i = 0; i < count; i++)
+                {
+                    Commands.CommandVerb childAction = action.Actions[i];
+                    if (childAction.Identifier == null)
                     {
-                        Commands.CommandVerb childAction = action.Actions[i];
-                        if (childAction.Identifier != null)
-                        {
-                            if (!Children.TryGetValue(childAction.Identifier, out CommandMapAction? value))
-                            {
-                                Children.Add(childAction.Identifier, new CommandMapAction(childAction));
-                            }
-                            else
-                            {
-                                value.Append(childAction);
-                            }
-                        }
+                        continue;
+                    }
+
+                    if (!Children.TryGetValue(childAction.Identifier, out CommandMapAction? value))
+                    {
+                        Children.Add(childAction.Identifier, new CommandMapAction(childAction));
+                    }
+                    else
+                    {
+                        value.Append(childAction);
                     }
                 }
             }
 
             public void AddHelpCommands(List<HelpCommand> commands, string prefix = "")
-            {               
+            {
                 if (!string.IsNullOrEmpty(Command))
                 {
                     commands.Add(new HelpCommand(prefix, Description));
@@ -98,7 +102,7 @@ namespace K9
                     foreach(KeyValuePair<string, CommandMapAction> kvp in Children)
                     {
                         kvp.Value.AddHelpCommands(commands, $"{prefix} {kvp.Key}");
-                    }                                
+                    }
                 }
             }
         }
@@ -111,15 +115,15 @@ namespace K9
                 Commands.CommandVerb action = commands.Actions[i];
                 if(action.Identifier != null)
                 {
-                    if (!m_Map.TryGetValue(action.Identifier, out CommandMapAction? value))
+                    if (!_map.TryGetValue(action.Identifier, out CommandMapAction? value))
                     {
-                        m_Map.Add(action.Identifier, new CommandMapAction(action));
+                        _map.Add(action.Identifier, new CommandMapAction(action));
                     }
                     else
                     {
                         value.Append(action);
                     }
-                }            
+                }
             }
         }
 
@@ -132,19 +136,12 @@ namespace K9
             // Early out
             if (partCount == 1)
             {
-                if (m_Map.TryGetValue(parts[0], out CommandMapAction? found))
-                {
-                    return found;
-                }
-                else
-                {
-                    return null;
-                }
+                return _map.GetValueOrDefault(parts[0]);
             }
 
-            // Find right base
+            // Find the right base
             CommandMapAction? currentActionMap = null;
-            if (m_Map.TryGetValue(parts[0], out CommandMapAction? value))
+            if (_map.TryGetValue(parts[0], out CommandMapAction? value))
             {
                 currentActionMap = value;
             }
@@ -172,14 +169,14 @@ namespace K9
         public string GetOutput()
         {
             List<HelpCommand> commands = [];
-            foreach(KeyValuePair<string, CommandMapAction> kvp in m_Map)
+            foreach(KeyValuePair<string, CommandMapAction> kvp in _map)
             {
                 // Odd case where a top level command exists
                 if (kvp.Value.Command != null)
                 {
                     commands.Add(new HelpCommand(kvp.Key, kvp.Value.Description));
-                   
-                }               
+
+                }
 
                 if(kvp.Value.Children.Count > 0)
                 {
@@ -214,8 +211,8 @@ namespace K9
 
         public struct HelpCommand(string command, string? description)
         {
-            public string Command = command;
-            public string? Description = description;
+            public string Command { get; set; } = command;
+            public string? Description { get; set; } = description;
         }
     }
 }

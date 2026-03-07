@@ -12,7 +12,7 @@ using K9.Services.Perforce;
 
 namespace K9.Workspace.Setup;
 
-static class Application
+internal static class Application
 {
     static void Main()
     {
@@ -213,7 +213,7 @@ static class Application
     static void SetupExecutionFlags(ConsoleApplication framework, SettingsProvider settings)
     {
         Log.WriteLine("Ensuring Execution Flags", ILogOutput.LogType.Notice);
-        // Ensure executable flags are setup across the workspace
+        // Ensure executable flags are set up across the workspace
         switch (framework.Platform.OperatingSystem)
         {
             case Core.Modules.PlatformModule.PlatformType.macOS:
@@ -237,10 +237,12 @@ static class Application
         Log.WriteLine("Adding Security Exclusions", ILogOutput.LogType.Notice);
         switch (framework.Platform.OperatingSystem)
         {
+            // ReSharper disable StringLiteralTypo
             case Core.Modules.PlatformModule.PlatformType.Windows:
                 ProcessUtil.Elevate("powershell", settings.RootFolder,
                     $"-inputformat none -outputformat none -NonInteractive -Command Add-MpPreference -ExclusionPath \"{settings.RootFolder}\"");
                 break;
+            // ReSharper restore StringLiteralTypo
         }
     }
 
@@ -266,6 +268,8 @@ static class Application
                 // Update path for new redist
                 string prereqExecutable = Path.Combine(settings.RootFolder, "Engine", "Extras", "Redist", "en-us", "vc_redist.x64.exe");
                 Log.WriteLine($"Running {prereqExecutable} ...");
+
+                // ReSharper disable once StringLiteralTypo
                 ProcessUtil.SpawnHidden(prereqExecutable, "/quiet /norestart");
 
                 string versionSelector = Path.Combine(settings.RootFolder, "Engine", "Binaries", "Win64", "UnrealVersionSelector-Win64-Shipping.exe");

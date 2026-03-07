@@ -58,7 +58,7 @@ public static class BootstrapUtils
             // Get character
             while ((c = s[0]) != 0)
             {
-                // Check character value and shift it if necessary (32)
+                // Check the character value and shift it if necessary (32)
                 if (c is >= k_AsciiLowerCaseStart and <= k_AsciiLowerCaseEnd)
                 {
                     c ^= k_AsciiCaseShift;
@@ -75,7 +75,7 @@ public static class BootstrapUtils
                     break;
                 }
 
-                // Check character value and shift it if necessary (32)
+                // Check the character value and shift it if necessary (32)
                 if (c is >= k_AsciiLowerCaseStart and <= k_AsciiLowerCaseEnd)
                 {
                     c ^= k_AsciiCaseShift;
@@ -123,6 +123,7 @@ public static class BootstrapUtils
         using Process childProcess = new();
         ProcessLogObject logObject = new(outputLine);
 
+        // ReSharper disable once StringLiteralTypo
         childProcess.StartInfo.EnvironmentVariables["DOTNET_CLI_TELEMETRY_OPTOUT"] = "true";
         if (workingDirectory != null)
         {
@@ -193,7 +194,7 @@ public static class BootstrapUtils
         }
     }
 
-    public static void GitCheckoutRepo(string uri, string checkoutFolder, string? branch = null, string? commit = null, int depth = -1, bool submodules = true, bool shallowsubmodules = true)
+    public static void GitCheckoutRepo(string uri, string checkoutFolder, string? branch = null, string? commit = null, int depth = -1, bool submodules = true, bool shallowSubmodules = true)
     {
         string executablePath = Environment.OSVersion.Platform == PlatformID.Win32NT ? "git.exe" : "git";
         StringBuilder commandLineBuilder = new();
@@ -212,7 +213,7 @@ public static class BootstrapUtils
         if (submodules)
         {
             commandLineBuilder.Append("--recurse-submodules --remote-submodules ");
-            if (shallowsubmodules)
+            if (shallowSubmodules)
             {
                 commandLineBuilder.Append("--shallow-submodules ");
             }
@@ -243,7 +244,7 @@ public static class BootstrapUtils
         // Check current
         List<string> output = [];
 
-        // Get status of the repository
+        // Get the status of the repository
         ProcessExecute(executablePath, checkoutFolder,
             $"rev-parse HEAD", null, (processIdentifier, line) =>
             {
@@ -261,7 +262,7 @@ public static class BootstrapUtils
         // Check current
         List<string> output = [];
 
-        // Get status of the repository
+        // Get the status of the repository
         ProcessExecute(executablePath, checkoutFolder,
             $"fetch origin", null, (processIdentifier, line) =>
             {

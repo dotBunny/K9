@@ -5,25 +5,25 @@ using K9.Core;
 
 namespace K9.OS.ScreenResolution
 {
-    public class ScreenResolutionConfig()
-    {        
-        public int Width = 1920;
-        public int Height = 1080;
+    public class ScreenResolutionConfig
+    {
+        public int Width { get; set; } = 1920;
+        public int Height { get; set; } = 1080;
 
 
         public static ScreenResolutionConfig Get(ConsoleApplication framework)
         {
-            ScreenResolutionConfig config = new ScreenResolutionConfig();
+            ScreenResolutionConfig config = new();
 
-            if (framework.Arguments.OverrideArguments.ContainsKey("HEIGHT"))
+            if (framework.Arguments.HasOverrideArgument("HEIGHT"))
             {
-                config.Height = int.Parse(framework.Arguments.OverrideArguments["HEIGHT"]);               
+                config.Height = int.Parse(framework.Arguments.OverrideArguments["HEIGHT"]);
             }
-          
-            if (framework.Arguments.OverrideArguments.ContainsKey("WIDTH"))
+
+            if (framework.Arguments.HasOverrideArgument("WIDTH"))
             {
                 config.Width = int.Parse(framework.Arguments.OverrideArguments["WIDTH"]);
-            }      
+            }
             return config;
         }
     }

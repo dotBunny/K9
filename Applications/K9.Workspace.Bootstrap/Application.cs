@@ -8,7 +8,7 @@ using System.Reflection;
 
 namespace K9.Workspace.Bootstrap;
 
-static class Application
+internal static class Application
 {
     static bool s_QuietMode;
     static bool s_ShouldClone = true;

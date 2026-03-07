@@ -10,7 +10,7 @@ using K9.Core.Utils;
 
 namespace K9.Publish.SteamToken;
 
-static class Application
+internal static class Application
 {
     static FileLock? s_Token;
     static string? s_TokenUsername;
@@ -115,8 +115,12 @@ static class Application
                 Log.WriteLine($"Installing Steamworks SDK to {config.InstallLocation}.");
                 System.IO.Compression.ZipFile.ExtractToDirectory(config.InstallPackage, config.InstallLocation);
             }
-            
+
+            // ReSharper disable StringLiteralTypo
             string steamCmd = Path.Combine(config.InstallLocation, "sdk", "tools", "ContentBuilder", "builder", "steamcmd.exe");
+            // ReSharper restore StringLiteralTypo
+
+
             if (!File.Exists(steamCmd))
             {
                 throw new Exception("Unable to find SteamCMD");

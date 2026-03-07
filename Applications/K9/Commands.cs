@@ -5,7 +5,7 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 
 namespace K9
-{   
+{
     public class Commands
     {
         public const string Extension = ".k9.json";
@@ -15,7 +15,7 @@ namespace K9
 
         public string ToJson()
         {
-            return JsonSerializer.Serialize<Commands>(this);
+            return JsonSerializer.Serialize(this);
         }
 
         public static Commands? Get(string path)

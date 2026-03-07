@@ -2,44 +2,41 @@
 // See the LICENSE file at the repository root for more information.
 
 using System;
-using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using K9.Core;
 using K9.Core.Utils;
 
-namespace K9.OS.FileReplacer
+namespace K9.OS.FileReplacer;
+
+internal static class Application
 {
-    internal class Application
+    static void Main()
     {
-        static void Main()
+        using ConsoleApplication framework = new(
+        new ConsoleApplicationSettings()
         {
-            using ConsoleApplication framework = new(
-            new K9.Core.ConsoleApplicationSettings()
-            {
-                DefaultLogCategory = "FILEREPLACER",
-                LogOutputs = [new K9.Core.Loggers.ConsoleLogOutput()]
-            });
+            // ReSharper disable once StringLiteralTypo
+            DefaultLogCategory = "OS.FILEREPLACER",
+            LogOutputs = [new Core.Loggers.ConsoleLogOutput()]
+        });
 
-            try
-            {
-                FileReplacerConfig config = FileReplacerConfig.Get(framework);
-                if (config.TargetFile == null || config.SourceFile == null) return;
+        try
+        {
+            FileReplacerConfig config = FileReplacerConfig.Get(framework);
+            if (config.TargetFile == null || config.SourceFile == null) return;
 
-                string content = File.ReadAllText(config.SourceFile);
-                foreach (KeyValuePair<string, string> kvp in config.Replaces)
-                {
-                    content = content.Replace(kvp.Key, kvp.Value);
-                }
+            string content = File.ReadAllText(config.SourceFile);
+            content = config.Replaces.Aggregate(content, (current, kvp) => current.Replace(kvp.Key, kvp.Value));
 
-                // Ensure target folder structure exists
-                FileUtil.EnsureFileFolderHierarchyExists(config.TargetFile);
+            // Ensure target folder structure exists
+            FileUtil.EnsureFileFolderHierarchyExists(config.TargetFile);
 
-                File.WriteAllText(config.TargetFile, content);
-            }
-            catch (Exception ex)
-            {
-                framework.ExceptionHandler(ex);
-            }
+            File.WriteAllText(config.TargetFile, content);
+        }
+        catch (Exception ex)
+        {
+            framework.ExceptionHandler(ex);
         }
     }
 }

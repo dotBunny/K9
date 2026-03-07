@@ -7,8 +7,10 @@ namespace K9.OS.ScreenResolution;
 
 public class WindowsDisplayPlatform
 {
+    // ReSharper disable IdentifierTypo
     // https://learn.microsoft.com/en-us/windows/win32/api/wingdi/ns-wingdi-devmodea
     [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Ansi)]
+    // ReSharper disable once InconsistentNaming
     public struct DEVMODEA
     {
         [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 32)]
@@ -47,13 +49,14 @@ public class WindowsDisplayPlatform
         public uint dmPanningWidth;
         public uint dmPanningHeight;
     }
+    // ReSharper restore IdentifierTypo
 
     [DllImport("user32.dll", CharSet = CharSet.Ansi)]
     private static extern int ChangeDisplaySettingsA(ref DEVMODEA lpDevMode, uint dwFlags);
 
     public static bool SetResolution(int x = 1920, int y = 1080)
     {
-        DEVMODEA dm = new DEVMODEA
+        DEVMODEA dm = new()
         {
             dmSize = (ushort)Marshal.SizeOf(typeof(DEVMODEA)),
             dmPelsWidth = (uint)x,
