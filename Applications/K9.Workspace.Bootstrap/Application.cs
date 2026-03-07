@@ -27,7 +27,7 @@ internal static class Application
             Assembly? assembly = Assembly.GetAssembly(typeof(Application));
 
             if (assembly != null)
-                Console.WriteLine($"K9 Bootstrap {assembly.GetName().Version}");
+                Console.WriteLine($"K9 Bootstrap {assembly.GetName().Version} @ {GitInfo.Head}");
 
             string? msBuildPath = BootstrapUtils.GetMSBuild();
             if (msBuildPath == null)

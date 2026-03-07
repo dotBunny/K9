@@ -101,6 +101,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "K9.Unity", "Shared\K9.Unity
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "K9.Unreal", "Shared\K9.Unreal\K9.Unreal.csproj", "{FDBCFC04-F964-4C88-AF64-F078788DF4ED}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "K9.Generator.GitInfo", "Shared\K9.Generator.GitInfo\K9.Generator.GitInfo.csproj", "{B00B3950-FAC9-43BF-B5EC-A0D9E03EBA21}"
+EndProject
 
 
 Global
@@ -193,6 +195,12 @@ Global
 		{017D95FC-4A2E-43A6-BD1A-C954B54D8391}.Release|Any CPU.Build.0 = Release|Any CPU
 		{017D95FC-4A2E-43A6-BD1A-C954B54D8391}.Workspace|Any CPU.ActiveCfg = Workspace|Any CPU
 		{017D95FC-4A2E-43A6-BD1A-C954B54D8391}.Workspace|Any CPU.Build.0 = Workspace|Any CPU
+		{B00B3950-FAC9-43BF-B5EC-A0D9E03EBA21}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B00B3950-FAC9-43BF-B5EC-A0D9E03EBA21}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B00B3950-FAC9-43BF-B5EC-A0D9E03EBA21}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B00B3950-FAC9-43BF-B5EC-A0D9E03EBA21}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B00B3950-FAC9-43BF-B5EC-A0D9E03EBA21}.Workspace|Any CPU.ActiveCfg = Debug|Any CPU
+		{B00B3950-FAC9-43BF-B5EC-A0D9E03EBA21}.Workspace|Any CPU.Build.0 = Debug|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -234,6 +242,7 @@ Global
 		{254F8EE5-1B23-4735-AB5C-E242497430F0} = {E4CCF069-9072-4D74-B000-2D2ABB660096}
 		
 		
+		{B00B3950-FAC9-43BF-B5EC-A0D9E03EBA21} = {20B9897A-8522-4606-8A3D-D7EF3C3521B2}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {8F2E7BB1-7BB3-49FB-A9AC-1A9A8DA9B43B}
