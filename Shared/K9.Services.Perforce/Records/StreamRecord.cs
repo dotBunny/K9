@@ -3,22 +3,22 @@
 
 using System.Collections.Generic;
 
-namespace K9.Services.Perforce.Records
-{
-    public class StreamRecord
-    {
-        public string Identifier;
-        public string Name;
-        public string? Parent;
+namespace K9.Services.Perforce.Records;
 
-        public StreamRecord(Dictionary<string, string> tags)
+public class StreamRecord
+{
+    public string Identifier;
+    public string Name;
+    // ReSharper disable once MemberCanBePrivate.Global
+    public readonly string? Parent;
+
+    public StreamRecord(Dictionary<string, string> tags)
+    {
+        tags.TryGetValue("Stream", out Identifier);
+        tags.TryGetValue("Name", out Name);
+        if (tags.TryGetValue("Parent", out Parent) && Parent == "none")
         {
-            tags.TryGetValue("Stream", out Identifier);
-            tags.TryGetValue("Name", out Name);
-            if (tags.TryGetValue("Parent", out Parent) && Parent == "none")
-            {
-                Parent = null;
-            }
+            Parent = null;
         }
     }
 }

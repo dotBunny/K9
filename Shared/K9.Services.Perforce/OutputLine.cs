@@ -1,33 +1,26 @@
 // Copyright dotBunny Inc. All Rights Reserved.
 // See the LICENSE file at the repository root for more information.
 
-namespace K9.Services.Perforce
+namespace K9.Services.Perforce;
+
+public class OutputLine(OutputLine.OutputChannel inChannel, string inText)
 {
-    public class OutputLine
+    public enum OutputChannel
     {
-        public enum OutputChannel
-        {
-            Unknown,
-            Text,
-            Info,
-            TaggedInfo,
-            Warning,
-            Error,
-            Exit
-        }
-        
-        public readonly OutputChannel Channel;
-        public readonly string Text;
+        Unknown,
+        Text,
+        Info,
+        TaggedInfo,
+        Warning,
+        Error,
+        Exit
+    }
 
-        public OutputLine(OutputChannel inChannel, string inText)
-        {
-            Channel = inChannel;
-            Text = inText;
-        }
+    public readonly OutputChannel Channel = inChannel;
+    public readonly string Text = inText;
 
-        public override string ToString()
-        {
-            return string.Format("{0}: {1}", Channel, Text);
-        }
+    public override string ToString()
+    {
+        return $"{Channel}: {Text}";
     }
 }
