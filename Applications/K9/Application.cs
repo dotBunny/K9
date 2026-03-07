@@ -1,7 +1,6 @@
 // Copyright dotBunny Inc. All Rights Reserved.
 // See the LICENSE file at the repository root for more information.
 
-using K9;
 using K9.Core;
 using K9.Core.Loggers;
 using K9.Core.Utils;
@@ -10,15 +9,15 @@ using static K9.CommandMap;
 
 namespace K9
 {
-    internal class Application
+    internal static class Application
     {
         static void Main()
         {
             using ConsoleApplication framework = new(
-            new K9.Core.ConsoleApplicationSettings()
+            new ConsoleApplicationSettings()
             {
                 DefaultLogCategory = "K9",
-                LogOutputs = [new K9.Core.Loggers.ConsoleLogOutput()],
+                LogOutputs = [new ConsoleLogOutput()],
                 PauseOnExit = false,
                 DisplayHeader = false,
                 DisplayRuntime = false
@@ -56,7 +55,8 @@ namespace K9
                         Log.WriteLine($"Unable to parse {programFolderCommands[i]}.", "JSON", ILogOutput.LogType.Error);
                         continue;
                     }
-                    else if(c.Actions == null || c.Actions.Length == 0)
+
+                    if(c.Actions.Length == 0)
                     {
                         Log.WriteLine($"No actions found in {programFolderCommands[i]}.", "JSON", ILogOutput.LogType.Info);
                         continue;
@@ -75,7 +75,7 @@ namespace K9
                         Log.WriteLine($"Unable to parse {projectFolderCommands[i]}.", "JSON", ILogOutput.LogType.Error);
                         continue;
                     }
-                    else if(c.Actions == null || c.Actions.Length == 0)
+                    else if(c.Actions.Length == 0)
                     {
                         Log.WriteLine($"No actions found in {projectFolderCommands[i]}.", "JSON", ILogOutput.LogType.Info);
                         continue;
@@ -112,8 +112,8 @@ namespace K9
                         }
 
 
-                        // We cant actually just run batch files they have to be ran from a command prompt
-                        string? command = settings.ReplaceKeywords(action.Command);
+                        // We can't actually just run batch files they have to be run from a command prompt
+                        string command = settings.ReplaceKeywords(action.Command);
                         if(action.Command.EndsWith(".bat"))
                         {
                             arguments = $"/K {command} {arguments}";
@@ -150,7 +150,7 @@ namespace K9
                 ["K9Temp"] = settings.TempFile,
 
                 // Some things UE uses
-                ["COMPUTERNAME"] = System.Environment.MachineName
+                ["COMPUTERNAME"] = Environment.MachineName
             };
 
             // P4 Config

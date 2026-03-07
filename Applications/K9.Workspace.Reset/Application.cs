@@ -8,17 +8,17 @@ using K9.Services.Perforce;
 
 namespace K9.Workspace.Reset
 {
-    internal class Application
+    internal static class Application
     {
-        static int s_ProcessCount = 0;
+        static int s_ProcessCount;
 
         static void Main()
         {
             using ConsoleApplication framework = new(
-            new K9.Core.ConsoleApplicationSettings()
+            new ConsoleApplicationSettings()
             {
                 DefaultLogCategory = "WORKSPACE.RESET",
-                LogOutputs = [new K9.Core.Loggers.ConsoleLogOutput()]
+                LogOutputs = [new ConsoleLogOutput()]
             });
 
             try
@@ -41,11 +41,15 @@ namespace K9.Workspace.Reset
                 ClearProjectPlugins(framework, settings);
                 ClearProject(framework, settings);
 
-                if (s_ProcessCount == 0)
+                if (s_ProcessCount != 0)
                 {
-                    Log.WriteLine("No valid commands found in arguments", ILogOutput.LogType.Warning);
-                    Log.WriteLine("Valid arguments include 'project' and 'project-plugins'", ILogOutput.LogType.Info);                    
+                    // We did stuff
+                    return;
                 }
+
+                // Nothing to do so tell the user they messed up
+                Log.WriteLine("No valid commands found in arguments", ILogOutput.LogType.Warning);
+                Log.WriteLine("Valid arguments include 'project' and 'project-plugins'", ILogOutput.LogType.Info);
             }
             catch (Exception ex)
             {
@@ -60,7 +64,7 @@ namespace K9.Workspace.Reset
                 return;
             }
             s_ProcessCount++;
-            Log.WriteLine("Clearing Project Artifacts ...", ILogOutput.LogType.Default);
+            Log.WriteLine("Clearing Project Artifacts ...");
             string[] projectDirectories = Directory.GetDirectories(settingsProvider.ProjectsFolder);
             int projectCount = projectDirectories.Length;
             for (int i = 0; i < projectCount; i++)
@@ -68,15 +72,17 @@ namespace K9.Workspace.Reset
                 string intermediateFolder = Path.Combine(projectDirectories[i], "Intermediate");
                 if (Path.Exists(intermediateFolder))
                 {
-                    Log.WriteLine($"Removing {intermediateFolder} ...", ILogOutput.LogType.Default);
+                    Log.WriteLine($"Removing {intermediateFolder} ...");
                     Directory.Delete(intermediateFolder, true);
                 }
                 string binariesFolder = Path.Combine(projectDirectories[i], "Binaries");
-                if (Path.Exists(binariesFolder))
+                if (!Path.Exists(binariesFolder))
                 {
-                    Log.WriteLine($"Removing {binariesFolder} ...", ILogOutput.LogType.Default);
-                    Directory.Delete(binariesFolder, true);
+                    continue;
                 }
+
+                Log.WriteLine($"Removing {binariesFolder} ...");
+                Directory.Delete(binariesFolder, true);
             }
         }
         static void ClearProjectPlugins(ConsoleApplication framework, SettingsProvider settingsProvider)
@@ -86,39 +92,45 @@ namespace K9.Workspace.Reset
                 return;
             }
             s_ProcessCount++;
-            Log.WriteLine("Clearing Project Plugin Artifacts ...", ILogOutput.LogType.Default);
+            Log.WriteLine("Clearing Project Plugin Artifacts ...");
             string[] projectDirectories = Directory.GetDirectories(settingsProvider.ProjectsFolder);
             int projectCount = projectDirectories.Length;
-            Log.WriteLine($"Found  {projectCount} Projects.", ILogOutput.LogType.Default);
+            Log.WriteLine($"Found  {projectCount} Projects.");
             for (int i = 0; i < projectCount; i++)
             {
                 string projectDirectory = projectDirectories[i];
                 string pluginBaseDirectory = Path.Combine(projectDirectory, "Plugins");
-                if (Path.Exists(pluginBaseDirectory))
+                if (!Path.Exists(pluginBaseDirectory))
                 {
-                    string[] pluginDefinitions = Directory.GetFiles(pluginBaseDirectory, "*.uplugin", SearchOption.AllDirectories);
-                    int pluginDefinitionsCount = pluginDefinitions.Length;
-                    Log.WriteLine($"Found  {pluginDefinitionsCount} plugins in {pluginBaseDirectory}.", ILogOutput.LogType.Default);
-                    for (int j = 0; j < pluginDefinitionsCount; j++)
+                    continue;
+                }
+
+                string[] pluginDefinitions = Directory.GetFiles(pluginBaseDirectory, "*.uplugin", SearchOption.AllDirectories);
+                int pluginDefinitionsCount = pluginDefinitions.Length;
+                Log.WriteLine($"Found  {pluginDefinitionsCount} plugins in {pluginBaseDirectory}.");
+                for (int j = 0; j < pluginDefinitionsCount; j++)
+                {
+                    string? pluginFolder = Path.GetDirectoryName(pluginDefinitions[j]);
+                    if (pluginFolder == null)
                     {
-                        string? pluginFolder = Path.GetDirectoryName(pluginDefinitions[j]);
-                        if (pluginFolder != null)
-                        {
-                            Log.WriteLine($"Evaluating {pluginFolder} ...", ILogOutput.LogType.Default);
-                            string intermediateFolder = Path.Combine(pluginFolder, "Intermediate");
-                            if (Path.Exists(intermediateFolder))
-                            {
-                                Log.WriteLine($"Removing {intermediateFolder} ...", ILogOutput.LogType.Default);
-                                Directory.Delete(intermediateFolder, true);
-                            }
-                            string binariesFolder = Path.Combine(pluginFolder, "Binaries");
-                            if (Path.Exists(binariesFolder))
-                            {
-                                Log.WriteLine($"Removing {binariesFolder} ...", ILogOutput.LogType.Default);
-                                Directory.Delete(binariesFolder, true);
-                            }
-                        }
+                        continue;
                     }
+
+                    Log.WriteLine($"Evaluating {pluginFolder} ...");
+                    string intermediateFolder = Path.Combine(pluginFolder, "Intermediate");
+                    if (Path.Exists(intermediateFolder))
+                    {
+                        Log.WriteLine($"Removing {intermediateFolder} ...");
+                        Directory.Delete(intermediateFolder, true);
+                    }
+                    string binariesFolder = Path.Combine(pluginFolder, "Binaries");
+                    if (!Path.Exists(binariesFolder))
+                    {
+                        continue;
+                    }
+
+                    Log.WriteLine($"Removing {binariesFolder} ...");
+                    Directory.Delete(binariesFolder, true);
                 }
             }
         }

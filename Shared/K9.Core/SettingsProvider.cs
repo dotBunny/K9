@@ -7,7 +7,7 @@ using System.IO;
 namespace K9.Core
 {
     /// <remarks>
-    ///     If these are changed you should triple check for anything in the Bootstrap project that would need updating.
+    ///     If these are changed, you should triple check for anything in the Bootstrap project that would need updating.
     ///     Because it does not reference anything else, changing here won't change Bootstrap.
     /// </remarks>
     public class SettingsProvider
@@ -31,7 +31,7 @@ namespace K9.Core
         public readonly string K9Folder;
 
         public readonly string K9ToolboxFolder;
-        
+
         public readonly string K9DotNETFolder;
         public readonly string K9DefaultsFolder;
 

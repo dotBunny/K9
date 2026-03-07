@@ -13,6 +13,7 @@ namespace K9.Core.Utils
 {
 	public static class ProcessUtil
 	{
+
 		public static void AddDefaultEnvironmentVariables(this Process process)
 		{
             if(process.StartInfo.UseShellExecute)
@@ -27,7 +28,7 @@ namespace K9.Core.Utils
 		{
 			using Process childProcess = new Process();
 			AddDefaultEnvironmentVariables(childProcess);
-            childProcess.StartInfo.WorkingDirectory = string.IsNullOrEmpty(workingDirectory) ? null : workingDirectory;
+            childProcess.StartInfo.WorkingDirectory = (string.IsNullOrEmpty(workingDirectory) ? null : workingDirectory)!;
 			childProcess.StartInfo.FileName = executablePath;
 			childProcess.StartInfo.Arguments = string.IsNullOrEmpty(arguments) ? string.Empty : arguments;
             childProcess.StartInfo.UseShellExecute = false;
@@ -54,7 +55,7 @@ namespace K9.Core.Utils
             {
                 childProcess.StartInfo.Verb = "runas";
             }
-            childProcess.StartInfo.WorkingDirectory = string.IsNullOrEmpty(workingDirectory) ? null : workingDirectory;
+            childProcess.StartInfo.WorkingDirectory = (string.IsNullOrEmpty(workingDirectory) ? null : workingDirectory)!;
             childProcess.StartInfo.FileName = executablePath;
             childProcess.StartInfo.Arguments = string.IsNullOrEmpty(arguments) ? "" : arguments;
             childProcess.StartInfo.UseShellExecute = true;
@@ -64,18 +65,21 @@ namespace K9.Core.Utils
         public static bool SpawnWithEnvironment(string executablePath, string? arguments, string? workingDirectory, Dictionary<string, string>? environmentVariables)
         {
             using Process childProcess = new Process();
-            childProcess.StartInfo.WorkingDirectory = string.IsNullOrEmpty(workingDirectory) ? null : workingDirectory;
+            childProcess.StartInfo.WorkingDirectory = (string.IsNullOrEmpty(workingDirectory) ? null : workingDirectory)!;
             childProcess.StartInfo.FileName = executablePath;
             childProcess.StartInfo.Arguments = string.IsNullOrEmpty(arguments) ? "" : arguments;
             childProcess.StartInfo.UseShellExecute = false;
             childProcess.AddDefaultEnvironmentVariables();
-            // Add custom
-            if(environmentVariables != null && environmentVariables.Count > 0)
+
+            if (environmentVariables == null || environmentVariables.Count <= 0)
             {
-                foreach(KeyValuePair<string,string> kvp in environmentVariables)
-                {
-                    childProcess.StartInfo.EnvironmentVariables[kvp.Key] = kvp.Value;
-                }
+                return childProcess.Start();
+            }
+
+            // Add custom environment variables
+            foreach(KeyValuePair<string,string> kvp in environmentVariables)
+            {
+                childProcess.StartInfo.EnvironmentVariables[kvp.Key] = kvp.Value;
             }
             return childProcess.Start();
         }
@@ -97,20 +101,10 @@ namespace K9.Core.Utils
 		public static int Execute(string executablePath, string? workingDirectory, string? arguments, string? input, Action<int, string> outputLine)
 		{
 			using Process childProcess = new Process();
-			object lockObject = new object();
 
-			void OutputHandler(object x, DataReceivedEventArgs y)
-			{
-				if (y.Data != null)
-				{
-					lock (lockObject)
-					{
-						outputLine(childProcess.Id, y.Data.TrimEnd());
-					}
-				}
-			}
+            ProcessLogObject_IntegerString logObject = new ProcessLogObject_IntegerString(outputLine);
 
-			AddDefaultEnvironmentVariables(childProcess);
+            AddDefaultEnvironmentVariables(childProcess);
 			if (workingDirectory != null)
 			{
 				childProcess.StartInfo.WorkingDirectory = workingDirectory;
@@ -120,8 +114,8 @@ namespace K9.Core.Utils
 			childProcess.StartInfo.UseShellExecute = false;
 			childProcess.StartInfo.RedirectStandardOutput = true;
 			childProcess.StartInfo.RedirectStandardError = true;
-			childProcess.OutputDataReceived += OutputHandler;
-			childProcess.ErrorDataReceived += OutputHandler;
+			childProcess.OutputDataReceived += logObject.OutputHandler;
+			childProcess.ErrorDataReceived += logObject.OutputHandler;
 			childProcess.StartInfo.RedirectStandardInput = input != null;
 			childProcess.StartInfo.CreateNoWindow = true;
 			childProcess.StartInfo.StandardOutputEncoding = new UTF8Encoding(false, false);
@@ -138,13 +132,15 @@ namespace K9.Core.Utils
 			// Busy wait for the process to exit so we can get a ThreadAbortException if the thread is terminated.
 			// It won't wait until we enter managed code again before it throws otherwise.
 			for (; ; )
-			{
-				if (childProcess.WaitForExit(20))
-				{
-					childProcess.WaitForExit();
-					break;
-				}
-			}
+            {
+                if (!childProcess.WaitForExit(20))
+                {
+                    continue;
+                }
+
+                childProcess.WaitForExit();
+                break;
+            }
 
 			return childProcess.ExitCode;
 		}
@@ -152,18 +148,9 @@ namespace K9.Core.Utils
 		public static int Interactive(string executablePath, string? workingDirectory, string? arguments, Action<string, StreamWriter> interactionHandler)
 		{
 			using Process childProcess = new Process();
-			object lockObject = new object();
 
-			void OutputHandler(object x, DataReceivedEventArgs y)
-			{
-				if (y.Data != null)
-				{
-					lock (lockObject)
-					{
-						interactionHandler(y.Data.TrimEnd(), childProcess.StandardInput);
-					}
-				}
-			}
+            ProcessLogObject_StringStreamWriter logObject =
+                new ProcessLogObject_StringStreamWriter(interactionHandler, childProcess.StandardInput);
 
 			AddDefaultEnvironmentVariables(childProcess);
 			if (workingDirectory != null)
@@ -175,8 +162,8 @@ namespace K9.Core.Utils
 			childProcess.StartInfo.UseShellExecute = false;
 			childProcess.StartInfo.RedirectStandardOutput = true;
 			childProcess.StartInfo.RedirectStandardError = true;
-			childProcess.OutputDataReceived += OutputHandler;
-			childProcess.ErrorDataReceived += OutputHandler;
+			childProcess.OutputDataReceived += logObject.OutputHandler;
+			childProcess.ErrorDataReceived += logObject.OutputHandler;
 			childProcess.StartInfo.RedirectStandardInput = true;
 			childProcess.StartInfo.CreateNoWindow = true;
 			childProcess.StartInfo.StandardOutputEncoding = new UTF8Encoding(false, false);
@@ -187,39 +174,36 @@ namespace K9.Core.Utils
 			// Busy wait for the process to exit so we can get a ThreadAbortException if the thread is terminated.
 			// It won't wait until we enter managed code again before it throws otherwise.
 			for (; ; )
-			{
-				if (childProcess.WaitForExit(20))
-				{
-					childProcess.WaitForExit();
-					break;
-				}
-			}
+            {
+                if (!childProcess.WaitForExit(20))
+                {
+                    continue;
+                }
+
+                childProcess.WaitForExit();
+                break;
+            }
 
 			return childProcess.ExitCode;
 		}
 
 		public static int OpenFileWithDefault(string filePath)
 		{
-			if (File.Exists(filePath)) 
-			{
-				if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-				{
-                    if (SpawnHidden("notepad", filePath))
-                    {
-                        return 0;
-                    }
-                    return 1;
-                }
-				else if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX) || RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
-				{
-					if (SpawnHidden("open", filePath))
-					{
-						return 0;
-					}
-					return 1;
-				}
-			}
-			return 1;
+            if (!File.Exists(filePath))
+            {
+                return 1;
+            }
+
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+            {
+                return SpawnHidden("notepad", filePath) ? 0 : 1;
+            }
+
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX) || RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+            {
+                return SpawnHidden("open", filePath) ? 0 : 1;
+            }
+            return 1;
 		}
 
         public static int Elevate(string executablePath, string? workingDirectory, string? arguments, bool shouldWait = true)
@@ -236,29 +220,25 @@ namespace K9.Core.Utils
             childProcess.StartInfo.CreateNoWindow = true;
             childProcess.Start();
 
-
             // Busy wait for the process to exit so we can get a ThreadAbortException if the thread is terminated.
             // It won't wait until we enter managed code again before it throws otherwise.'
-            if (shouldWait)
+            if (!shouldWait)
             {
-                for (; ; )
-                {
-                    if (childProcess.WaitForExit(20))
-                    {
-                        childProcess.WaitForExit();
-                        break;
-                    }
-                }
+                return childProcess.HasExited ? childProcess.ExitCode : 0;
             }
 
-            if (childProcess.HasExited)
+            for (; ; )
             {
-                return childProcess.ExitCode;
+                if (!childProcess.WaitForExit(20))
+                {
+                    continue;
+                }
+
+                childProcess.WaitForExit();
+                break;
             }
-            else
-            {
-                return 0;
-            }
+
+            return childProcess.HasExited ? childProcess.ExitCode : 0;
         }
 
         public static bool IsElevated()

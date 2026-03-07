@@ -10,9 +10,14 @@ namespace K9.Core.Modules
 {	public class ArgumentsModule : IModule
 	{
 		private const string k_LogCategory = "ARGS";
-       
+
 		public readonly List<string> BaseArguments = new List<string>();
 		public readonly Dictionary<string, string> OverrideArguments = new Dictionary<string, string>();
+
+        public bool HasOverrideArgument(string key)
+        {
+            return OverrideArguments.ContainsKey(key);
+        }
 
 		public ArgumentsModule()
 		{
@@ -69,7 +74,7 @@ namespace K9.Core.Modules
 		{
 			// Check if first argument is actually passing in a DLL
 			string fakePath = Path.GetFullPath(BaseArguments[0]);
-			
+
 			if (File.Exists(fakePath) && fakePath.EndsWith(".dll") && assemblyModule.AssemblyPath == fakePath)
 			{
 				BaseArguments.RemoveAt(0);

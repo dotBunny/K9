@@ -1,6 +1,9 @@
 // Copyright dotBunny Inc. All Rights Reserved.
 // See the LICENSE file at the repository root for more information.
 
+using System;
+using System.IO;
+using System.Threading.Tasks;
 using K9.Core;
 using K9.Core.Loggers;
 using K9.Core.Utils;
@@ -8,7 +11,7 @@ using K9.Services.Perforce;
 
 namespace K9.Unreal.Types
 {
-    internal class Appplication
+    static class Application
     {
         public enum FileType
         {
@@ -36,25 +39,19 @@ namespace K9.Unreal.Types
         }
 
 
-        public struct WorkUnit
+        struct WorkUnit(FileType type, string path)
         {
-            public FileType Type;
-            public string Path;
-            public WorkUnit(FileType type, string path)
-            {
-                Type = type;
-                Path = path;
-            }
-
+            public readonly FileType Type = type;
+            public readonly string Path = path;
         }
 
         static void Main()
         {
             using ConsoleApplication framework = new(
-            new K9.Core.ConsoleApplicationSettings()
+            new ConsoleApplicationSettings()
             {
                 DefaultLogCategory = "UNREAL.TYPES",
-                LogOutputs = [new K9.Core.Loggers.ConsoleLogOutput()]
+                LogOutputs = [new ConsoleLogOutput()]
             });
 
             try
@@ -68,7 +65,7 @@ namespace K9.Unreal.Types
                     return;
                 }
 
-                if (!framework.Arguments.OverrideArguments.ContainsKey("changelist"))
+                if (!framework.Arguments.HasOverrideArgument("changelist"))
                 {
                     Log.WriteLine("A changelist must be defined.", ILogOutput.LogType.Error);
                     framework.Environment.UpdateExitCode(1, true);
@@ -83,7 +80,7 @@ namespace K9.Unreal.Types
                 settings.Output();
 
                 string rootDirectory = workspaceRoot;
-                if (framework.Arguments.OverrideArguments.ContainsKey("directory"))
+                if (framework.Arguments.HasOverrideArgument("directory"))
                 {
                     rootDirectory = framework.Arguments.OverrideArguments["directory"];
                 }
@@ -101,14 +98,14 @@ namespace K9.Unreal.Types
         static WorkUnit[] FindUntypedFiles(string rootDirectory)
         {
             Log.SetThreadSafeMode();
-            System.Collections.Concurrent.ConcurrentBag<WorkUnit> workUnits = new System.Collections.Concurrent.ConcurrentBag<WorkUnit>();
+            System.Collections.Concurrent.ConcurrentBag<WorkUnit> workUnits = [];
             _ = Parallel.ForEach(Directory.EnumerateFiles(rootDirectory, "*.*", SearchOption.AllDirectories), path =>
             {
                 byte[] bom = new byte[4];
                 try
                 {
-                    using FileStream file = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.Read);
-                    file.Read(bom, 0, 4);
+                    using FileStream file = new(path, FileMode.Open, FileAccess.Read, FileShare.Read);
+                    file.ReadExactly(bom, 0, 4);
 
                     if (bom[0] == 0xef && bom[1] == 0xbb && bom[2] == 0xbf)
                     {
@@ -130,7 +127,6 @@ namespace K9.Unreal.Types
             return workUnits.ToArray();
         }
 
-
         static void UpdateFileTypes(string workspaceRoot, WorkUnit[] files, string changelist)
         {
             // Turn on explicit thread safety for logging
@@ -143,7 +139,7 @@ namespace K9.Unreal.Types
                 string currentPath = $"\"{currentUnit.Path}\"";
                 string currentP4Type = GetPerforceType(currentUnit.Type);
 
-                // Get current type                
+                // Get current type
                 string processResponse = string.Empty;
                 ProcessUtil.Execute("p4", workspaceRoot, $"files {currentPath}", null, (processIdentifier, line) =>
                 {
@@ -170,7 +166,7 @@ namespace K9.Unreal.Types
 
                 }
 
-                // Check if the file is under the clients root
+                // Check if the file is under the client's root
                 if (processResponse.Contains("is not under client's root"))
                 {
                     Log.WriteLine($"{currentUnit.Path} - is not under client's root.", ILogOutput.LogType.Error);
@@ -218,17 +214,14 @@ namespace K9.Unreal.Types
             if (processResponse.EndsWith($"type {currentP4Type}; change {changelist}"))
             {
                 Log.WriteLine($"Changed type ({currentP4Type}) of {rawPath}");
-                return;
             }
             else if (processResponse.EndsWith($"reopened; change {changelist}"))
             {
                 // Log.WriteLine($"NOOP type ({currentP4Type}) of {rawPath}");
-                return;
             }
             else
             {
                 Log.WriteLine($"Failed to change type ({currentP4Type}) of {rawPath}", ILogOutput.LogType.Error);
-                return;
             }
         }
     }
