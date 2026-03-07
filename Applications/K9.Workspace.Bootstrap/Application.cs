@@ -32,7 +32,7 @@ internal static class Application
             string? msBuildPath = BootstrapUtils.GetMSBuild();
             if (msBuildPath == null)
             {
-                Console.WriteLine("Unable to find an installation of MSBuild.\nYou need to install .NET SDK found at https://dotnet.microsoft.com/en-us/download/dotnet/8.0");
+                Console.WriteLine("Unable to find an installation of MSBuild.\nYou need to install the .NET SDK (10+) found at https://dotnet.microsoft.com/en-us/download/dotnet/10.0");
                 Environment.ExitCode = 1;
                 PressAnyKeyToContinue();
                 return;
