@@ -5,56 +5,55 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace K9.Core.Utils
+namespace K9.Core.Utils;
+
+public class ProcessLogCapture
 {
-    public class ProcessLogCapture
+    private readonly Action<int, string> m_Action;
+    private readonly List<string> m_Lines = new();
+
+    public ProcessLogCapture()
     {
-        private readonly Action<int, string> _action;
-        private readonly List<string> _lines = new List<string>();
+        m_Action = (_, line) => { m_Lines.Add(line); };
+    }
 
-        public ProcessLogCapture()
-        {
-            _action = (processIdentifier, line) => { _lines.Add(line);};
-        }
+    public void Reset()
+    {
+        m_Lines.Clear();
+    }
 
-        public void Reset()
-        {
-            _lines.Clear();
-        }
+    public string GetNewLinesString()
+    {
+        return m_Lines.Aggregate(string.Empty, (current, s) => current + s + Environment.NewLine);
+    }
 
-        public string GetNewLinesString()
-        {
-            return _lines.Aggregate(string.Empty, (current, s) => current + s + Environment.NewLine);
-        }
+    public int GetLineCount()
+    {
+        return m_Lines.Count;
+    }
 
-        public int GetLineCount()
-        {
-            return _lines.Count;
-        }
+    public string GetFirstLine()
+    {
+        return m_Lines[0];
+    }
 
-        public string GetFirstLine()
-        {
-            return _lines[0];
-        }
+    public bool IsFirstLineEmpty()
+    {
+        return m_Lines.Count == 0 || string.IsNullOrEmpty(m_Lines[0]);
+    }
 
-        public bool IsFirstLineEmpty()
-        {
-            return _lines.Count == 0 || string.IsNullOrEmpty(_lines[0]);
-        }
+    public string GetString()
+    {
+        return m_Lines.Aggregate(string.Empty, (current, s) => current + s);
+    }
 
-        public string GetString()
-        {
-            return _lines.Aggregate(string.Empty, (current, s) => current + s);
-        }
+    public string[] GetLines()
+    {
+        return m_Lines.ToArray();
+    }
 
-        public string[] GetLines()
-        {
-            return _lines.ToArray();
-        }
-
-        public Action<int, string> GetAction()
-        {
-            return _action;
-        }
+    public Action<int, string> GetAction()
+    {
+        return m_Action;
     }
 }

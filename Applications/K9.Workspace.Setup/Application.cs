@@ -5,7 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using K9.Core;
-using K9.Core.Loggers;
+using K9.Core.LogOutputs;
 using K9.Core.Services.Git;
 using K9.Core.Utils;
 using K9.Services.Perforce;
@@ -67,11 +67,11 @@ internal static class Application
             return;
         }
 
-        string? branch = GitProvider.GetBranch(settings.K9ToolboxFolder);
+        string? branch = GitProvider.GetBranch(settings.SourceFolder);
         branch ??= "main";
 
-        string localCommitHash = GitProvider.GetLocalCommit(settings.K9ToolboxFolder);
-        string? remoteCommitHash = GitProvider.GetRemoteCommit(settings.K9ToolboxFolder, branch);
+        string localCommitHash = GitProvider.GetLocalCommit(settings.SourceFolder);
+        string? remoteCommitHash = GitProvider.GetRemoteCommit(settings.SourceFolder, branch);
 
         if (localCommitHash == remoteCommitHash)
         {
@@ -96,8 +96,8 @@ internal static class Application
             return;
         }
 
-        string localCommitHash = GitProvider.GetLocalCommit(settings.K9ToolboxFolder);
-        string builtTagFile = Path.Combine(settings.K9ToolboxFolder, SettingsProvider.BuildHashFileName);
+        string localCommitHash = GitProvider.GetLocalCommit(settings.SourceFolder);
+        string builtTagFile = Path.Combine(settings.SourceFolder, SettingsProvider.BuildHashFileName);
         bool shouldRebuild = !File.Exists(builtTagFile);
         if (!shouldRebuild)
         {
@@ -121,15 +121,15 @@ internal static class Application
         Log.WriteLine("Setup Perforce", ILogOutput.LogType.Notice);
 
         Log.WriteLine("Set P4 Flags ...");
-        ProcessUtil.SpawnHidden(PerforceProvider.GetExecutablePath(), $"set P4IGNORE={SettingsProvider.P4IgnoreFileName} P4CONFIG={SettingsProvider.P4ConfigFileName} P4CHARSET={SettingsProvider.P4CharacterSet}");
+        ProcessUtil.SpawnHidden(PerforceProvider.GetExecutablePath(), $"set P4IGNORE={SettingsProvider.PerforceIgnoreFileName} P4CONFIG={SettingsProvider.PerforceConfigFileName} P4CHARSET={SettingsProvider.PerforceCharacterSet}");
 
         Log.WriteLine($"Configure P4Config ...");
-        if (!File.Exists(settings.P4ConfigFile))
+        if (!File.Exists(settings.PerforceConfigFile))
         {
             Log.WriteLine($"Writing default P4Config ...");
-            PerforceConfig.WriteDefault(settings.P4ConfigFile, SettingsProvider.P4Port, SettingsProvider.P4CharacterSet, SettingsProvider.P4IgnoreFileName);
+            PerforceConfig.WriteDefault(settings.PerforceConfigFile, SettingsProvider.PerforcePort, SettingsProvider.PerforceCharacterSet, SettingsProvider.PerforceIgnoreFileName);
             Log.WriteLine($"Opening P4Config for edit.");
-            ProcessUtil.OpenFileWithDefault(settings.P4ConfigFile);
+            ProcessUtil.OpenFileWithDefault(settings.PerforceConfigFile);
         }
         else
         {
@@ -143,8 +143,8 @@ internal static class Application
         // We need to find all the extra tools throughout the workspace
         List<string> p4Tools =
         [
-            .. Directory.GetFiles(settings.K9Folder, SettingsProvider.P4CustomToolsFileName, SearchOption.AllDirectories),
-            .. Directory.GetFiles(settings.ProjectsFolder, SettingsProvider.P4CustomToolsFileName, SearchOption.AllDirectories),
+            .. Directory.GetFiles(settings.K9Folder, SettingsProvider.PerforceCustomToolsFileName, SearchOption.AllDirectories),
+            .. Directory.GetFiles(settings.UnrealProjectsFolder, SettingsProvider.PerforceCustomToolsFileName, SearchOption.AllDirectories),
         ];
         int foundTools = p4Tools.Count;
         for (int i = 0; i < foundTools; i++)
@@ -166,10 +166,10 @@ internal static class Application
         Log.WriteLine("Setup Environment", ILogOutput.LogType.Notice);
 
         string? existingMachinePath = Environment.GetEnvironmentVariable("PATH", EnvironmentVariableTarget.Machine);
-        if (existingMachinePath != null && !existingMachinePath.Contains(settings.K9DotNETFolder))
+        if (existingMachinePath != null && !existingMachinePath.Contains(settings.BinariesFolder))
         {
             Log.WriteLine($"Adding to PATH variable ...");
-            Environment.SetEnvironmentVariable("PATH", $"{existingMachinePath};{settings.K9DotNETFolder};", EnvironmentVariableTarget.Machine);
+            Environment.SetEnvironmentVariable("PATH", $"{existingMachinePath};{settings.BinariesFolder};", EnvironmentVariableTarget.Machine);
             restartShellsRequired = true;
         }
 
@@ -178,12 +178,12 @@ internal static class Application
             Log.WriteLine("Restarting of terminals required to pickup new environment variables.", ILogOutput.LogType.Info);
         }
 
-        ProcessLogOutput processLogOutput = new(ILogOutput.LogType.ExternalProcess);
+        ProcessLogRedirect processLogRedirect = new(ILogOutput.LogType.ExternalProcess);
 
-        ProcessUtil.Execute("dotnet", settings.RootFolder, "dev-certs https --trust", null, processLogOutput.GetAction());
+        ProcessUtil.Execute("dotnet", settings.RootFolder, "dev-certs https --trust", null, processLogRedirect.GetAction());
 
         // Update workloads
-        ProcessUtil.Execute("dotnet", settings.RootFolder, "workload update", null, processLogOutput.GetAction());
+        ProcessUtil.Execute("dotnet", settings.RootFolder, "workload update", null, processLogRedirect.GetAction());
     }
 
     // ReSharper disable once InconsistentNaming
@@ -194,10 +194,10 @@ internal static class Application
         if (!File.Exists(vscodePath))
         {
             FileUtil.EnsureFileFolderHierarchyExists(vscodePath);
-            string k9Path = Path.Combine(settings.K9DotNETFolder, "K9.exe").Replace("\\", "\\\\");
+            string k9Path = Path.Combine(settings.BinariesFolder, "K9.exe").Replace("\\", "\\\\");
             File.WriteAllLines(vscodePath, [
                 "{",
-                    $"\t\"terminal.integrated.cwd\": \"{settings.K9DotNETFolder.Replace("\\", "\\\\")}\",",
+                    $"\t\"terminal.integrated.cwd\": \"{settings.BinariesFolder.Replace("\\", "\\\\")}\",",
                     "\t\"terminal.integrated.profiles.windows\": {",
                         "\t\t\"Command Prompt\": {",
                             $"\t\t\t\"args\": [\"/K\", \"{k9Path}\"]",
@@ -260,9 +260,9 @@ internal static class Application
                     string gitDependencies = Path.Combine(settings.RootFolder, "Engine", "Binaries", "DotNET", "GitDependencies", "win-x64", "GitDependencies.exe");
                     Log.WriteLine($"Running {gitDependencies} ...");
 
-                    ProcessLogOutput processLogOutput = new(ILogOutput.LogType.ExternalProcess);
+                    ProcessLogRedirect processLogRedirect = new(ILogOutput.LogType.ExternalProcess);
                     ProcessUtil.Execute(gitDependencies, settings.RootFolder, "--force", null,
-                        processLogOutput.GetAction());
+                        processLogRedirect.GetAction());
                 }
 
                 // Update path for new redist

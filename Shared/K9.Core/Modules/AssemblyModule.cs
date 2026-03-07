@@ -4,49 +4,52 @@
 using System.IO;
 using System.Reflection;
 
-namespace K9.Core.Modules
+namespace K9.Core.Modules;
+
+public class AssemblyModule : IModule
 {
-	public class AssemblyModule : IModule
+	private const string k_LogCategory = "ASSEMBLY";
+	private const string k_AssemblyLocationKey = "ASSSEMBLYLOCATION";
+
+	public readonly Assembly CoreAssembly;
+    public readonly Assembly ExecutingAssembly;
+    public readonly Assembly? EntryAssembly;
+	public readonly string AssemblyPath = "Undefined";
+    string m_AssemblyLocation = "Undefined";
+
+	public AssemblyModule()
 	{
-		private const string LogCategory = "ASSEMBLY";
-		private const string AssemblyLocationKey = "ASSSEMBLYLOCATION";
-
-		public readonly Assembly CoreAssembly;
-        public readonly Assembly ExecutingAssembly;
-        public readonly Assembly? EntryAssembly;
-		public readonly string AssemblyPath = "Undefined";
-		public string AssemblyLocation = "Undefined";
-
-		public AssemblyModule()
+		CoreAssembly = Assembly.GetAssembly(typeof(ConsoleApplication));
+        ExecutingAssembly = Assembly.GetExecutingAssembly();
+		EntryAssembly = Assembly.GetEntryAssembly();
+		if(EntryAssembly != null)
 		{
-			CoreAssembly = Assembly.GetAssembly(typeof(K9.Core.ConsoleApplication));
-            ExecutingAssembly = Assembly.GetExecutingAssembly();
-			EntryAssembly = Assembly.GetEntryAssembly();
-			if(EntryAssembly != null)
-			{
-				AssemblyPath = EntryAssembly.Location;
-			}
-
-			if (!string.IsNullOrEmpty(AssemblyPath))
-			{
-				AssemblyLocation = Path.GetFullPath(Path.Combine(AssemblyLocation, ".."));
-			}
-
-			Core.Log.WriteLine($"Assembly Location: {AssemblyLocation}", LogCategory, ILogOutput.LogType.Info);
+			AssemblyPath = EntryAssembly.Location;
 		}
 
-
-		public void Init(ArgumentsModule argumentsModule)
+		if (!string.IsNullOrEmpty(AssemblyPath))
 		{
-			if (argumentsModule.OverrideArguments.ContainsKey(AssemblyLocationKey))
-			{
-				string newPath = Path.GetFullPath(argumentsModule.OverrideArguments[AssemblyLocationKey]);
-				if (Directory.Exists(newPath))
-				{
-					AssemblyLocation = newPath;
-					Core.Log.WriteLine($"Using manual AssemblyLocation: {AssemblyLocation}");
-				}
-			}
+			m_AssemblyLocation = Path.GetFullPath(Path.Combine(m_AssemblyLocation, ".."));
 		}
+
+		Log.WriteLine($"Assembly Location: {m_AssemblyLocation}", k_LogCategory, ILogOutput.LogType.Info);
 	}
+
+
+	public void Init(ArgumentsModule argumentsModule)
+    {
+        if (!argumentsModule.HasOverrideArgument(k_AssemblyLocationKey))
+        {
+            return;
+        }
+
+        string newPath = Path.GetFullPath(argumentsModule.OverrideArguments[k_AssemblyLocationKey]);
+        if (!Directory.Exists(newPath))
+        {
+            return;
+        }
+
+        m_AssemblyLocation = newPath;
+        Log.WriteLine($"Using manual AssemblyLocation: {m_AssemblyLocation}");
+    }
 }

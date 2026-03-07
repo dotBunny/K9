@@ -4,7 +4,7 @@
 using System;
 using System.IO;
 using K9.Core;
-using K9.Core.Loggers;
+using K9.Core.LogOutputs;
 using K9.Services.Perforce;
 
 namespace K9.Workspace.Reset;
@@ -66,7 +66,7 @@ internal static class Application
         }
         s_ProcessCount++;
         Log.WriteLine("Clearing Project Artifacts ...");
-        string[] projectDirectories = Directory.GetDirectories(settingsProvider.ProjectsFolder);
+        string[] projectDirectories = Directory.GetDirectories(settingsProvider.UnrealProjectsFolder);
         int projectCount = projectDirectories.Length;
         for (int i = 0; i < projectCount; i++)
         {
@@ -94,7 +94,7 @@ internal static class Application
         }
         s_ProcessCount++;
         Log.WriteLine("Clearing Project Plugin Artifacts ...");
-        string[] projectDirectories = Directory.GetDirectories(settingsProvider.ProjectsFolder);
+        string[] projectDirectories = Directory.GetDirectories(settingsProvider.UnrealProjectsFolder);
         int projectCount = projectDirectories.Length;
         Log.WriteLine($"Found  {projectCount} Projects.");
         for (int i = 0; i < projectCount; i++)

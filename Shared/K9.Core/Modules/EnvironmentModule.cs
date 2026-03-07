@@ -4,41 +4,42 @@
 using System;
 using System.IO;
 
-namespace K9.Core.Modules
+namespace K9.Core.Modules;
+
+public class EnvironmentModule : IModule
 {
-	public class EnvironmentModule : IModule
-	{
-		public int ExitCode = 0;
-        public string? OriginalWorkingDirectory;
+    public int ExitCode;
+    public string? OriginalWorkingDirectory;
 
-		public void UpdateExitCode(int code, bool forceSet = false)
-		{
-			if (forceSet)
-			{
-				ExitCode = code;
-				return;
-			}
-
-			// This will update the exit code to the last known bad code
-			if (code != 0)
-			{
-				ExitCode = code;
-			}
-		}
-
-        public void Init(PlatformModule platform)
+    public void UpdateExitCode(int code, bool forceSet = false)
+    {
+        if (forceSet)
         {
-            Environment.SetEnvironmentVariable("DOTNET_CLI_TELEMETRY_OPTOUT", "1");
-
-            OriginalWorkingDirectory = Directory.GetCurrentDirectory();
-            Environment.SetEnvironmentVariable("OriginalWorkingDirectory", OriginalWorkingDirectory);
-
-            if(platform.OperatingSystem == PlatformModule.PlatformType.Windows)
-            {
-                Environment.SetEnvironmentVariable("Win32", "C:\\Windows\\System32");
-            }
-
-            Environment.SetEnvironmentVariable("COMPUTERNAME", System.Environment.MachineName);
+            ExitCode = code;
+            return;
         }
-	}
+
+        // This will update the exit code to the last known bad code
+        if (code != 0)
+        {
+            ExitCode = code;
+        }
+    }
+
+    public void Init(PlatformModule platform)
+    {
+        // ReSharper disable StringLiteralTypo
+        Environment.SetEnvironmentVariable("DOTNET_CLI_TELEMETRY_OPTOUT", "1");
+
+        OriginalWorkingDirectory = Directory.GetCurrentDirectory();
+        Environment.SetEnvironmentVariable("OriginalWorkingDirectory", OriginalWorkingDirectory);
+
+        if (platform.OperatingSystem == PlatformModule.PlatformType.Windows)
+        {
+            Environment.SetEnvironmentVariable("Win32", @"C:\Windows\System32");
+        }
+
+        Environment.SetEnvironmentVariable("COMPUTERNAME", Environment.MachineName);
+        // ReSharper restore StringLiteralTypo
+    }
 }

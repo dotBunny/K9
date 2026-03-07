@@ -2,7 +2,7 @@
 // See the LICENSE file at the repository root for more information.
 
 using K9.Core;
-using K9.Core.Loggers;
+using K9.Core.LogOutputs;
 using K9.Core.Utils;
 using K9.Services.Perforce;
 using static K9.CommandMap;
@@ -40,8 +40,8 @@ internal static class Application
             Log.AddLogOutput(new FileLogOutput(settings.LogsFolder, "K9"));
 
             // Try to find the desired execution
-            string[] programFolderCommands = Directory.GetFiles(settings.K9DefaultsFolder, $"*{Commands.Extension}", SearchOption.AllDirectories);
-            string[] projectFolderCommands = Directory.GetFiles(settings.ProjectsFolder, $"*{Commands.Extension}", SearchOption.AllDirectories);
+            string[] programFolderCommands = Directory.GetFiles(settings.Defaults, $"*{Commands.Extension}", SearchOption.AllDirectories);
+            string[] projectFolderCommands = Directory.GetFiles(settings.UnrealProjectsFolder, $"*{Commands.Extension}", SearchOption.AllDirectories);
 
             CommandMap map = new();
 
@@ -147,7 +147,7 @@ internal static class Application
 
             // Our own few things
             ["Workspace"] = settings.RootFolder,
-            ["BatchFiles"] = settings.BuildBatchFilesFolder,
+            ["BatchFiles"] = settings.UnrealEngineBuildBatchFilesFolder,
             ["K9Temp"] = settings.TempFile,
 
             // Some things UE uses
@@ -156,9 +156,9 @@ internal static class Application
         // ReSharper restore StringLiteralTypo
 
         // P4 Config
-        if (File.Exists(settings.P4ConfigFile))
+        if (File.Exists(settings.PerforceConfigFile))
         {
-            PerforceConfig config = new(settings.P4ConfigFile);
+            PerforceConfig config = new(settings.PerforceConfigFile);
             returnData["P4CLIENT"] = config.Client;
             returnData["P4PORT"] = config.Port;
         }

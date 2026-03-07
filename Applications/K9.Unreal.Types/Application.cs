@@ -5,7 +5,7 @@ using System;
 using System.IO;
 using System.Threading.Tasks;
 using K9.Core;
-using K9.Core.Loggers;
+using K9.Core.LogOutputs;
 using K9.Core.Utils;
 using K9.Services.Perforce;
 

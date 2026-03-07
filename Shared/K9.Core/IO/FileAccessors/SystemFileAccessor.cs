@@ -3,53 +3,45 @@
 
 using System.IO;
 
-namespace K9.Core.IO.FileAccessors
+namespace K9.Core.IO.FileAccessors;
+
+public class SystemFileAccessor(string filePath) : IFileAccessor
 {
-	public class SystemFileAccessor : IFileAccessor
+    /// <inheritdoc />
+	public uint GetBlockSize()
 	{
-		private readonly string m_FilePath;
+		return 4096;
+	}
 
-		public SystemFileAccessor(string filePath)
-		{
-			m_FilePath = filePath;
-		}
+	/// <inheritdoc />
+	public int GetReadBufferSize()
+	{
+		return 4096;
+	}
 
-		/// <inheritdoc />
-		public uint GetBlockSize()
-		{
-			return 4096;
-		}
+	/// <inheritdoc />
+	public int GetWriteBufferSize()
+	{
+		return 4096;
+	}
 
-		/// <inheritdoc />
-		public int GetReadBufferSize()
-		{
-			return 4096;
-		}
+	/// <inheritdoc />
+	public bool ValidConnection()
+	{
+		return true;
+	}
 
-		/// <inheritdoc />
-		public int GetWriteBufferSize()
-		{
-			return 4096;
-		}
+	/// <inheritdoc />
+	public Stream GetReader()
+	{
+		Log.WriteLine($"Open file stream for {filePath} (R).", "FILE");
+		return File.OpenRead(filePath);
+	}
 
-		/// <inheritdoc />
-		public bool ValidConnection()
-		{
-			return true;
-		}
-
-		/// <inheritdoc />
-		public Stream GetReader()
-		{
-			Core.Log.WriteLine($"Open file stream for {m_FilePath} (R).", "FILE");
-			return File.OpenRead(m_FilePath); ;
-		}
-
-		/// <inheritdoc />
-		public Stream GetWriter()
-		{
-			Core.Log.WriteLine($"Open file stream for {m_FilePath} (W).", "FILE");
-			return File.Create(m_FilePath);
-		}
+	/// <inheritdoc />
+	public Stream GetWriter()
+	{
+		Log.WriteLine($"Open file stream for {filePath} (W).", "FILE");
+		return File.Create(filePath);
 	}
 }

@@ -5,67 +5,51 @@ using System;
 using System.Diagnostics;
 using System.IO;
 
-namespace K9.Core.Utils
-{
-    public class ProcessLogObject_StringStreamWriter
-    {
-        private readonly Action<string, StreamWriter> _outputAction;
+namespace K9.Core.Utils;
 
-        public ProcessLogObject_StringStreamWriter(Action<string, StreamWriter> action, StreamWriter streamWriter)
+// ReSharper disable once InconsistentNaming
+public class ProcessLogObject_StringStreamWriter(Action<string, StreamWriter> action, StreamWriter streamWriter)
+{
+    private readonly object m_LockObject = new();
+
+    public void OutputHandler(object x, DataReceivedEventArgs y)
+    {
+        if (y.Data == null)
         {
-            _outputAction = action;
-            _streamWriter = streamWriter;
+            return;
         }
 
-        private readonly object _lockObject = new object();
-        private readonly StreamWriter _streamWriter;
-
-        public void OutputHandler(object x, DataReceivedEventArgs y)
+        lock (m_LockObject)
         {
-            if (y.Data == null)
-            {
-                return;
-            }
+            action(y.Data.TrimEnd(), streamWriter);
+        }
+    }
+}
 
-            lock (_lockObject)
-            {
-                _outputAction(y.Data.TrimEnd(), _streamWriter);
-            }
+// ReSharper disable once InconsistentNaming
+public class ProcessLogObject_IntegerString(Action<int, string> action)
+{
+    private int m_ProcessIdentifier;
+    private readonly object m_LockObject = new();
+
+    public void SetProcessIdentifier(int processIdentifier)
+    {
+        lock (m_LockObject)
+        {
+            m_ProcessIdentifier = processIdentifier;
         }
     }
 
-    public class ProcessLogObject_IntegerString
+    public void OutputHandler(object x, DataReceivedEventArgs y)
     {
-        private readonly Action<int, string> _outputAction;
-
-        public ProcessLogObject_IntegerString(Action<int, string> action)
+        if (y.Data == null)
         {
-            _outputAction = action;
+            return;
         }
 
-        public void SetProcessIdentifier(int processIdentifier)
+        lock (m_LockObject)
         {
-            lock (_lockObject)
-            {
-                _processIdentifier = processIdentifier;
-            }
-        }
-
-        private int _processIdentifier;
-
-        private readonly object _lockObject = new object();
-
-        public void OutputHandler(object x, DataReceivedEventArgs y)
-        {
-            if (y.Data == null)
-            {
-                return;
-            }
-
-            lock (_lockObject)
-            {
-                _outputAction(_processIdentifier, y.Data.TrimEnd());
-            }
+            action(m_ProcessIdentifier, y.Data.TrimEnd());
         }
     }
 }

@@ -6,6 +6,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Threading;
 using K9.Core;
+using K9.Core.Utils;
 
 namespace K9.OS.KeepAlive;
 
@@ -22,7 +23,7 @@ internal static class Application
          new ConsoleApplicationSettings()
          {
              DefaultLogCategory = "OS.KEEPALIVE",
-             LogOutputs = [new Core.Loggers.ConsoleLogOutput()],
+             LogOutputs = [new Core.LogOutputs.ConsoleLogOutput()],
              PauseOnExit = true,
              RequiresElevatedAccess = false,
          });
@@ -63,7 +64,11 @@ internal static class Application
                 ProcessMonitor.IsValidPID(pid) &&
                 ProcessMonitor.GetProcessName(pid) == Path.GetFileNameWithoutExtension(s_Settings.Application))
             {
-                s_ProcessMonitor = new ProcessMonitor(pid);
+                s_ProcessMonitor = new ProcessMonitor(pid)
+                {
+                    CheckHasExited = s_Settings.CheckHasExited,
+                    CheckResponding = s_Settings.CheckResponding,
+                };
                 if (s_ProcessMonitor.IsValid())
                 {
                     Log.WriteLine("Found valid process from PID file.");
@@ -130,7 +135,11 @@ internal static class Application
         startProcess.Start();
         Thread.Sleep(s_Settings.StartSleepMilliseconds);
 
-        s_ProcessMonitor = new ProcessMonitor(startProcess);
+        s_ProcessMonitor = new ProcessMonitor(startProcess)
+        {
+            CheckHasExited = s_Settings.CheckHasExited,
+            CheckResponding = s_Settings.CheckResponding,
+        };
 
         Log.WriteLine($"Started with PID of {startProcess.Id}");
         File.WriteAllText(s_Settings.ProcessInfoPath, startProcess.Id.ToString());

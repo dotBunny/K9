@@ -15,6 +15,7 @@
     <RepositoryUrl>https://github.com/dotBunny/K9</RepositoryUrl>
     <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
     <AssemblyVersion>1.0.0.0</AssemblyVersion>
+    <LangVersion>14</LangVersion>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">

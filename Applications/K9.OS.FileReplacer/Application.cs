@@ -18,7 +18,7 @@ internal static class Application
         {
             // ReSharper disable once StringLiteralTypo
             DefaultLogCategory = "OS.FILEREPLACER",
-            LogOutputs = [new Core.Loggers.ConsoleLogOutput()]
+            LogOutputs = [new Core.LogOutputs.ConsoleLogOutput()]
         });
 
         try

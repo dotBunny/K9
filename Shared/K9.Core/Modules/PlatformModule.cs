@@ -4,49 +4,57 @@
 using System;
 using System.Runtime.InteropServices;
 
-namespace K9.Core.Modules
+namespace K9.Core.Modules;
+
+public class PlatformModule : IModule
 {
-	public class PlatformModule : IModule
-	{
-		public enum PlatformType
-		{
-			Windows,
-			macOS,
-			Linux
-		}
+    public enum PlatformType
+    {
+        Windows,
+        // ReSharper disable once InconsistentNaming
+        macOS,
+        Linux
+    }
 
-		public enum ArchitectureType
-		{
-			None,
-			x64,
-			x86,
-			Intel,
-			Arm64
-		}
+    public enum ArchitectureType
+    {
+        None,
+        // ReSharper disable InconsistentNaming
+        x64,
+        x86,
+        // ReSharper restore InconsistentNaming
+        Intel,
+        Arm64
+    }
 
-		public readonly PlatformType OperatingSystem;
-		public readonly ArchitectureType Architecture;
-		public readonly string MachineName;
+    public readonly PlatformType OperatingSystem;
+    public readonly ArchitectureType Architecture;
+    public readonly string MachineName;
 
-		public PlatformModule()
-		{
-			if(RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-			{
-				OperatingSystem = PlatformType.Windows;
-				Architecture = RuntimeInformation.ProcessArchitecture == System.Runtime.InteropServices.Architecture.X86 ? ArchitectureType.x86 : ArchitectureType.x64;
-			}
-			else if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
-			{
-				OperatingSystem = PlatformType.macOS;
-				Architecture = RuntimeInformation.ProcessArchitecture == System.Runtime.InteropServices.Architecture.Arm64 ? ArchitectureType.Arm64 : ArchitectureType.Intel;
-			}
-			else if(RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
-			{
-				OperatingSystem = PlatformType.Linux;
-				Architecture = RuntimeInformation.ProcessArchitecture == System.Runtime.InteropServices.Architecture.X86 ? ArchitectureType.x86 : ArchitectureType.x64;
-			}
+    public PlatformModule()
+    {
+        if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+        {
+            OperatingSystem = PlatformType.Windows;
+            Architecture = RuntimeInformation.ProcessArchitecture == System.Runtime.InteropServices.Architecture.X86
+                ? ArchitectureType.x86
+                : ArchitectureType.x64;
+        }
+        else if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
+        {
+            OperatingSystem = PlatformType.macOS;
+            Architecture = RuntimeInformation.ProcessArchitecture == System.Runtime.InteropServices.Architecture.Arm64
+                ? ArchitectureType.Arm64
+                : ArchitectureType.Intel;
+        }
+        else if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+        {
+            OperatingSystem = PlatformType.Linux;
+            Architecture = RuntimeInformation.ProcessArchitecture == System.Runtime.InteropServices.Architecture.X86
+                ? ArchitectureType.x86
+                : ArchitectureType.x64;
+        }
 
-			MachineName = Environment.MachineName;
-		}
-	}
+        MachineName = Environment.MachineName;
+    }
 }

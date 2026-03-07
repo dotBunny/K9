@@ -3,21 +3,22 @@
 
 using System.IO;
 
-namespace K9.Core.IO
-{
-	public interface IFileAccessor
-	{
-		public enum Type
-		{
-			Default,
-			SMB
-		}
-		public uint GetBlockSize();
+namespace K9.Core.IO;
 
-		public int GetReadBufferSize();
-		public int GetWriteBufferSize();
-		public bool ValidConnection();
-		public Stream GetReader();
-		public Stream GetWriter();
+public interface IFileAccessor
+{
+	public enum Type
+	{
+		Default,
+        // ReSharper disable once UnusedMember.Global
+        // ReSharper disable once InconsistentNaming
+        SMB
 	}
+	public uint GetBlockSize();
+
+	public int GetReadBufferSize();
+	public int GetWriteBufferSize();
+	public bool ValidConnection();
+	public Stream GetReader();
+	public Stream GetWriter();
 }

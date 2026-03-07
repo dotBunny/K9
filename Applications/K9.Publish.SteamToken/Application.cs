@@ -101,7 +101,7 @@ internal static class Application
         {
             // ReSharper disable once StringLiteralTypo
             DefaultLogCategory = "PUBLISH.STEAMTOKEN",
-            LogOutputs = [new Core.Loggers.ConsoleLogOutput()]
+            LogOutputs = [new Core.LogOutputs.ConsoleLogOutput()]
         });
 
         try
@@ -129,10 +129,10 @@ internal static class Application
             string steamCmdDirectory = Path.GetDirectoryName(steamCmd);
 #pragma warning restore CS8600 // Converting null literal or possible null value to non-nullable type.
 
-            ProcessLogOutput processLogOutput = new(ILogOutput.LogType.ExternalProcess);
+            ProcessLogRedirect processLogRedirect = new(ILogOutput.LogType.ExternalProcess);
 
             // Make sure the installation is up to date
-            int updateExitCode = ProcessUtil.Execute(steamCmd, steamCmdDirectory, "+quit", null, processLogOutput.GetAction());
+            int updateExitCode = ProcessUtil.Execute(steamCmd, steamCmdDirectory, "+quit", null, processLogRedirect.GetAction());
             framework.Environment.UpdateExitCode(updateExitCode);
 
             if (!CheckoutToken(config))
@@ -147,7 +147,7 @@ internal static class Application
             {
                 uploadExitCode = ProcessUtil.Execute(steamCmd, steamCmdDirectory,
                     $"+login {s_TokenUsername} +run_app_build {config.AppBuild} +quit", null,
-                    processLogOutput.GetAction());
+                    processLogRedirect.GetAction());
                 uploadRetryCount--;
                 Log.WriteLine("Upload exited with code: " + uploadExitCode);
                 if (uploadExitCode == 0)
