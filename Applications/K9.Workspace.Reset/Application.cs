@@ -1,9 +1,10 @@
 ﻿// Copyright dotBunny Inc. All Rights Reserved.
 // See the LICENSE file at the repository root for more information.
 
+using System;
+using System.IO;
 using K9.Core;
 using K9.Core.Loggers;
-using K9.Core.Utils;
 using K9.Services.Perforce;
 
 namespace K9.Workspace.Reset

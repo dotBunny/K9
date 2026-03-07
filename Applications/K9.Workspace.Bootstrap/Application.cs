@@ -1,6 +1,9 @@
 // Copyright dotBunny Inc. All Rights Reserved.
 // See the LICENSE file at the repository root for more information.
 
+using System;
+using System.Collections.Generic;
+using System.IO;
 using System.Reflection;
 
 namespace K9.Workspace.Bootstrap;
@@ -65,7 +68,7 @@ static class Application
             Console.WriteLine(ex);
             Environment.ExitCode = ex.HResult;
         }
-        
+
         PressAnyKeyToContinue();
     }
 

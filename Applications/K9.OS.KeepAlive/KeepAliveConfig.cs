@@ -1,6 +1,8 @@
 // Copyright dotBunny Inc. All Rights Reserved.
 // See the LICENSE file at the repository root for more information.
 
+using System;
+using System.IO;
 using System.Text.Json.Serialization;
 using System.Text.Json;
 using K9.Core;

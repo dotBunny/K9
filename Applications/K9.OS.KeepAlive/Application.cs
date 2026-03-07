@@ -1,7 +1,10 @@
 // Copyright dotBunny Inc. All Rights Reserved.
 // See the LICENSE file at the repository root for more information.
 
+using System;
 using System.Diagnostics;
+using System.IO;
+using System.Threading;
 using K9.Core;
 
 namespace K9.OS.KeepAlive
