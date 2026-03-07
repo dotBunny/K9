@@ -43,10 +43,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="System.Text.Json" Version="8.0.5" />
-  </ItemGroup>
-
-  <ItemGroup>
     <ProjectReference Include="..\..\Shared\K9.Core\K9.Core.csproj" />
     <ProjectReference Include="..\..\Shared\K9.Services.Git\K9.Services.Git.csproj" />
     <ProjectReference Include="..\..\Shared\K9.Services.Perforce\K9.Services.Perforce.csproj" />

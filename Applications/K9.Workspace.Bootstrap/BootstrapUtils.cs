@@ -28,6 +28,7 @@ public static class BootstrapUtils
                 m_ProcessIdentifier = processIdentifier;
             }
         }
+
         public void OutputHandler(object x, DataReceivedEventArgs y)
         {
             if (y.Data == null)
@@ -95,7 +96,8 @@ public static class BootstrapUtils
     {
         // Check using the Visual Studio instance finder first
         IEnumerable<VisualStudioInstance> quickFind = MSBuildLocator.QueryVisualStudioInstances();
-        IEnumerable<VisualStudioInstance> visualStudioInstances = quickFind as VisualStudioInstance[] ?? quickFind.ToArray();
+        IEnumerable<VisualStudioInstance> visualStudioInstances =
+            quickFind as VisualStudioInstance[] ?? quickFind.ToArray();
         if (quickFind != null && visualStudioInstances.Any())
         {
             return visualStudioInstances.OrderByDescending(instance => instance.Version).First().MSBuildPath;
@@ -109,17 +111,20 @@ public static class BootstrapUtils
 
         // Find any instance of MSBuild.dll
         List<string> foundPaths = [];
-        IEnumerable<string> folders = Directory.EnumerateDirectories(@"C:\Program Files\dotnet\sdk", "*", SearchOption.TopDirectoryOnly);
+        IEnumerable<string> folders =
+            Directory.EnumerateDirectories(@"C:\Program Files\dotnet\sdk", "*", SearchOption.TopDirectoryOnly);
         foundPaths.AddRange(folders.Select(folder => Path.Combine(folder, "MSBuild.dll")).Where(File.Exists));
         if (foundPaths.Count <= 0)
         {
             return null;
         }
+
         foundPaths.Sort();
         return foundPaths[^1];
     }
 
-    public static int ProcessExecute(string executablePath, string? workingDirectory, string? arguments, string? input, Action<int, string> outputLine)
+    public static int ProcessExecute(string executablePath, string? workingDirectory, string? arguments, string? input,
+        Action<int, string> outputLine)
     {
         using Process childProcess = new();
         ProcessLogObject logObject = new(outputLine);
@@ -130,6 +135,7 @@ public static class BootstrapUtils
         {
             childProcess.StartInfo.WorkingDirectory = workingDirectory;
         }
+
         childProcess.StartInfo.FileName = executablePath;
         childProcess.StartInfo.Arguments = string.IsNullOrEmpty(arguments) ? "" : arguments;
         childProcess.StartInfo.UseShellExecute = false;
@@ -153,7 +159,7 @@ public static class BootstrapUtils
 
         // Busy wait for the process to exit so we can get a ThreadAbortException if the thread is terminated.
         // It won't wait until we enter managed code again before it throws otherwise.
-        for (; ; )
+        for (;;)
         {
             if (!childProcess.WaitForExit(20))
             {
@@ -174,6 +180,7 @@ public static class BootstrapUtils
         {
             childProcess.StartInfo.WorkingDirectory = workingDirectory;
         }
+
         childProcess.StartInfo.FileName = executablePath;
         childProcess.StartInfo.Arguments = string.IsNullOrEmpty(arguments) ? "" : arguments;
         childProcess.StartInfo.UseShellExecute = true;
@@ -183,7 +190,7 @@ public static class BootstrapUtils
 
         // Busy wait for the process to exit so we can get a ThreadAbortException if the thread is terminated.
         // It won't wait until we enter managed code again before it throws otherwise.
-        for (; ; )
+        for (;;)
         {
             if (!childProcess.WaitForExit(20))
             {
@@ -195,7 +202,8 @@ public static class BootstrapUtils
         }
     }
 
-    public static void GitCheckoutRepo(string uri, string checkoutFolder, string? branch = null, string? commit = null, int depth = -1, bool submodules = true, bool shallowSubmodules = true)
+    public static void GitCheckoutRepo(string uri, string checkoutFolder, string? branch = null, string? commit = null,
+        int depth = -1, bool submodules = true, bool shallowSubmodules = true)
     {
         string executablePath = Environment.OSVersion.Platform == PlatformID.Win32NT ? "git.exe" : "git";
         StringBuilder commandLineBuilder = new();
@@ -228,16 +236,19 @@ public static class BootstrapUtils
             });
 
         // Was a commit specified?
-        if (commit != null)
+        if (commit == null)
         {
-            Console.WriteLine($"Checkout Commit {commit}");
-            ProcessExecute(executablePath, checkoutFolder,
-                $"checkout {commit}", null, (processIdentifier, line) =>
-                {
-                    Console.WriteLine($"[{processIdentifier}] {line}");
-                });
+            return;
         }
+
+        Console.WriteLine($"Checkout Commit {commit}");
+        ProcessExecute(executablePath, checkoutFolder,
+            $"checkout {commit}", null, (processIdentifier, line) =>
+            {
+                Console.WriteLine($"[{processIdentifier}] {line}");
+            });
     }
+
     public static string GitGetLocalCommit(string checkoutFolder)
     {
         string executablePath = Environment.OSVersion.Platform == PlatformID.Win32NT ? "git.exe" : "git";
@@ -256,7 +267,8 @@ public static class BootstrapUtils
         return output[0].Trim();
     }
 
-    public static void GitUpdateRepo(string checkoutFolder, string? branch = null, string? commit = null, bool forceUpdate = true)
+    public static void GitUpdateRepo(string checkoutFolder, string? branch = null, string? commit = null,
+        bool forceUpdate = true)
     {
         string executablePath = Environment.OSVersion.Platform == PlatformID.Win32NT ? "git.exe" : "git";
 
@@ -369,6 +381,4 @@ public static class BootstrapUtils
         // Clear our cached output
         output.Clear();
     }
-
-
 }

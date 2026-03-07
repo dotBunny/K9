@@ -6,8 +6,8 @@ using System.Collections.Generic;
 using System.IO;
 using K9.Core;
 using K9.Core.LogOutputs;
-using K9.Core.Services.Git;
 using K9.Core.Utils;
+using K9.Services.Git;
 using K9.Services.Perforce;
 
 namespace K9.Workspace.Setup;
@@ -83,7 +83,7 @@ internal static class Application
 #if DEBUG
             Log.WriteLine("Skipping Cloning (Debug Mode) ...");
 #else
-            GitProvider.UpdateRepo(settings.K9ToolboxFolder, branch);
+            GitProvider.UpdateRepo(settings.SourceFolder, branch);
 #endif
         }
     }
@@ -143,7 +143,7 @@ internal static class Application
         // We need to find all the extra tools throughout the workspace
         List<string> p4Tools =
         [
-            .. Directory.GetFiles(settings.K9Folder, SettingsProvider.PerforceCustomToolsFileName, SearchOption.AllDirectories),
+            .. Directory.GetFiles(settings.DefaultsFolder, SettingsProvider.PerforceCustomToolsFileName, SearchOption.AllDirectories),
             .. Directory.GetFiles(settings.UnrealProjectsFolder, SettingsProvider.PerforceCustomToolsFileName, SearchOption.AllDirectories),
         ];
         int foundTools = p4Tools.Count;
@@ -178,7 +178,7 @@ internal static class Application
             Log.WriteLine("Restarting of terminals required to pickup new environment variables.", ILogOutput.LogType.Info);
         }
 
-        ProcessLogRedirect processLogRedirect = new(ILogOutput.LogType.ExternalProcess);
+        ProcessLogRedirect processLogRedirect = new(ILogOutput.LogType.ExternalProcess, ".NET");
 
         ProcessUtil.Execute("dotnet", settings.RootFolder, "dev-certs https --trust", null, processLogRedirect.GetAction());
 

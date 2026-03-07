@@ -37,6 +37,11 @@ public class ProcessLogCapture
         return m_Lines[0];
     }
 
+    public string GetLastLine()
+    {
+        return m_Lines.Last();
+    }
+
     public bool IsFirstLineEmpty()
     {
         return m_Lines.Count == 0 || string.IsNullOrEmpty(m_Lines[0]);
@@ -50,6 +55,11 @@ public class ProcessLogCapture
     public string[] GetLines()
     {
         return m_Lines.ToArray();
+    }
+
+    public bool HasContent()
+    {
+        return m_Lines.Count != 0 && m_Lines.Any(line => !string.IsNullOrEmpty(line));
     }
 
     public Action<int, string> GetAction()

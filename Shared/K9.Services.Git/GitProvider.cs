@@ -1,315 +1,266 @@
 // Copyright dotBunny Inc. All Rights Reserved.
 // See the LICENSE file at the repository root for more information.
 
-using K9.Core.Utils;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Text;
+using K9.Core;
+using K9.Core.Utils;
 
-namespace K9.Core.Services.Git
+namespace K9.Services.Git;
+
+public static class GitProvider
 {
-	public static class GitProvider
-	{
-		public static string GetExecutablePath()
-		{
-			if (Environment.OSVersion.Platform == PlatformID.Win32NT)
-			{
-				return "git.exe";
-			}
-			else
-			{
-				return "git";
-			}
-		}
+    static string GetExecutablePath()
+    {
+        return Environment.OSVersion.Platform == PlatformID.Win32NT ? "git.exe" : "git";
+    }
 
-		public static string? GetRemote(string checkoutFolder)
-		{
-			string? output = null;
-			ProcessUtil.Execute(GetExecutablePath(), checkoutFolder,
-				"status -sb", null, (processIdentifier, line) =>
-				{
-					if (!string.IsNullOrEmpty(line))
-					{
-						output = line;
-					}
-				});
-
-			if (!string.IsNullOrEmpty(output))
-			{
-				string[] parts = output.Split(' ')[1].Split("...");
-				return parts[1];
-			}
-			return null;
-		}
-		public static string? GetBranch(string checkoutFolder)
-		{
-			string? output = null;
-			ProcessUtil.Execute(GetExecutablePath(), checkoutFolder,
-				"status -sb", null, (processIdentifier, line) =>
-				{
-					if (!string.IsNullOrEmpty(line))
-					{
-						output = line;
-					}
-				});
-
-			if (!string.IsNullOrEmpty(output))
-			{
-				string[] parts = output.Split(' ')[1].Split("...");
-				return parts[0];
-			}
-			return null;
-		}
-
-		public static string GetLocalCommit(string checkoutFolder)
-		{
-			// Check current
-			List<string> output = new List<string>();
-
-			// Get status of the repository
-			ProcessUtil.Execute(GetExecutablePath(), checkoutFolder,
-				$"rev-parse HEAD", null, (System.Action<int, string>)((processIdentifier, line) =>
-				{
-					Core.Log.WriteLine(line, "GIT", ILogOutput.LogType.ExternalProcess);
-					output.Add(line);
-				}));
-
-			return output[0].Trim();
-		}
-        public static string? GetRemoteCommit(string checkoutFolder, string branch = "main")
+    public static string? GetRemote(string checkoutFolder)
+    {
+        ProcessLogCapture logCapture = new();
+        ProcessUtil.Execute(GetExecutablePath(), checkoutFolder, "status -sb", null, logCapture.GetAction());
+        if (!logCapture.HasContent())
         {
-            // Check current
-            List<string> output = new List<string>();
-            ProcessUtil.Execute(GetExecutablePath(), checkoutFolder,
-                $"ls-remote --sort=committerdate", null, (System.Action<int, string>)((processIdentifier, line) =>
-                {
-                    Core.Log.WriteLine(line, "GIT", ILogOutput.LogType.ExternalProcess);
-                    output.Add(line);
-                }));
-
-            string branchHead = $"refs/heads/{branch}";
-            string? failSafe = null;
-            foreach(string s in output)
-            {
-                string parsed = s.Trim();
-                if(parsed.EndsWith(branchHead))
-                {
-                    return parsed[..^branchHead.Length].Trim();
-                }
-
-                if (parsed.EndsWith("HEAD"))
-                {
-                    failSafe = parsed[..^4].Trim();
-                }                
-            }
-            return failSafe;  
+            return null;
         }
 
-		public static void CheckoutRepo(string uri, string checkoutFolder, string? branch = null, string? commit = null, int depth = -1, bool submodules = true, bool shallowsubmodules = true)
-		{
-			string executablePath = GetExecutablePath();
-			StringBuilder commandLineBuilder = new StringBuilder();
-			commandLineBuilder.Append("clone ");
+        string[] parts = logCapture.GetLastLine().Split(' ')[1].Split("...");
+        return parts[1];
+    }
 
-			// Was a branch defined?
-			if (branch != null)
-			{
-				commandLineBuilder.AppendFormat("--branch {0} --single-branch ", branch);
-			}
+    public static string? GetBranch(string checkoutFolder)
+    {
+        ProcessLogCapture logCapture = new();
+        ProcessUtil.Execute(GetExecutablePath(), checkoutFolder, "status -sb", null, logCapture.GetAction());
+        if (!logCapture.HasContent())
+        {
+            return null;
+        }
 
-			// Do we have a specific depth to go too?
-			if (depth != -1)
-			{
-				commandLineBuilder.AppendFormat("--depth {0} ", depth.ToString());
-			}
+        string[] parts = logCapture.GetLastLine().Split(' ')[1].Split("...");
+        return parts[0];
+    }
 
-			if (submodules)
-			{
-				commandLineBuilder.Append("--recurse-submodules --remote-submodules ");
-				if (shallowsubmodules)
-				{
-					commandLineBuilder.Append("--shallow-submodules ");
-				}
-			}
+    public static string GetLocalCommit(string checkoutFolder)
+    {
+        // Check current
+        List<string> output = [];
 
-			Core.Log.WriteLine($"{commandLineBuilder}{uri} {checkoutFolder}", "GIT");
-			ProcessUtil.Execute(executablePath, Directory.GetParent(checkoutFolder).GetPathWithCorrectCase(),
-				$"{commandLineBuilder}{uri} {checkoutFolder}", null, (System.Action<int, string>)((processIdentifier, line) =>
-				{
-					Core.Log.WriteLine(line, "GIT", ILogOutput.LogType.ExternalProcess);
-				}));
+        // Get the status of the repository
+        ProcessUtil.Execute(GetExecutablePath(), checkoutFolder,
+            $"rev-parse HEAD", null, (_, line) =>
+            {
+                Log.WriteLine(line, "GIT", ILogOutput.LogType.ExternalProcess);
+                output.Add(line);
+            });
 
-			// Was a commit specified?
-			if (commit != null)
-			{
-				Core.Log.WriteLine($"Checkout Commit {commit}", "GIT", ILogOutput.LogType.ExternalProcess);
-				ProcessUtil.Execute(executablePath, checkoutFolder,
-					$"checkout {commit}", null, (System.Action<int, string>)((processIdentifier, line) =>
-					{
-						Core.Log.WriteLine(line, "GIT", ILogOutput.LogType.ExternalProcess);
-					}));
-			}
-		}
+        return output[0].Trim();
+    }
 
-		public static void InitializeSubmodules(string checkoutFolder) //, int depth = -1)
-		{
-			StringBuilder commandLineBuilder = new StringBuilder();
-			commandLineBuilder.Append("submodule init ");
+    public static string? GetRemoteCommit(string checkoutFolder, string branch = "main")
+    {
+        // Check current
+        List<string> output = [];
+        ProcessUtil.Execute(GetExecutablePath(), checkoutFolder,
+            // ReSharper disable once StringLiteralTypo
+            $"ls-remote --sort=committerdate", null, (_, line) =>
+            {
+                Log.WriteLine(line, "GIT", ILogOutput.LogType.ExternalProcess);
+                output.Add(line);
+            });
 
-			// if (depth != -1)
-			// {
-			//     commandLineBuilder.AppendFormat("--depth {0} ", depth.ToString());
-			// }
-			// if (depth == 1)
-			// {
-			//     commandLineBuilder.Append("--shallow-submodules ");
-			// }
+        string branchHead = $"refs/heads/{branch}";
+        string? failSafe = null;
+        foreach (string? parsed in output.Select(s => s.Trim()))
+        {
+            if (parsed.EndsWith(branchHead))
+            {
+                return parsed[..^branchHead.Length].Trim();
+            }
 
-			Core.Log.WriteLine("Initialize Submodules", "GIT", ILogOutput.LogType.ExternalProcess);
-			ProcessUtil.Execute(GetExecutablePath(), checkoutFolder,
-				commandLineBuilder.ToString(), null, (System.Action<int, string>)((processIdentifier, line) =>
-				{
-					Core.Log.WriteLine(line, "GIT", ILogOutput.LogType.ExternalProcess);
-				}));
-		}
-		public static void UpdateSubmodule(string checkoutFolder, int depth = -1, string? submodule = null)
-		{
-			StringBuilder commandLineBuilder = new StringBuilder();
-			commandLineBuilder.Append("submodule update ");
-			if (depth == 1)
-			{
-				commandLineBuilder.Append("--recommend-shallow ");
-			}
-			commandLineBuilder.Append("--remote ");
+            if (parsed.EndsWith("HEAD"))
+            {
+                failSafe = parsed[..^4].Trim();
+            }
+        }
 
-			if (!string.IsNullOrEmpty(submodule))
-			{
-				commandLineBuilder.Append(submodule);
-			}
+        return failSafe;
+    }
 
-			Core.Log.WriteLine(submodule != null ? $"Update Submodule [{submodule}]" : $"Update Submodule", "GIT",
-				ILogOutput.LogType.ExternalProcess);
+    public static void CheckoutRepo(string uri, string checkoutFolder, string? branch = null, string? commit = null,
+        int depth = -1, bool submodules = true, bool shallowSubmodules = true)
+    {
+        string executablePath = GetExecutablePath();
+        StringBuilder commandLineBuilder = new();
+        commandLineBuilder.Append("clone ");
 
-			ProcessUtil.Execute(GetExecutablePath(), checkoutFolder,
-				commandLineBuilder.ToString().Trim(), null, (System.Action<int, string>)((processIdentifier, line) =>
-				{
-					Core.Log.WriteLine(line, "GIT", ILogOutput.LogType.ExternalProcess);
-				}));
-		}
+        // Was a branch defined?
+        if (branch != null)
+        {
+            commandLineBuilder.AppendFormat("--branch {0} --single-branch ", branch);
+        }
 
-		public static void UpdateRepo(string checkoutFolder, string? branch = null, string? commit = null, bool forceUpdate = true)
-		{
-			string executablePath = GetExecutablePath();
-			// Check current
-			List<string> output = new List<string>();
+        // Do we have a specific depth to go too?
+        if (depth != -1)
+        {
+            commandLineBuilder.AppendFormat("--depth {0} ", depth.ToString());
+        }
 
-			// Get status of the repository
-			ProcessUtil.Execute(executablePath, checkoutFolder,
-				$"fetch origin", null, (System.Action<int, string>)((processIdentifier, line) =>
-				{
-					Core.Log.WriteLine(line, "GIT", ILogOutput.LogType.ExternalProcess);
-				}));
-			ProcessUtil.Execute(executablePath, checkoutFolder,
-				"status -uno --long", null, (System.Action<int, string>)((processIdentifier, line) =>
-				{
-					Core.Log.WriteLine(line, "GIT", ILogOutput.LogType.ExternalProcess);
-					output.Add(line);
-				}));
+        if (submodules)
+        {
+            commandLineBuilder.Append("--recurse-submodules --remote-submodules ");
+            if (shallowSubmodules)
+            {
+                commandLineBuilder.Append("--shallow-submodules ");
+            }
+        }
 
-			bool branchBehind = false;
-			bool fastForward = false;
-			bool detached = false;
-			foreach (string s in output)
-			{
-				if (s.Contains("branch is behind"))
-				{
-					branchBehind = true;
-				}
+        ProcessLogRedirect logRedirect = new(ILogOutput.LogType.ExternalProcess, "GIT");
 
-				if (s.Contains("and can be fast-forwarded"))
-				{
-					fastForward = true;
-				}
+        Log.WriteLine($"{commandLineBuilder}{uri} {checkoutFolder}", "GIT");
+        ProcessUtil.Execute(executablePath, Directory.GetParent(checkoutFolder).GetPathWithCorrectCase(),
+            $"{commandLineBuilder}{uri} {checkoutFolder}", null, logRedirect.GetAction());
 
-				if (s.Contains("HEAD detached at"))
-				{
-					detached = true;
-				}
-			}
+        // Was a commit specified?
+        if (commit == null)
+        {
+            return;
+        }
 
-			if (detached)
-			{
-				ProcessUtil.Execute(executablePath, checkoutFolder,
-					$"reset --hard", null, (System.Action<int, string>)((processIdentifier, line) =>
-					{
-						Core.Log.WriteLine(line, "GIT");
-					}));
+        Log.WriteLine($"Checkout Commit {commit}", "GIT", ILogOutput.LogType.ExternalProcess);
+        ProcessUtil.Execute(executablePath, checkoutFolder,
+            $"checkout {commit}", null, logRedirect.GetAction());
+    }
 
-				if (branch != null)
-				{
-					ProcessUtil.Execute(executablePath, checkoutFolder,
-						$"switch {branch}", null, (System.Action<int, string>)((processIdentifier, line) =>
-						{
-							Core.Log.WriteLine(line, "GIT");
-						}));
-				}
+    public static void InitializeSubmodules(string checkoutFolder) //, int depth = -1)
+    {
+        StringBuilder commandLineBuilder = new();
+        commandLineBuilder.Append("submodule init ");
 
-				ProcessUtil.Execute(executablePath, checkoutFolder,
-					"pull", null, (System.Action<int, string>)((processIdentifier, line) =>
-					{
-						Core.Log.WriteLine(line, "GIT");
-					}));
+        // if (depth != -1)
+        // {
+        //     commandLineBuilder.AppendFormat("--depth {0} ", depth.ToString());
+        // }
+        // if (depth == 1)
+        // {
+        //     commandLineBuilder.Append("--shallow-submodules ");
+        // }
 
-				if (commit != null)
-				{
-					ProcessUtil.Execute(executablePath, checkoutFolder,
-						$"checkout {commit}", null, (System.Action<int, string>)((processIdentifier, line) =>
-						{
-							Core.Log.WriteLine(line, "GIT");
-						}));
-					Core.Log.WriteLine($"{checkoutFolder} detached updated to {commit}.", "CHECKOUT");
-				}
-				else
-				{
-					Core.Log.WriteLine($"{checkoutFolder} detached head reset to latest.", "CHECKOUT");
-				}
-			}
-			else if ((!fastForward && branchBehind) || forceUpdate)
-			{
-				// We actually need to do something to upgrade this repository
-				Core.Log.WriteLine($"{checkoutFolder} needs updating, resetting as it could not be cleanly updated.", "CHECKOUT");
+        Log.WriteLine("Initialize Submodules", "GIT", ILogOutput.LogType.ExternalProcess);
+        ProcessLogRedirect logRedirect = new(ILogOutput.LogType.ExternalProcess, "GIT");
+        ProcessUtil.Execute(GetExecutablePath(), checkoutFolder,
+            commandLineBuilder.ToString(), null, logRedirect.GetAction());
+    }
 
-				ProcessUtil.Execute(executablePath, checkoutFolder,
-					"reset --hard", null, (System.Action<int, string>)((processIdentifier, line) =>
-					{
-						Core.Log.WriteLine(line, "GIT");
-					}));
-				ProcessUtil.Execute(executablePath, checkoutFolder,
-					"pull", null, (System.Action<int, string>)((processIdentifier, line) =>
-					{
-						Core.Log.WriteLine(line, "GIT");
-					}));
-			}
-			else if (fastForward)
-			{
-				// We actually need to do something to upgrade this repository
-				Core.Log.WriteLine($"Fast-forwarding {checkoutFolder}.", "CHECKOUT");
+    public static void UpdateSubmodule(string checkoutFolder, int depth = -1, string? submodule = null)
+    {
+        StringBuilder commandLineBuilder = new();
+        commandLineBuilder.Append("submodule update ");
+        if (depth == 1)
+        {
+            commandLineBuilder.Append("--recommend-shallow ");
+        }
 
-				ProcessUtil.Execute(executablePath, checkoutFolder,
-					"pull", null, (System.Action<int, string>)((processIdentifier, line) =>
-					{
-						Core.Log.WriteLine(line, "GIT");
-					}));
-			}
-			else
-			{
-				Core.Log.WriteLine($"{checkoutFolder} is up-to-date.", "CHECKOUT");
-			}
+        commandLineBuilder.Append("--remote ");
 
-			// Clear our cached output
-			output.Clear();
-		}
+        if (!string.IsNullOrEmpty(submodule))
+        {
+            commandLineBuilder.Append(submodule);
+        }
 
-	}
+        Log.WriteLine(submodule != null ? $"Update Submodule [{submodule}]" : $"Update Submodule", "GIT",
+            ILogOutput.LogType.ExternalProcess);
+
+        ProcessLogRedirect logRedirect = new(ILogOutput.LogType.ExternalProcess, "GIT");
+        ProcessUtil.Execute(GetExecutablePath(), checkoutFolder,
+            commandLineBuilder.ToString().Trim(), null, logRedirect.GetAction());
+    }
+
+    public static void UpdateRepo(string checkoutFolder, string? branch = null, string? commit = null,
+        bool forceUpdate = true)
+    {
+        string executablePath = GetExecutablePath();
+        // Check current
+        List<string> output = [];
+        ProcessLogRedirect logRedirect = new(ILogOutput.LogType.ExternalProcess, "GIT");
+
+        // Get the status of the repository
+        ProcessUtil.Execute(executablePath, checkoutFolder, "fetch origin", null, logRedirect.GetAction());
+        ProcessUtil.Execute(executablePath, checkoutFolder,
+            "status -uno --long", null, (_, line) =>
+            {
+                Log.WriteLine(line, "GIT", ILogOutput.LogType.ExternalProcess);
+                output.Add(line);
+            });
+
+        bool branchBehind = false;
+        bool fastForward = false;
+        bool detached = false;
+        foreach (string s in output)
+        {
+            if (s.Contains("branch is behind"))
+            {
+                branchBehind = true;
+            }
+
+            if (s.Contains("and can be fast-forwarded"))
+            {
+                fastForward = true;
+            }
+
+            if (s.Contains("HEAD detached at"))
+            {
+                detached = true;
+            }
+        }
+
+        if (detached)
+        {
+            ProcessUtil.Execute(executablePath, checkoutFolder, "reset --hard", null, logRedirect.GetAction());
+
+            if (branch != null)
+            {
+                ProcessUtil.Execute(executablePath, checkoutFolder, $"switch {branch}", null, logRedirect.GetAction());
+            }
+
+            ProcessUtil.Execute(executablePath, checkoutFolder, "pull", null, logRedirect.GetAction());
+
+            if (commit != null)
+            {
+                ProcessUtil.Execute(executablePath, checkoutFolder, $"checkout {commit}", null,
+                    logRedirect.GetAction());
+                Log.WriteLine($"{checkoutFolder} detached updated to {commit}.", "CHECKOUT");
+            }
+            else
+            {
+                Log.WriteLine($"{checkoutFolder} detached head reset to latest.", "CHECKOUT");
+            }
+        }
+        else if ((!fastForward && branchBehind) || forceUpdate)
+        {
+            // We actually need to do something to upgrade this repository
+            Log.WriteLine($"{checkoutFolder} needs updating, resetting as it could not be cleanly updated.",
+                "CHECKOUT");
+
+            ProcessUtil.Execute(executablePath, checkoutFolder, "reset --hard", null, logRedirect.GetAction());
+            ProcessUtil.Execute(executablePath, checkoutFolder, "pull", null, logRedirect.GetAction());
+        }
+        else if (fastForward)
+        {
+            // We actually need to do something to upgrade this repository
+            Log.WriteLine($"Fast-forwarding {checkoutFolder}.", "CHECKOUT");
+
+            ProcessUtil.Execute(executablePath, checkoutFolder, "pull", null, logRedirect.GetAction());
+        }
+        else
+        {
+            Log.WriteLine($"{checkoutFolder} is up-to-date.", "CHECKOUT");
+        }
+
+        // Clear our cached output
+        output.Clear();
+    }
 }

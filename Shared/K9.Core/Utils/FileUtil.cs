@@ -89,7 +89,7 @@ public static class FileUtil
             : null;
     }
 
-    public static string GetPathWithCorrectCase(this DirectoryInfo info)
+    public static string GetPathWithCorrectCase(this DirectoryInfo? info)
     {
         DirectoryInfo? parentInfo = info.Parent;
         return parentInfo == null

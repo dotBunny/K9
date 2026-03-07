@@ -40,7 +40,7 @@ internal static class Application
             Log.AddLogOutput(new FileLogOutput(settings.LogsFolder, "K9"));
 
             // Try to find the desired execution
-            string[] programFolderCommands = Directory.GetFiles(settings.Defaults, $"*{Commands.Extension}", SearchOption.AllDirectories);
+            string[] programFolderCommands = Directory.GetFiles(settings.DefaultsFolder, $"*{Commands.Extension}", SearchOption.AllDirectories);
             string[] projectFolderCommands = Directory.GetFiles(settings.UnrealProjectsFolder, $"*{Commands.Extension}", SearchOption.AllDirectories);
 
             CommandMap map = new();

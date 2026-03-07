@@ -105,7 +105,7 @@ public static class ProcessUtil
 
         ProcessLogObject_IntegerString logObject = new(outputLine);
 
-        AddDefaultEnvironmentVariables(childProcess);
+        childProcess.AddDefaultEnvironmentVariables();
 		if (workingDirectory != null)
 		{
 			childProcess.StartInfo.WorkingDirectory = workingDirectory;
