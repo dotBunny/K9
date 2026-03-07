@@ -10,10 +10,9 @@ namespace K9.OS.FileReplacer;
 
 public class FileReplacerConfig
 {
-    public string? SourceFile { get; set; }
-    public string? TargetFile { get; set; }
-    public Dictionary<string, string> Replaces { get; set; } = new();
-
+    public string? SourceFile;
+    public string? TargetFile;
+    public readonly Dictionary<string, string> Replaces = new();
 
     public static FileReplacerConfig Get(ConsoleApplication framework)
     {

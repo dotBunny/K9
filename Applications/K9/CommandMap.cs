@@ -9,19 +9,19 @@ namespace K9
 {
     public class CommandMap
     {
-        readonly Dictionary<string, CommandMapAction> _map = [];
+        readonly Dictionary<string, CommandMapAction> m_Map = [];
 
         public bool HasCommands()
         {
-            return _map.Count > 0;
+            return m_Map.Count > 0;
         }
 
         public class CommandMapAction
         {
-            public string? Command { get; set; }
-            public string? Description { get; set; }
-            public string? WorkingDirectory { get; set; }
-            public string? Arguments { get; set; }
+            public string? Command;
+            public string? Description;
+            public string? WorkingDirectory;
+            public string? Arguments;
 
             public Dictionary<string, CommandMapAction> Children { get; set; } = [];
 
@@ -115,9 +115,9 @@ namespace K9
                 Commands.CommandVerb action = commands.Actions[i];
                 if(action.Identifier != null)
                 {
-                    if (!_map.TryGetValue(action.Identifier, out CommandMapAction? value))
+                    if (!m_Map.TryGetValue(action.Identifier, out CommandMapAction? value))
                     {
-                        _map.Add(action.Identifier, new CommandMapAction(action));
+                        m_Map.Add(action.Identifier, new CommandMapAction(action));
                     }
                     else
                     {
@@ -136,12 +136,12 @@ namespace K9
             // Early out
             if (partCount == 1)
             {
-                return _map.GetValueOrDefault(parts[0]);
+                return m_Map.GetValueOrDefault(parts[0]);
             }
 
             // Find the right base
             CommandMapAction? currentActionMap = null;
-            if (_map.TryGetValue(parts[0], out CommandMapAction? value))
+            if (m_Map.TryGetValue(parts[0], out CommandMapAction? value))
             {
                 currentActionMap = value;
             }
@@ -169,7 +169,7 @@ namespace K9
         public string GetOutput()
         {
             List<HelpCommand> commands = [];
-            foreach(KeyValuePair<string, CommandMapAction> kvp in _map)
+            foreach(KeyValuePair<string, CommandMapAction> kvp in m_Map)
             {
                 // Odd case where a top level command exists
                 if (kvp.Value.Command != null)

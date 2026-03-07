@@ -7,8 +7,8 @@ namespace K9.OS.ScreenResolution
 {
     public class ScreenResolutionConfig
     {
-        public int Width { get; set; } = 1920;
-        public int Height { get; set; } = 1080;
+        public int Width = 1920;
+        public int Height = 1080;
 
 
         public static ScreenResolutionConfig Get(ConsoleApplication framework)

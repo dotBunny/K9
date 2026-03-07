@@ -9,8 +9,9 @@ K9 is by no means the most optimized battle-ready code, nor is it meant to be. I
 ### Git
 Git needs to be accessible from your command prompt; some Git clients do not add Git to the `PATH` so it may be easier to just use the installers found at: https://git-scm.com/download/.
 
-### .NET SDK 8.0
-The bootstrapped build requires the installation of the .NET 8.0 SDK, which can be found at: https://dotnet.microsoft.com/en-us/download/dotnet/8.0
+### .NET SDK 10.0
+The bootstrapped build requires the installation of the .NET 8.0 SDK, which can be found at: https://dotnet.microsoft.com/en-us/download/dotnet/10.0
+This is because we are targeting C# 14, in both .NET Runtime 10 for console applications, and .NET Standard 2.1 for shared libraries.
 
 ## Development
 

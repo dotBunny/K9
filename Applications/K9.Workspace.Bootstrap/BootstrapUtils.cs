@@ -8,6 +8,7 @@ using System.IO;
 using System.Linq;
 using System.Security;
 using System.Text;
+using System.Threading;
 using Microsoft.Build.Locator;
 
 namespace K9.Workspace.Bootstrap;
@@ -16,15 +17,15 @@ public static class BootstrapUtils
 {
     class ProcessLogObject(Action<int, string> outputAction)
     {
-        private int _processIdentifier;
+        private int m_ProcessIdentifier;
 
-        private readonly object _lockObject = new();
+        private readonly Lock m_LockObject = new();
 
         public void SetProcessIdentifier(int processIdentifier)
         {
-            lock (_lockObject)
+            lock (m_LockObject)
             {
-                _processIdentifier = processIdentifier;
+                m_ProcessIdentifier = processIdentifier;
             }
         }
         public void OutputHandler(object x, DataReceivedEventArgs y)
@@ -34,9 +35,9 @@ public static class BootstrapUtils
                 return;
             }
 
-            lock (_lockObject)
+            lock (m_LockObject)
             {
-                outputAction(_processIdentifier, y.Data.TrimEnd());
+                outputAction(m_ProcessIdentifier, y.Data.TrimEnd());
             }
         }
     }

@@ -10,21 +10,21 @@ namespace K9.Publish.SteamToken;
 
 public class SteamTokenConfig
 {
-    public bool ForceFlag { get; set; }
+    public bool ForceFlag;
 
-    public string? Token { get; set; }
-    public string InstallPackage { get; set; } = @"H:\Steamworks\SDK\161.zip";
-    public string InstallLocation { get; set; } = "D:\\Steam";
-    public string TokenFolder { get; set; }= @"H:\Steamworks\Tokens";
+    public string? Token;
+    public string InstallPackage = @"H:\Steamworks\SDK\161.zip";
+    public string InstallLocation = "D:\\Steam";
+    public string TokenFolder = @"H:\Steamworks\Tokens";
 
-    public string? NetworkUsername { get; set; }
-    public string? NetworkPassword { get; set; }
-    public string NetworkDrive { get; set; } = "H:";
-    public string NetworkShare { get; set; } = @"\\192.168.20.21\Horde"; // This is the farms NAS path to the Horde share
+    public string? AppBuild;
+    public int RetryCount = 3;
+    public string? TokenTarget;
 
-    public string? AppBuild{ get; set; }
-    public int RetryCount { get; set; } = 3;
-    public string? TokenTarget { get; set; }
+    string? m_NetworkUsername;
+    string? m_NetworkPassword;
+    string m_NetworkDrive = "H:";
+    string m_NetworkShare = @"\\192.168.20.21\Horde"; // This is the farms NAS path to the Horde share
 
     // ReSharper disable StringLiteralTypo
     public static SteamTokenConfig Get(ConsoleApplication framework)
@@ -38,26 +38,26 @@ public class SteamTokenConfig
         // Network Share Settings
         if (framework.Arguments.HasOverrideArgument("NETWORK-USERNAME"))
         {
-            config.NetworkUsername = framework.Arguments.OverrideArguments["NETWORK-USERNAME"];
+            config.m_NetworkUsername = framework.Arguments.OverrideArguments["NETWORK-USERNAME"];
         }
         if (framework.Arguments.HasOverrideArgument("NETWORK-PASSWORD"))
         {
-            config.NetworkPassword = framework.Arguments.OverrideArguments["NETWORK-PASSWORD"];
+            config.m_NetworkPassword = framework.Arguments.OverrideArguments["NETWORK-PASSWORD"];
         }
         if (framework.Arguments.HasOverrideArgument("NETWORK-DRIVE"))
         {
-            config.NetworkDrive = framework.Arguments.OverrideArguments["NETWORK-DRIVE"];
+            config.m_NetworkDrive = framework.Arguments.OverrideArguments["NETWORK-DRIVE"];
         }
         if (framework.Arguments.HasOverrideArgument("NETWORK-SHARE"))
         {
-            config.NetworkShare = framework.Arguments.OverrideArguments["NETWORK-SHARE"];
+            config.m_NetworkShare = framework.Arguments.OverrideArguments["NETWORK-SHARE"];
         }
 
         // We need to early configure the network share if we have a password
-        if (!string.IsNullOrEmpty(config.NetworkPassword) && !string.IsNullOrEmpty(config.NetworkUsername) && !Directory.Exists(config.TokenFolder))
+        if (!string.IsNullOrEmpty(config.m_NetworkPassword) && !string.IsNullOrEmpty(config.m_NetworkUsername) && !Directory.Exists(config.TokenFolder))
         {
-            Log.WriteLine($"Establishing network share {config.NetworkDrive} -> {config.NetworkShare}");
-            ProcessUtil.Execute("net", null, $"use {config.NetworkDrive} {config.NetworkShare} /USER:{config.NetworkUsername} {config.NetworkPassword}", null, (processIdentifier, line) =>
+            Log.WriteLine($"Establishing network share {config.m_NetworkDrive} -> {config.m_NetworkShare}");
+            ProcessUtil.Execute("net", null, $"use {config.m_NetworkDrive} {config.m_NetworkShare} /USER:{config.m_NetworkUsername} {config.m_NetworkPassword}", null, (processIdentifier, line) =>
             {
                 Log.WriteLine($"[{processIdentifier}]\t{line}");
             });

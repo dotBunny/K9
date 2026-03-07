@@ -13,6 +13,7 @@ namespace K9.Unreal.Types;
 
 internal static class Application
 {
+    // ReSharper disable InconsistentNaming
     public enum FileType
     {
         Text,
@@ -21,6 +22,8 @@ internal static class Application
         UTF16,
         Symlink
     }
+    // ReSharper restore InconsistentNaming
+
 
     public static string GetPerforceType(FileType type)
     {

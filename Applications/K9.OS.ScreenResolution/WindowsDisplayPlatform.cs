@@ -5,13 +5,14 @@ using System.Runtime.InteropServices;
 
 namespace K9.OS.ScreenResolution;
 
+// ReSharper disable once ClassNeverInstantiated.Global
 public class WindowsDisplayPlatform
 {
     // ReSharper disable IdentifierTypo
     // https://learn.microsoft.com/en-us/windows/win32/api/wingdi/ns-wingdi-devmodea
     [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Ansi)]
     // ReSharper disable once InconsistentNaming
-    public struct DEVMODEA
+    struct DEVMODEA
     {
         [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 32)]
         public string dmDeviceName;

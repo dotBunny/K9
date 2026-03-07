@@ -14,7 +14,7 @@ internal static class Application
     static void Main()
     {
         using ConsoleApplication framework = new(
-        new ConsoleApplicationSettings()
+        new ConsoleApplicationSettings
         {
             DefaultLogCategory = "K9",
             LogOutputs = [new ConsoleLogOutput()],

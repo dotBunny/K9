@@ -10,8 +10,7 @@ namespace K9
     {
         public const string Extension = ".k9.json";
 
-        [JsonPropertyName("actions")]
-        public required CommandVerb[] Actions { get; set; }
+        [JsonPropertyName("actions")] public required CommandVerb[] Actions;
 
         public string ToJson()
         {
@@ -26,23 +25,14 @@ namespace K9
 
         public class CommandVerb
         {
-            [JsonPropertyName("verb")]
-            public string? Identifier { get; set; }
-
-            [JsonPropertyName("command")]
-            public string? Command { get; set; }
-
-            [JsonPropertyName("workingDirectory")]
-            public string? WorkingDirectory { get; set; }
-
-            [JsonPropertyName("arguments")]
-            public string? Arguments { get; set; }
-
-            [JsonPropertyName("description")]
-            public string? Description { get; set; }
-
-            [JsonPropertyName("actions")]
-            public CommandVerb[]? Actions { get; set; }
+            // ReSharper disable UnassignedField.Global
+            [JsonPropertyName("verb")] public string? Identifier;
+            [JsonPropertyName("command")] public string? Command;
+            [JsonPropertyName("workingDirectory")] public string? WorkingDirectory;
+            [JsonPropertyName("arguments")] public string? Arguments;
+            [JsonPropertyName("description")] public string? Description;
+            [JsonPropertyName("actions")] public CommandVerb[]? Actions;
+            // ReSharper restore UnassignedField.Global
         }
     }
 }
