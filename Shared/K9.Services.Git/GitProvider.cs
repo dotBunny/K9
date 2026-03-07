@@ -121,8 +121,17 @@ public static class GitProvider
         ProcessLogRedirect logRedirect = new(ILogOutput.LogType.ExternalProcess, "GIT");
 
         Log.WriteLine($"{commandLineBuilder}{uri} {checkoutFolder}", "GIT");
-        ProcessUtil.Execute(executablePath, Directory.GetParent(checkoutFolder).GetPathWithCorrectCase(),
-            $"{commandLineBuilder}{uri} {checkoutFolder}", null, logRedirect.GetAction());
+        DirectoryInfo? info = Directory.GetParent(checkoutFolder);
+        if (info != null)
+        {
+            ProcessUtil.Execute(executablePath,info.GetPathWithCorrectCase(),
+                $"{commandLineBuilder}{uri} {checkoutFolder}", null, logRedirect.GetAction());
+        }
+        else
+        {
+            Log.WriteLine($"Unable to find parent directory for {checkoutFolder}", ILogOutput.LogType.Error, "GIT");
+            return;
+        }
 
         // Was a commit specified?
         if (commit == null)

@@ -12,7 +12,7 @@ public class ProcessMonitor
     public bool CheckResponding;
     public bool CheckHasExited;
 
-    public const int BAD_PID = -1;
+    public const int BadProcessIdentifier = -1;
 
     private readonly Process m_Process;
     public ProcessMonitor(int pid)
@@ -50,7 +50,7 @@ public class ProcessMonitor
     public static int GetPIDFromFile(string path)
     {
         Log.WriteLine($"Attempt to get PID from {path} ...");
-        int pid = BAD_PID;
+        int pid = BadProcessIdentifier;
 
         // Look for ProcessInfoPath
         if (File.Exists(path) && int.TryParse(File.ReadAllText(path).Trim(), out pid))

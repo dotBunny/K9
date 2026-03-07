@@ -60,7 +60,7 @@ internal static class Application
 
             // Get an existing running process, just in case It's still there and this app failed?
             int pid = ProcessMonitor.GetPIDFromFile(s_Settings.ProcessInfoPath);
-            if (pid != ProcessMonitor.BAD_PID &&
+            if (pid != ProcessMonitor.BadProcessIdentifier &&
                 ProcessMonitor.IsValidPID(pid) &&
                 ProcessMonitor.GetProcessName(pid) == Path.GetFileNameWithoutExtension(s_Settings.Application))
             {

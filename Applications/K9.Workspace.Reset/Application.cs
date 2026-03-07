@@ -65,7 +65,7 @@ internal static class Application
             return;
         }
         s_ProcessCount++;
-        Log.WriteLine("Clearing Project Artifacts ...");
+        Log.WriteLine("Clearing Unreal Project Artifacts ...");
         string[] projectDirectories = Directory.GetDirectories(settingsProvider.UnrealProjectsFolder);
         int projectCount = projectDirectories.Length;
         for (int i = 0; i < projectCount; i++)
@@ -96,7 +96,7 @@ internal static class Application
         Log.WriteLine("Clearing Project Plugin Artifacts ...");
         string[] projectDirectories = Directory.GetDirectories(settingsProvider.UnrealProjectsFolder);
         int projectCount = projectDirectories.Length;
-        Log.WriteLine($"Found  {projectCount} Projects.");
+        Log.WriteLine($"Found {projectCount} Unreal Projects.");
         for (int i = 0; i < projectCount; i++)
         {
             string projectDirectory = projectDirectories[i];
@@ -108,7 +108,7 @@ internal static class Application
 
             string[] pluginDefinitions = Directory.GetFiles(pluginBaseDirectory, "*.uplugin", SearchOption.AllDirectories);
             int pluginDefinitionsCount = pluginDefinitions.Length;
-            Log.WriteLine($"Found  {pluginDefinitionsCount} plugins in {pluginBaseDirectory}.");
+            Log.WriteLine($"Found {pluginDefinitionsCount} Unreal Plugins in {pluginBaseDirectory}.");
             for (int j = 0; j < pluginDefinitionsCount; j++)
             {
                 string? pluginFolder = Path.GetDirectoryName(pluginDefinitions[j]);

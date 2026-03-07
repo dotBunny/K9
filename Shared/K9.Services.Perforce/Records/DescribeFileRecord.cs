@@ -1,8 +1,6 @@
 // Copyright dotBunny Inc. All Rights Reserved.
 // See the LICENSE file at the repository root for more information.
 
-using System;
-
 namespace K9.Services.Perforce.Records;
 
 public class DescribeFileRecord
