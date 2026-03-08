@@ -10,15 +10,13 @@ namespace K9.Workspace.Bootstrap;
 
 internal static class Application
 {
-
     static bool s_QuietMode;
     static bool s_ShouldClone = true;
     static bool s_ShouldBuild = true;
     static bool s_ShouldSetupWorkspace = true;
     static bool s_UpdateCheck;
 
-
-
+    // UE Specific structure
     static readonly int k_CachedGenerateProjectFilesHash = "GenerateProjectFiles.bat".GetStableUpperCaseHashCode();
     static readonly int k_CachedSetupHash = "Setup.bat".GetStableUpperCaseHashCode();
 

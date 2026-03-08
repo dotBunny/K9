@@ -10,6 +10,10 @@ namespace K9.Core;
 
 public class ConsoleApplication : IDisposable
 {
+    public static string DateTimeLongFormat = "yyyy-MM-dd HH:mm:ss";
+    public static string TimeShortFormat = "HH:mm:ss";
+    public static string DateShortFormat = "yyyy-MM-dd";
+    
 	private const string k_LogCategory = "CORE";
 
     // Builtin Modules
