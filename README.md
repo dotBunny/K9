@@ -21,17 +21,17 @@ In 2026, a modernization effort was made to bring all applications to target C# 
 
 ## Applications
 
-| Documentation                                                                           | Description                                                                    |
-|:----------------------------------------------------------------------------------------|:-------------------------------------------------------------------------------|
-| [K9.OS.FileReplacer](Applications/K9.OS.FileReplacer/K9.OS.FileReplacer.md)             | A tool to replace content in an existing file.                                 |
-| [K9.OS.KeepAlive](Applications/K9.OS.KeepAlive/K9.OS.KeepAlive.md)                      | A tool to monitor and restart a given process.                                 |
-| [K9.OS.ScreenResolution](Applications/K9.OS.ScreenResolution/K9.OS.ScreenResolution.md) | A tool to force a specific screen resolution.                                  |
-| [K9.Publish.SteamToken](Applications/K9.Publish.SteamToken/K9.Publish.SteamToken.md)    | A tool to support SteamGuard token storage and retrieval.                      |
-| [K9.Unreal.Types](Applications/K9.Unreal.Types/K9.Unreal.Types.md)                      | A tool to detect improper types of files in Perforce for Unreal Engine source. |
-| [K9.Workspace.Bootstrap](Applications/K9.Workspace.Bootstrap/K9.Workspace.Bootstrap.md) | A tool to bootstrap a user-workspace.                                          |
-| [K9.Workspace.Reset](Applications/K9.Workspace.Reset/K9.Workspace.Reset.md)             | A tool to reset a user-workspace.                                              |
-| [K9.Workspace.Setup](Applications/K9.Workspace.Setup/K9.Workspace.Setup.md)             | A tool to setup a user-workspace.                                              |
-| [K9](Applications/K9/K9.md)                                                             | A tool to execute pre-defined tasks.                                           |
+| Documentation                                                                              | Description                                                                    |
+|:-------------------------------------------------------------------------------------------|:-------------------------------------------------------------------------------|
+| [K9.OS.FileReplacer](Applications/K9.OS.FileReplacer/K9.OS.FileReplacer.md)                | A tool to replace content in an existing file.                                 |
+| [K9.OS.KeepAlive](Applications/K9.OS.KeepAlive/K9.OS.KeepAlive.md)                         | A tool to monitor and restart a given process.                                 |
+| [K9.OS.ScreenResolution](Applications/K9.OS.ScreenResolution/K9.OS.ScreenResolution.md)    | A tool to force a specific screen resolution.                                  |
+| [K9.Publish.SteamToken](Applications/K9.Publish.SteamToken/K9.Publish.SteamToken.md)       | A tool to support SteamGuard token storage and retrieval.                      |
+| [K9.Unreal.PerforceTypes](Applications/K9.Unreal.PerforceTypes/K9.Unreal.PerforceTypes.md) | A tool to detect improper types of files in Perforce for Unreal Engine source. |
+| [K9.Workspace.Bootstrap](Applications/K9.Workspace.Bootstrap/K9.Workspace.Bootstrap.md)    | A tool to bootstrap a user-workspace.                                          |
+| [K9.Workspace.Reset](Applications/K9.Workspace.Reset/K9.Workspace.Reset.md)                | A tool to reset a user-workspace.                                              |
+| [K9.Workspace.Setup](Applications/K9.Workspace.Setup/K9.Workspace.Setup.md)                | A tool to setup a user-workspace.                                              |
+| [K9](Applications/K9/K9.md)                                                                | A tool to execute pre-defined tasks.                                           |
 
 ## Workspace
 

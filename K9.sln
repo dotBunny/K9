@@ -54,7 +54,7 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Unreal", "Unreal", "{E4CCF069-9072-4D74-B000-2D2ABB660096}"
 EndProject
 
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "K9.Unreal.Types", "Applications\K9.Unreal.Types\K9.Unreal.Types.csproj", "{254F8EE5-1B23-4735-AB5C-E242497430F0}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "K9.Unreal.PerforceTypes", "Applications\K9.Unreal.PerforceTypes\K9.Unreal.PerforceTypes.csproj", "{254F8EE5-1B23-4735-AB5C-E242497430F0}"
 EndProject
 
 # Workspace Projects (E4CCF069-9072-4D74-B000-2D2ABB660097)
