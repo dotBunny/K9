@@ -14,8 +14,7 @@
     <Authors>dotBunny</Authors>
     <Company>dotBunny Inc.</Company>
     <RepositoryUrl>https://github.com/dotBunny/K9</RepositoryUrl>
-    <LangVersion>14</LangVersion>
-    <RootNamespace>K9.OS.CreateArtifact.Program</RootNamespace>
+    <LangVersion>14</LangVersion>    
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">

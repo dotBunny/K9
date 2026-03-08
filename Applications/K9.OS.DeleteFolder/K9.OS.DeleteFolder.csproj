@@ -15,7 +15,6 @@
     <Company>dotBunny Inc.</Company>
     <RepositoryUrl>https://github.com/dotBunny/K9</RepositoryUrl>
     <LangVersion>14</LangVersion>
-    <RootNamespace>K9.OS.DeleteFolder.Program</RootNamespace>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
