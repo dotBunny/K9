@@ -47,7 +47,7 @@ trim_trailing_whitespace = false
 
 ## CSHARP FILES / SETTINGS
 [*.cs]
-file_header_template = Copyright (c) 2020-2024 dotBunny Inc.\ndotBunny licenses this file to you under the BSL-1.0 license.\nSee the LICENSE file in the project root for more information.
+file_header_template = Copyright dotBunny Inc. All Rights Reserved.\See the LICENSE file at the repository root for more information.
 indent_size = 4
 
 ### RULES

@@ -15,6 +15,8 @@ namespace K9.Workspace.Bootstrap;
 
 public static class BootstrapUtils
 {
+    public const string BuildInfoFileName = "K9_BUILD_SHA";
+
     class ProcessLogObject(Action<int, string> outputAction)
     {
         private int m_ProcessIdentifier;
@@ -265,6 +267,17 @@ public static class BootstrapUtils
             });
 
         return output[0].Trim();
+    }
+
+    public static string GetBuildCommit(string sourceFolder)
+    {
+        string filePath = Path.Combine(sourceFolder, BuildInfoFileName);
+        return File.Exists(filePath) ? File.ReadAllText(filePath).Trim() : "Undefined";
+    }
+
+    public static void SetBuildCommit(string sourceFolder, string value)
+    {
+        File.WriteAllText(Path.Combine(sourceFolder, BuildInfoFileName), value);
     }
 
     public static void GitUpdateRepo(string checkoutFolder, string? branch = null, string? commit = null,

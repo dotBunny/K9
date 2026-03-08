@@ -24,7 +24,7 @@ public class ConsoleApplication : IDisposable
     readonly bool m_DisplayRuntime;
 
 	public ConsoleApplication(ConsoleApplicationSettings settings)
-	{
+    {
         // Immediately setup logging
         if (settings.DefaultLogCategory != null)
         {

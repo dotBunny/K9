@@ -10,12 +10,14 @@ namespace K9.Workspace.Bootstrap;
 
 internal static class Application
 {
+
     static bool s_QuietMode;
     static bool s_ShouldClone = true;
     static bool s_ShouldBuild = true;
     static bool s_ShouldSetupWorkspace = true;
+    static bool s_UpdateCheck;
 
-    const string k_BuildInfo = "K9_BUILD_SHA";
+
 
     static readonly int k_CachedGenerateProjectFilesHash = "GenerateProjectFiles.bat".GetStableUpperCaseHashCode();
     static readonly int k_CachedSetupHash = "Setup.bat".GetStableUpperCaseHashCode();
@@ -57,10 +59,18 @@ internal static class Application
             // Grab anything relevant from the command line args
             ParseArguments(args);
 
-            // Run through steps
-            CloneSource(sourceFolder);
-            BuildSource(sourceFolder);
-            WorkspaceSetup(workspaceRoot);
+            // Process things
+            if (s_UpdateCheck)
+            {
+                Environment.ExitCode = UpdateWorkspace(sourceFolder);
+            }
+            else
+            {
+                // Run through steps
+                CloneSource(sourceFolder);
+                BuildSource(sourceFolder);
+                WorkspaceSetup(workspaceRoot);
+            }
         }
         catch (Exception ex)
         {
@@ -78,6 +88,10 @@ internal static class Application
 
         for (int i = 0; i < count; i++)
         {
+            if (arguments[i] == "update")
+            {
+                s_UpdateCheck = true;
+            }
 
             if (arguments[i] == "no-clone")
             {
@@ -100,6 +114,13 @@ internal static class Application
             }
         }
 
+        if (s_UpdateCheck)
+        {
+            Console.WriteLine("Update Mode!");
+            Console.WriteLine("Checking for remote updates against local installation and building projects if found.");
+            return;
+        }
+
         // Not outputting settings cause we are being quiet
         if (s_QuietMode)
         {
@@ -112,6 +133,56 @@ internal static class Application
         Console.WriteLine($"\tSetup Workspace\t{s_ShouldSetupWorkspace}");
         Console.WriteLine($"\tQuiet Mode\t{s_QuietMode}");
     }
+
+    static int UpdateWorkspace(string? sourceFolder)
+    {
+        // Disable interaction for an update process, it should be transparent
+        s_QuietMode = true;
+
+        // Extra safe
+        if (sourceFolder == null || !Directory.Exists(sourceFolder))
+        {
+            Console.WriteLine("Skipping Updating (Null Source Folder) ...");
+            return -1;
+        }
+
+        if (Directory.Exists(Path.Combine(sourceFolder, ".git")))
+        {
+            try
+            {
+                BootstrapUtils.GitUpdateRepo(sourceFolder);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine("Unable to check repo, but not failing: " + e.Message);
+                return 0;
+            }
+        }
+        else
+        {
+            Console.WriteLine("Skipping Updating (Null Source Folder) ...");
+            return -1;
+        }
+
+        string localCommitHash = BootstrapUtils.GitGetLocalCommit(sourceFolder);
+        string buildCommitHash = BootstrapUtils.GetBuildCommit(sourceFolder);
+
+        Console.WriteLine("Local Commit: " + localCommitHash);
+        Console.WriteLine("Build Commit: " + buildCommitHash);
+
+        if (localCommitHash != buildCommitHash)
+        {
+            Console.WriteLine("K9 needs to be rebuilt!");
+            s_ShouldBuild = true;
+            BuildSource(sourceFolder);
+        }
+        else
+        {
+            Console.WriteLine("K9 is up to date!");
+        }
+        return 0;
+    }
+
     static void CloneSource(string? sourceFolder)
     {
         if (!s_ShouldClone)
@@ -140,11 +211,11 @@ internal static class Application
         // Get or update the source
         if (Directory.Exists(Path.Combine(sourceFolder, ".git")))
         {
-            GitUpdateRepo(sourceFolder);
+            BootstrapUtils.GitUpdateRepo(sourceFolder);
         }
         else
         {
-            GitCheckoutRepo("https://github.com/dotBunny/K9.git", sourceFolder);
+           BootstrapUtils.GitCheckoutRepo("https://github.com/dotBunny/K9.git", sourceFolder);
         }
 #endif
     }
@@ -189,7 +260,7 @@ internal static class Application
         // Check that we had a good build
         if (exitCode == 0)
         {
-            File.WriteAllText(Path.Combine(sourceFolder, k_BuildInfo), BootstrapUtils.GitGetLocalCommit(sourceFolder));
+            BootstrapUtils.SetBuildCommit(sourceFolder, BootstrapUtils.GitGetLocalCommit(sourceFolder));
         }
     }
     static void WorkspaceSetup(string workspaceRoot)

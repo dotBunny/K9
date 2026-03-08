@@ -10,6 +10,8 @@ public class GitInfoGenerator : IIncrementalGenerator
 {
     public void Initialize(IncrementalGeneratorInitializationContext context)
     {
+        // TODO: This could be turned into a provider, that would cash the revision and then only add when it changed.
+        // Currently this runs every build
         context.RegisterPostInitializationOutput(ctx =>
         {
             // Figure out the GIT head hash
