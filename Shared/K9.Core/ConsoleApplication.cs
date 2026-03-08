@@ -46,7 +46,7 @@ public class ConsoleApplication : IDisposable
 
         if (settings.DisplayHeader)
         {
-            Log.WriteLine($"Core Framework v{m_Assembly.CoreAssembly.GetName().Version}", ILogOutput.LogType.Notice);
+            Log.WriteLine($"Core Framework v{m_Assembly.CoreAssembly.GetName().Version} @ {GitInfo.Head}", ILogOutput.LogType.Notice);
         }
         m_DisplayRuntime = settings.DisplayRuntime;
 

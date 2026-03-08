@@ -46,6 +46,9 @@
     <ProjectReference Include="..\..\Shared\K9.Core\K9.Core.csproj" />
     <ProjectReference Include="..\..\Shared\K9.Services.Git\K9.Services.Git.csproj" />
     <ProjectReference Include="..\..\Shared\K9.Services.Perforce\K9.Services.Perforce.csproj" />
+    <ProjectReference Include="..\..\Shared\K9.Generator.GitInfo\K9.Generator.GitInfo.csproj"
+                      OutputItemType="Analyzer"
+                      ReferenceOutputAssembly="false" />
   </ItemGroup>
 
 </Project>

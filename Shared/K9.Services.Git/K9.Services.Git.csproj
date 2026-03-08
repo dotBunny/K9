@@ -32,6 +32,9 @@
 
   <ItemGroup>
     <ProjectReference Include="..\K9.Core\K9.Core.csproj" />
+    <ProjectReference Include="..\K9.Generator.GitInfo\K9.Generator.GitInfo.csproj"
+                      OutputItemType="Analyzer"
+                      ReferenceOutputAssembly="false" />
   </ItemGroup>
 
 </Project>
