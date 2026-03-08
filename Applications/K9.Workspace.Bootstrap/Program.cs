@@ -8,7 +8,7 @@ using System.Reflection;
 
 namespace K9.Workspace.Bootstrap;
 
-internal static class Application
+internal static class Program
 {
     static bool s_QuietMode;
     static bool s_ShouldClone = true;
@@ -24,7 +24,7 @@ internal static class Application
     {
         try
         {
-            Assembly? assembly = Assembly.GetAssembly(typeof(Application));
+            Assembly? assembly = Assembly.GetAssembly(typeof(Program));
 
             if (assembly != null)
                 Console.WriteLine($"K9 Bootstrap {assembly.GetName().Version} @ {GitInfo.Head}");

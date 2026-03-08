@@ -10,7 +10,7 @@ using K9.Core.Utils;
 
 namespace K9.Publish.SteamToken;
 
-internal static class Application
+internal static class Program
 {
     static FileLock? s_Token;
     static string? s_TokenUsername;

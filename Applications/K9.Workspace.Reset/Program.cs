@@ -9,7 +9,7 @@ using K9.Services.Perforce;
 
 namespace K9.Workspace.Reset;
 
-internal static class Application
+internal static class Program
 {
     static int s_ProcessCount;
 

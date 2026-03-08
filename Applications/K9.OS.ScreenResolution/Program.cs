@@ -7,7 +7,7 @@ using K9.Core.Modules;
 
 namespace K9.OS.ScreenResolution;
 
-internal static class Application
+internal static class Program
 {
     static void Main()
     {

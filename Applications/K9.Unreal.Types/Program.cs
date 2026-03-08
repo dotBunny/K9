@@ -11,7 +11,7 @@ using K9.Services.Perforce;
 
 namespace K9.Unreal.Types;
 
-internal static class Application
+internal static class Program
 {
     // ReSharper disable InconsistentNaming
     public enum FileType

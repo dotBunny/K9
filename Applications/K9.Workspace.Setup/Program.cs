@@ -12,7 +12,7 @@ using K9.Services.Perforce;
 
 namespace K9.Workspace.Setup;
 
-internal static class Application
+internal static class Program
 {
     static void Main()
     {
@@ -110,7 +110,7 @@ internal static class Application
 #if DEBUG
             Log.WriteLine("Skipping Building (Debug Mode) ...");
 #else
-            ProcessUtil.SpawnSeperate("dotnet", $"{settings.BoostrapLibrary} quiet", null, true);
+            ProcessUtil.SpawnShell("dotnet", $"{settings.BoostrapLibrary} quiet", null, true);
             framework.Shutdown(true);
 #endif
         }

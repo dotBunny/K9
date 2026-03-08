@@ -10,7 +10,7 @@ using K9.Core.Utils;
 
 namespace K9.OS.KeepAlive;
 
-internal static class Application
+internal static class Program
 {
     static bool s_Alive = true;
     static DateTime s_LastHeartbeat;

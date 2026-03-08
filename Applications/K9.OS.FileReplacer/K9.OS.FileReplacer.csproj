@@ -1,7 +1,6 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <StartupObject>K9.OS.FileReplacer.Application</StartupObject>
     <AssemblyName>K9.OS.FileReplacer</AssemblyName>
     <OutputType>Exe</OutputType>
     <TargetFramework>net10.0</TargetFramework>
@@ -16,6 +15,7 @@
     <Company>dotBunny Inc.</Company>
     <RepositoryUrl>https://github.com/dotBunny/K9</RepositoryUrl>
     <LangVersion>14</LangVersion>
+    <RootNamespace>K9.OS.FileReplacer.Program</RootNamespace>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
@@ -28,7 +28,7 @@
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Workspace|AnyCPU'">
     <IsPublishable>False</IsPublishable>
-    <OutputPath>..\..\..\..\..\Binaries\DotNET</OutputPath>
+    <OutputPath>..\..\..\Binaries</OutputPath>
   </PropertyGroup>
 
   <ItemGroup>

@@ -9,7 +9,7 @@ using static K9.CommandMap;
 
 namespace K9;
 
-internal static class Application
+internal static class Program
 {
     static void Main()
     {

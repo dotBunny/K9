@@ -9,7 +9,7 @@ using K9.Core.Utils;
 
 namespace K9.OS.FileReplacer;
 
-internal static class Application
+internal static class Program
 {
     static void Main()
     {

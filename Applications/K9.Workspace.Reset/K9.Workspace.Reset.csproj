@@ -1,7 +1,6 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <StartupObject>K9.Workspace.Reset.Application</StartupObject>
     <AssemblyName>K9.Workspace.Reset</AssemblyName>
     <OutputType>Exe</OutputType>
     <TargetFramework>net10.0</TargetFramework>
@@ -28,7 +27,7 @@
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Workspace|AnyCPU'">
     <IsPublishable>False</IsPublishable>
-    <OutputPath>..\..\..\..\..\Binaries\DotNET</OutputPath>
+    <OutputPath>..\..\..\Binaries</OutputPath>
   </PropertyGroup>
 
   <ItemGroup>
