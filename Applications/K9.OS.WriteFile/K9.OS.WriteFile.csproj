@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <AssemblyName>K9.OS.CleanFolder</AssemblyName>
+    <AssemblyName>K9.OS.WriteFile</AssemblyName>
     <OutputType>Exe</OutputType>
     <TargetFramework>net10.0</TargetFramework>
     <ImplicitUsings>disable</ImplicitUsings>
@@ -15,7 +15,7 @@
     <Company>dotBunny Inc.</Company>
     <RepositoryUrl>https://github.com/dotBunny/K9</RepositoryUrl>
     <LangVersion>14</LangVersion>
-    <RootNamespace>K9.OS.CleanFolder.Program</RootNamespace>
+    <RootNamespace>K9.OS.WriteFile.Program</RootNamespace>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
