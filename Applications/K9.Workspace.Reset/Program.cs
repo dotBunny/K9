@@ -18,7 +18,7 @@ internal static class Program
         using ConsoleApplication framework = new(
         new ConsoleApplicationSettings()
         {
-            DefaultLogCategory = "WORKSPACE.RESET",
+            DefaultLogCategory = "RESET",
             LogOutputs = [new ConsoleLogOutput()]
         }, new ProgramProvider());
 

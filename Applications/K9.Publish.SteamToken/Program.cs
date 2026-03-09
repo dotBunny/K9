@@ -100,7 +100,7 @@ internal static class Program
         new ConsoleApplicationSettings()
         {
             // ReSharper disable once StringLiteralTypo
-            DefaultLogCategory = "PUBLISH.STEAMTOKEN",
+            DefaultLogCategory = "STEAMTOKEN",
             LogOutputs = [new Core.LogOutputs.ConsoleLogOutput()]
         }, new SteamTokenProvider());
 

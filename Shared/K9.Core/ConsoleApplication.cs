@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using K9.Core.Modules;
 using K9.Core.Utils;
@@ -53,8 +54,9 @@ public class ConsoleApplication : IDisposable
 
         if (settings.DisplayHeader)
         {
-            Log.WriteLine($"Core Framework v{m_Assembly.CoreAssembly.GetName().Version} @ {GitInfo.Head}", ILogOutput.LogType.Notice);
+            Log.WriteLine($"Core Framework @ {GetCoreGitHead()}", ILogOutput.LogType.Notice);
         }
+
         m_DisplayRuntime = settings.DisplayRuntime;
 
         if (settings.RequiresElevatedAccess && !ProcessUtil.IsElevated())
@@ -137,33 +139,33 @@ public class ConsoleApplication : IDisposable
     {
         if (m_Assembly.EntryAssembly != null)
         {
-            Log.WriteLine($"# {m_Assembly.EntryAssembly.GetName().Name} #", ILogOutput.LogType.Notice);
+            Log.WriteLine($"# {m_Assembly.EntryAssembly.GetName().Name} #", ILogOutput.LogType.Info);
         }
 
         // Do we have a description to output?
         if (!string.IsNullOrEmpty(ProgramProvider.GetDescription()))
         {
-            Log.WriteLine($"{ProgramProvider.GetDescription()}", ILogOutput.LogType.Notice);
+            Log.WriteLine($"{ProgramProvider.GetDescription()}", ILogOutput.LogType.Info);
         }
 
         // Output argument help
         KeyValuePair<string, string>[] arguments = ProgramProvider.GetArgumentHelp();
         if (arguments.Length > 0)
         {
-            Log.WriteLine("Arguments:", ILogOutput.LogType.Notice);
+            Log.WriteLine("Arguments:", ILogOutput.LogType.Info);
             foreach (KeyValuePair<string, string> argument in arguments)
             {
-                Log.WriteLine($"\t{argument.Key}: {argument.Value}", ILogOutput.LogType.Notice);
+                Log.WriteLine($"\t{argument.Key}: {argument.Value}", ILogOutput.LogType.Info);
             }
         }
         // Output flag help
         KeyValuePair<string, string>[] flags = ProgramProvider.GetFlagHelp();
         if (flags.Length > 0)
         {
-            Log.WriteLine("Flags:", ILogOutput.LogType.Notice);
+            Log.WriteLine("Flags:", ILogOutput.LogType.Info);
             foreach (KeyValuePair<string, string> flag in flags)
             {
-                Log.WriteLine($"\t{flag.Key}: {flag.Value}", ILogOutput.LogType.Notice);
+                Log.WriteLine($"\t{flag.Key}: {flag.Value}", ILogOutput.LogType.Info);
             }
         }
     }
@@ -181,5 +183,20 @@ public class ConsoleApplication : IDisposable
     public void Dispose()
     {
         Shutdown();
+    }
+
+    public string GetCoreGitHead()
+    {
+        FileVersionInfo fvi = FileVersionInfo.GetVersionInfo(m_Assembly.CoreAssembly.Location);
+        string[] productVersion = fvi.ProductVersion.Split('+');
+        return productVersion.Length == 2 ? productVersion[1] : "Unknown";
+    }
+
+    public string GetApplicationGitHead()
+    {
+        if (m_Assembly.EntryAssembly == null) return "Unknown";
+        FileVersionInfo fvi = FileVersionInfo.GetVersionInfo(m_Assembly.EntryAssembly.Location);
+        string[] productVersion = fvi.ProductVersion.Split('+');
+        return productVersion.Length == 2 ? productVersion[1] : "Unknown";
     }
 }

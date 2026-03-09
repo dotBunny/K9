@@ -52,7 +52,7 @@ internal static class Program
         using ConsoleApplication framework = new(
         new ConsoleApplicationSettings()
         {
-            DefaultLogCategory = "UNREAL.TYPES",
+            DefaultLogCategory = "P4TYPES",
             LogOutputs = [new ConsoleLogOutput()]
         }, new PerforceTypesProvider());
 

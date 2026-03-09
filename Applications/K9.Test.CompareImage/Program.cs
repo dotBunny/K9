@@ -18,7 +18,7 @@ internal static class Program
             new ConsoleApplicationSettings()
             {
                 // ReSharper disable once StringLiteralTypo
-                DefaultLogCategory = "TEST.COMPAREIMAGE",
+                DefaultLogCategory = "COMPAREIMAGE",
                 LogOutputs = [new Core.LogOutputs.ConsoleLogOutput()]
             },
             new CompareImageProvider());

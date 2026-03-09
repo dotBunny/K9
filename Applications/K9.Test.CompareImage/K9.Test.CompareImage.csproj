@@ -32,13 +32,20 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\Shared\K9.Core\K9.Core.csproj" />
-    <ProjectReference Include="..\..\Shared\K9.Generator.GitInfo\K9.Generator.GitInfo.csproj"
-                      OutputItemType="Analyzer"
-                      ReferenceOutputAssembly="false" />
   </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="System.Drawing.Common" Version="10.0.3" />
   </ItemGroup>
+
+  <Target Name="PreBuild" BeforeTargets="PreBuildEvent">
+    <Exec Command="git rev-parse HEAD" StandardOutputImportance="Low" ConsoleToMsBuild="true">
+      <Output TaskParameter="ConsoleOutput" PropertyName="SourceRevisionId" />
+      <Output TaskParameter="ExitCode" PropertyName="ExecExitCode" />
+    </Exec>
+    <PropertyGroup>
+      <SourceRevisionId Condition="'$(ExecExitCode)' != '0'">Unknown</SourceRevisionId>
+    </PropertyGroup>
+  </Target>
 
 </Project>

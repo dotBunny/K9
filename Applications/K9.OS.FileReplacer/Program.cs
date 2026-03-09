@@ -17,7 +17,7 @@ internal static class Program
         new ConsoleApplicationSettings()
         {
             // ReSharper disable once StringLiteralTypo
-            DefaultLogCategory = "OS.FILEREPLACER",
+            DefaultLogCategory = "FILEREPLACER",
             LogOutputs = [new Core.LogOutputs.ConsoleLogOutput()]
         }, new FileReplacerProvider());
 

@@ -16,7 +16,7 @@ internal static class Program
         {
 
             // ReSharper disable once StringLiteralTypo
-            DefaultLogCategory = "OS.SCREENRESOLUTION",
+            DefaultLogCategory = "SCREENRES",
             LogOutputs = [new Core.LogOutputs.ConsoleLogOutput()]
         },
         new ScreenResolutionProvider());

@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Reflection;
 
@@ -27,7 +28,20 @@ internal static class Program
             Assembly? assembly = Assembly.GetAssembly(typeof(Program));
 
             if (assembly != null)
-                Console.WriteLine($"K9 Bootstrap {assembly.GetName().Version} @ {GitInfo.Head}");
+            {
+                string gitHead = "Unknown";
+                FileVersionInfo fvi = FileVersionInfo.GetVersionInfo(assembly.Location);
+                if (fvi.ProductVersion != null)
+                {
+                    string[] productVersion = fvi.ProductVersion.Split('+');
+                    if (productVersion.Length == 2)
+                    {
+                        gitHead = productVersion[1];
+                    }
+                }
+
+                Console.WriteLine($"K9 Bootstrap {assembly.GetName().Version} @ {gitHead}");
+            }
 
             string? msBuildPath = BootstrapUtils.GetMSBuild();
             if (msBuildPath == null)

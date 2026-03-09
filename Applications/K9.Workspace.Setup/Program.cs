@@ -19,7 +19,7 @@ internal static class Program
         using ConsoleApplication framework = new(
         new ConsoleApplicationSettings()
         {
-            DefaultLogCategory = "WORKSPACE.SETUP",
+            DefaultLogCategory = "SETUP",
             LogOutputs = [new ConsoleLogOutput()],
             PauseOnExit = true,
             RequiresElevatedAccess = true,

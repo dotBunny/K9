@@ -21,7 +21,7 @@ internal static class Program
         using ConsoleApplication framework = new(
          new ConsoleApplicationSettings
          {
-             DefaultLogCategory = "OS.KEEPALIVE",
+             DefaultLogCategory = "KEEPALIVE",
              LogOutputs = [new Core.LogOutputs.ConsoleLogOutput()],
              PauseOnExit = true,
              RequiresElevatedAccess = false,

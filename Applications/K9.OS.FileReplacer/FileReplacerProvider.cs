@@ -25,7 +25,7 @@ public class FileReplacerProvider : ProgramProvider
         KeyValuePair<string, string>[] lines = new KeyValuePair<string, string>[4];
 
         lines[0] = new KeyValuePair<string, string>("SOURCE", "The absolute path of the file to read the content to be replaced from.");
-        lines[1] = new KeyValuePair<string, string>("TARGET", "The absolute path of the file to write the replaced content to.\n\t\t(Optional: Uses the SOURCE file as TARGET)");
+        lines[1] = new KeyValuePair<string, string>("TARGET", "The absolute path of the file to write the replaced content to. (Optional: Uses the SOURCE file as TARGET)");
         lines[2] = new KeyValuePair<string, string>("KEY", "A comma delimited list of strings to replace.");
         lines[3] = new KeyValuePair<string, string>("VALUE", "A comma delimited list of values to replace the identified keys with.");
 
