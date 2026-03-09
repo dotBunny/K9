@@ -102,11 +102,12 @@ internal static class Program
             // ReSharper disable once StringLiteralTypo
             DefaultLogCategory = "PUBLISH.STEAMTOKEN",
             LogOutputs = [new Core.LogOutputs.ConsoleLogOutput()]
-        });
+        }, new SteamTokenConfig());
 
         try
         {
-            SteamTokenConfig config = SteamTokenConfig.Get(framework);
+            // Get the filled-out config
+            SteamTokenConfig config = (SteamTokenConfig)framework.Config;
 
             // Check for existing installation
             if (!Directory.Exists(Path.Combine(config.InstallLocation, "sdk")))

@@ -21,7 +21,7 @@ internal static class Program
             PauseOnExit = false,
             DisplayHeader = false,
             DisplayRuntime = false
-        });
+        }, new ProgramConfig());
 
         try
         {

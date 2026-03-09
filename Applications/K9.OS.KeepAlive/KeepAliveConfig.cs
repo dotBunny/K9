@@ -6,6 +6,7 @@ using System.IO;
 using System.Text.Json.Serialization;
 using System.Text.Json;
 using K9.Core;
+using K9.Core.Modules;
 
 namespace K9.OS.KeepAlive;
 
@@ -25,6 +26,7 @@ public class KeepAliveConfig
 
     public bool CheckResponding = true;
     public bool CheckHasExited = true;
+    
 
     public static KeepAliveConfig Get(string? jsonPath = null)
     {

@@ -2,28 +2,28 @@
 // See the LICENSE file at the repository root for more information.
 
 using K9.Core;
+using K9.Core.Modules;
 
 namespace K9.OS.ScreenResolution
 {
-    public class ScreenResolutionConfig
+    public class ScreenResolutionConfig : ProgramConfig
     {
         public int Width = 1920;
         public int Height = 1080;
 
-        public static ScreenResolutionConfig Get(ConsoleApplication framework)
+        public override void Parse(ArgumentsModule args)
         {
-            ScreenResolutionConfig config = new();
+            base.Parse(args);
 
-            if (framework.Arguments.HasOverrideArgument("HEIGHT"))
+            if (args.HasOverrideArgument("HEIGHT"))
             {
-                config.Height = int.Parse(framework.Arguments.OverrideArguments["HEIGHT"]);
+                Height = int.Parse(args.OverrideArguments["HEIGHT"]);
             }
 
-            if (framework.Arguments.HasOverrideArgument("WIDTH"))
+            if (args.HasOverrideArgument("WIDTH"))
             {
-                config.Width = int.Parse(framework.Arguments.OverrideArguments["WIDTH"]);
+                Width = int.Parse(args.OverrideArguments["WIDTH"]);
             }
-            return config;
         }
     }
 }

@@ -23,7 +23,7 @@ internal static class Program
             LogOutputs = [new ConsoleLogOutput()],
             PauseOnExit = true,
             RequiresElevatedAccess = true,
-        });
+        }, new ProgramConfig());
 
         try
         {

@@ -4,11 +4,12 @@
 using System;
 using System.IO;
 using K9.Core;
+using K9.Core.Modules;
 using K9.Core.Utils;
 
 namespace K9.Publish.SteamToken;
 
-public class SteamTokenConfig
+public class SteamTokenConfig : ProgramConfig
 {
     public bool ForceFlag;
 
@@ -27,104 +28,103 @@ public class SteamTokenConfig
     string m_NetworkShare = @"\\192.168.20.21\Horde"; // This is the farms NAS path to the Horde share
 
     // ReSharper disable StringLiteralTypo
-    public static SteamTokenConfig Get(ConsoleApplication framework)
+    public override void Parse(ArgumentsModule args)
     {
-        // ReSharper disable once UseObjectOrCollectionInitializer
-        SteamTokenConfig config = new();
+        base.Parse(args);
 
         // Should we force operations?
-        config.ForceFlag = framework.Arguments.BaseArguments.Contains("FORCE");
+        ForceFlag = args.BaseArguments.Contains("FORCE");
 
         // Network Share Settings
-        if (framework.Arguments.HasOverrideArgument("NETWORK-USERNAME"))
+        if (args.HasOverrideArgument("NETWORK-USERNAME"))
         {
-            config.m_NetworkUsername = framework.Arguments.OverrideArguments["NETWORK-USERNAME"];
+            m_NetworkUsername = args.OverrideArguments["NETWORK-USERNAME"];
         }
-        if (framework.Arguments.HasOverrideArgument("NETWORK-PASSWORD"))
+        if (args.HasOverrideArgument("NETWORK-PASSWORD"))
         {
-            config.m_NetworkPassword = framework.Arguments.OverrideArguments["NETWORK-PASSWORD"];
+            m_NetworkPassword = args.OverrideArguments["NETWORK-PASSWORD"];
         }
-        if (framework.Arguments.HasOverrideArgument("NETWORK-DRIVE"))
+        if (args.HasOverrideArgument("NETWORK-DRIVE"))
         {
-            config.m_NetworkDrive = framework.Arguments.OverrideArguments["NETWORK-DRIVE"];
+            m_NetworkDrive = args.OverrideArguments["NETWORK-DRIVE"];
         }
-        if (framework.Arguments.HasOverrideArgument("NETWORK-SHARE"))
+        if (args.HasOverrideArgument("NETWORK-SHARE"))
         {
-            config.m_NetworkShare = framework.Arguments.OverrideArguments["NETWORK-SHARE"];
+            m_NetworkShare = args.OverrideArguments["NETWORK-SHARE"];
         }
 
         // We need to early configure the network share if we have a password
-        if (!string.IsNullOrEmpty(config.m_NetworkPassword) && !string.IsNullOrEmpty(config.m_NetworkUsername) && !Directory.Exists(config.TokenFolder))
+        if (!string.IsNullOrEmpty(m_NetworkPassword) && !string.IsNullOrEmpty(m_NetworkUsername) && !Directory.Exists(TokenFolder))
         {
-            Log.WriteLine($"Establishing network share {config.m_NetworkDrive} -> {config.m_NetworkShare}");
-            ProcessUtil.Execute("net", null, $"use {config.m_NetworkDrive} {config.m_NetworkShare} /USER:{config.m_NetworkUsername} {config.m_NetworkPassword}", null, (processIdentifier, line) =>
+            Log.WriteLine($"Establishing network share {m_NetworkDrive} -> {m_NetworkShare}");
+            ProcessUtil.Execute("net", null, $"use {m_NetworkDrive} {m_NetworkShare} /USER:{m_NetworkUsername} {m_NetworkPassword}", null, (processIdentifier, line) =>
             {
                 Log.WriteLine($"[{processIdentifier}]\t{line}");
             });
         }
 
-        if (framework.Arguments.HasOverrideArgument("TOKEN-TARGET"))
+        if (args.HasOverrideArgument("TOKEN-TARGET"))
         {
-            config.TokenTarget = framework.Arguments.OverrideArguments["TOKEN-TARGET"];
+            TokenTarget = args.OverrideArguments["TOKEN-TARGET"];
         }
 
-        if (framework.Arguments.HasOverrideArgument("TOKEN-FOLDER"))
+        if (args.HasOverrideArgument("TOKEN-FOLDER"))
         {
-            config.TokenFolder = framework.Arguments.OverrideArguments["TOKEN-FOLDER"];
+            TokenFolder = args.OverrideArguments["TOKEN-FOLDER"];
         }
 
-        if (!Directory.Exists(config.TokenFolder))
+        if (!Directory.Exists(TokenFolder))
         {
-            throw (new DirectoryNotFoundException($"Unable to reach the token folder @ {config.TokenFolder}"));
+            throw (new DirectoryNotFoundException($"Unable to reach the token folder @ {TokenFolder}"));
         }
 
-        if (framework.Arguments.HasOverrideArgument("INSTALL-PACKAGE"))
+        if (args.HasOverrideArgument("INSTALL-PACKAGE"))
         {
-            config.InstallPackage = framework.Arguments.OverrideArguments["INSTALL-PACKAGE"];
+            InstallPackage = args.OverrideArguments["INSTALL-PACKAGE"];
         }
 
-        if (!File.Exists(config.InstallPackage))
+        if (!File.Exists(InstallPackage))
         {
-            throw (new DirectoryNotFoundException($"Unable to reach the install package @ {config.InstallPackage}"));
+            throw (new DirectoryNotFoundException($"Unable to reach the install package @ {InstallPackage}"));
         }
 
-        if (framework.Arguments.HasOverrideArgument("INSTALL-LOCATION"))
+        if (args.HasOverrideArgument("INSTALL-LOCATION"))
         {
-            config.InstallLocation = framework.Arguments.OverrideArguments["INSTALL-LOCATION"];
+            InstallLocation = args.OverrideArguments["INSTALL-LOCATION"];
         }
 
-        if (framework.Arguments.HasOverrideArgument("TOKEN"))
+        if (args.HasOverrideArgument("TOKEN"))
         {
-            config.Token = framework.Arguments.OverrideArguments["TOKEN"];
+            Token = args.OverrideArguments["TOKEN"];
         }
 
-        if (framework.Arguments.HasOverrideArgument("RETRYCOUNT") &&
+        if (args.HasOverrideArgument("RETRYCOUNT") &&
 
-            int.TryParse(framework.Arguments.OverrideArguments["RETRYCOUNT"], out int count))
+            int.TryParse(args.OverrideArguments["RETRYCOUNT"], out int count))
         {
-            config.RetryCount = count;
+            RetryCount = count;
         }
 
-        if (config.RetryCount < 0)
+        if (RetryCount < 0)
         {
             throw new Exception("Retry count must not be negative.");
         }
 
-        if (framework.Arguments.HasOverrideArgument("APPBUILD"))
+        if (args.HasOverrideArgument("APPBUILD"))
         {
-            config.AppBuild = framework.Arguments.OverrideArguments["APPBUILD"];
-            if (!File.Exists(config.AppBuild))
+            AppBuild = args.OverrideArguments["APPBUILD"];
+            if (!File.Exists(AppBuild))
             {
-                throw new FileNotFoundException($"Unable to access {config.AppBuild}");
+                throw new FileNotFoundException($"Unable to access {AppBuild}");
             }
         }
 
-        if (string.IsNullOrEmpty(config.AppBuild))
+
+        if (string.IsNullOrEmpty(AppBuild))
         {
             throw new Exception("You need to provide an APPBUILD to utilizing the LAUNCH action.");
         }
-
-        return config;
+        // ReSharper restore StringLiteralTypo
     }
-    // ReSharper restore StringLiteralTypo
+
 }

@@ -26,7 +26,7 @@ internal static class Program
              LogOutputs = [new Core.LogOutputs.ConsoleLogOutput()],
              PauseOnExit = true,
              RequiresElevatedAccess = false,
-         });
+         }, new ProgramConfig());
 
         try
         {

@@ -20,7 +20,7 @@ internal static class Program
         {
             DefaultLogCategory = "WORKSPACE.RESET",
             LogOutputs = [new ConsoleLogOutput()]
-        });
+        }, new ProgramConfig());
 
         try
         {

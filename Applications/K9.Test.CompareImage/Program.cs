@@ -20,7 +20,8 @@ internal static class Program
                 // ReSharper disable once StringLiteralTypo
                 DefaultLogCategory = "TEST.COMPAREIMAGE",
                 LogOutputs = [new Core.LogOutputs.ConsoleLogOutput()]
-            });
+            },
+            new CompareImageConfig());
 
         try
         {
@@ -30,19 +31,21 @@ internal static class Program
                 framework.Shutdown(true);
             }
 
-#pragma warning disable CA1416
-            CompareImageConfig config = CompareImageConfig.Get(framework);
+
+            // Get the filled-out config
+            CompareImageConfig config = (CompareImageConfig)framework.Config;
+            
             if (config.LeftHandSidePath == null || config.RightHandSidePath == null)
             {
-                Log.WriteLine("Either path are null, failing.");
+                Log.WriteLine($"{Core.Utils.TestUtils.FailPrefix}Either path are null, failing.");
                 framework.Environment.UpdateExitCode(-1);
                 framework.Shutdown(true);
                 return;
             }
 
+#pragma warning disable CA1416
              // Build LHS Dataset
             Bitmap lhs = new(config.LeftHandSidePath);
-
 
             Rectangle lhsRect = new (0, 0, lhs.Width, lhs.Height);
 
@@ -71,8 +74,8 @@ internal static class Program
             // Image format needs to the same
             if (lhs.PixelFormat != rhs.PixelFormat)
             {
-                Log.WriteLine($"Image pixel format must match (LHS {lhs.PixelFormat} vs RHS {rhs.PixelFormat}).");
-                framework.Environment.UpdateExitCode(-1);
+                Log.WriteLine($"{Core.Utils.TestUtils.FailPrefix} Image pixel format must match (LHS {lhs.PixelFormat} vs RHS {rhs.PixelFormat}).");
+                if(config.ShouldFailCode) framework.Environment.UpdateExitCode(-1);
                 framework.Shutdown(true);
                 return;
 
@@ -81,8 +84,8 @@ internal static class Program
             // Image sizes need to be the same
             if (lhsLength != rhsLength)
             {
-                Log.WriteLine($"Image sizes must match (LHS {lhs.Width}x{lhs.Height} vs RHS {rhs.Width}x{rhs.Height}).");
-                framework.Environment.UpdateExitCode(-1);
+                Log.WriteLine($"{Core.Utils.TestUtils.FailPrefix} Image sizes must match (LHS {lhs.Width}x{lhs.Height} vs RHS {rhs.Width}x{rhs.Height}).");
+                if(config.ShouldFailCode) framework.Environment.UpdateExitCode(-1);
                 framework.Shutdown(true);
                 return;
             }
@@ -100,13 +103,13 @@ internal static class Program
             float difference = ((float)differenceCount / lhsLength) * 100f;
             if (difference > config.Threshold)
             {
-                Log.WriteLine($"FAIL: A difference of {difference}% was found.");
-                framework.Environment.UpdateExitCode(-1);
+                Log.WriteLine($"{Core.Utils.TestUtils.FailPrefix} A difference of {difference}% was found.");
+                if(config.ShouldFailCode) framework.Environment.UpdateExitCode(-1);
                 framework.Shutdown(true);
             }
 #pragma warning restore CA1416
 
-            Log.WriteLine($"PASS: A difference of {difference}% was found.");
+            Log.WriteLine($"{Core.Utils.TestUtils.PassPrefix} A difference of {difference}% was found.");
             framework.Environment.UpdateExitCode(0);
             framework.Shutdown();
 

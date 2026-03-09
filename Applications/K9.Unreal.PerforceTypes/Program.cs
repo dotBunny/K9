@@ -55,7 +55,7 @@ internal static class Program
         {
             DefaultLogCategory = "UNREAL.TYPES",
             LogOutputs = [new ConsoleLogOutput()]
-        });
+        }, new ProgramConfig());
 
         try
         {

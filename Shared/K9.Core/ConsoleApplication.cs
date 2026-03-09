@@ -13,7 +13,7 @@ public class ConsoleApplication : IDisposable
     public static string DateTimeLongFormat = "yyyy-MM-dd HH:mm:ss";
     public static string TimeShortFormat = "HH:mm:ss";
     public static string DateShortFormat = "yyyy-MM-dd";
-    
+
 	private const string k_LogCategory = "CORE";
 
     // Builtin Modules
@@ -22,12 +22,15 @@ public class ConsoleApplication : IDisposable
 	public readonly EnvironmentModule Environment = new();
 	public readonly PlatformModule Platform = new();
 
+    // Configuration
+    public readonly ProgramConfig Config;
+
     readonly Timer m_RuntimeTimer = new();
     bool m_HasTerminated;
     readonly bool m_ShouldPause;
     readonly bool m_DisplayRuntime;
 
-	public ConsoleApplication(ConsoleApplicationSettings settings)
+    public ConsoleApplication(ConsoleApplicationSettings settings, ProgramConfig config)
     {
         // Immediately setup logging
         if (settings.DefaultLogCategory != null)
@@ -35,7 +38,6 @@ public class ConsoleApplication : IDisposable
             Log.DefaultCategory = settings.DefaultLogCategory;
         }
         Log.AddLogOutputs(settings.LogOutputs);
-
 
         Arguments.Init(m_Assembly);
         m_Assembly.Init(Arguments);
@@ -70,6 +72,10 @@ public class ConsoleApplication : IDisposable
             m_ShouldPause = false;
             Shutdown();
         }
+
+        // Handle Config
+        Config = config;
+        config.Parse(Arguments);
     }
 
 	public void Shutdown(bool forced = false)

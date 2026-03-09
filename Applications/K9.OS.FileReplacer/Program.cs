@@ -19,11 +19,13 @@ internal static class Program
             // ReSharper disable once StringLiteralTypo
             DefaultLogCategory = "OS.FILEREPLACER",
             LogOutputs = [new Core.LogOutputs.ConsoleLogOutput()]
-        });
+        }, new FileReplacerConfig());
 
         try
         {
-            FileReplacerConfig config = FileReplacerConfig.Get(framework);
+            // Get the filled-out config
+            FileReplacerConfig config = (FileReplacerConfig)framework.Config;
+
             if (config.TargetFile == null || config.SourceFile == null) return;
 
             string content = File.ReadAllText(config.SourceFile);

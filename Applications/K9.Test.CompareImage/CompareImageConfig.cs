@@ -4,58 +4,66 @@
 using System;
 using System.IO;
 using K9.Core;
+using K9.Core.Modules;
 
 namespace K9.Test.CompareImage
 {
-    public class CompareImageConfig
+    public class CompareImageConfig : ProgramConfig
     {
         public string? LeftHandSidePath;
         public string? RightHandSidePath;
         public float Threshold = 50.0f;
+        public bool ShouldFailCode = false;
 
-        public static CompareImageConfig Get(ConsoleApplication framework)
+        public override void Parse(ArgumentsModule args)
         {
-            CompareImageConfig config = new();
+            base.Parse(args);
 
-            if (framework.Arguments.HasOverrideArgument("LHS"))
+            if (args.HasOverrideArgument("LHS"))
             {
-                config.LeftHandSidePath = framework.Arguments.OverrideArguments["LHS"];
+                LeftHandSidePath = args.OverrideArguments["LHS"];
             }
             else
             {
                 throw new Exception("No LHS image path provided.");
             }
 
-            if (!File.Exists(config.LeftHandSidePath))
+            if (!File.Exists(LeftHandSidePath))
             {
-                throw new Exception($"Unable to find LHS path {config.LeftHandSidePath}.");
+                throw new Exception($"Unable to find LHS path {LeftHandSidePath}.");
             }
 
-            if (framework.Arguments.HasOverrideArgument("RHS"))
+            if (args.HasOverrideArgument("RHS"))
             {
-                config.RightHandSidePath = framework.Arguments.OverrideArguments["RHS"];
+                RightHandSidePath = args.OverrideArguments["RHS"];
             }
             else
             {
                 throw new Exception("No RHS image path provided.");
             }
 
-            if (!File.Exists(config.RightHandSidePath))
+            if (!File.Exists(RightHandSidePath))
             {
-                throw new Exception($"Unable to find RHS path {config.RightHandSidePath}.");
+                throw new Exception($"Unable to find RHS path {RightHandSidePath}.");
             }
 
-            if (framework.Arguments.HasOverrideArgument("THRESHOLD"))
+            if (args.HasOverrideArgument("THRESHOLD"))
             {
-                config.Threshold = float.Parse(framework.Arguments.OverrideArguments["THRESHOLD"]);
+                Threshold = float.Parse(args.OverrideArguments["THRESHOLD"]);
             }
 
-            if (config.Threshold > 100.0f | config.Threshold < 0.0f)
+            if (Threshold > 100.0f | Threshold < 0.0f)
             {
                 throw new Exception("Threshold must be between 0 and 100.");
             }
 
-            return config;
+            // ReSharper disable StringLiteralTypo
+            if (args.HasOverrideArgument("FAILCODE"))
+            {
+                ShouldFailCode = bool.Parse(args.OverrideArguments["FAILCODE"]);
+            }
+            // ReSharper restore StringLiteralTypo
         }
+
     }
 }
