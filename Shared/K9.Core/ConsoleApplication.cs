@@ -44,6 +44,8 @@ public class ConsoleApplication : IDisposable
         m_Assembly.Init(Arguments);
         Environment.Init(Platform);
 
+        // TODO: check for "help" and show it here, then shutdown
+
         // Should we pause on leaving?
         m_ShouldPause = settings.PauseOnExit;
         if(Arguments.BaseArguments.Contains("no-pause") || Arguments.BaseArguments.Contains("quiet"))
