@@ -2,6 +2,7 @@
 // See the LICENSE file at the repository root for more information.
 
 using System;
+using System.Collections.Generic;
 using System.IO;
 using K9.Core.Modules;
 using K9.Core.Utils;
@@ -75,6 +76,21 @@ public class ConsoleApplication : IDisposable
 
         // Handle Config
         Config = config;
+        if (!config.IsValid(Arguments))
+        {
+            Log.WriteLine("Issue with parsing configuration from arguments, please check the arguments and try again.", k_LogCategory, ILogOutput.LogType.Error);
+
+            KeyValuePair<string, string>[] arguments = config.GetArgumentHelp();
+            if (arguments.Length > 0)
+            {
+                Log.WriteLine("Valid Arguments:", k_LogCategory, ILogOutput.LogType.Info);
+                foreach (KeyValuePair<string, string> argument in arguments)
+                {
+                    Log.WriteLine($"\t{argument.Key}: {argument.Value}", k_LogCategory, ILogOutput.LogType.Info);
+                }
+            }
+            Shutdown();
+        }
         config.Parse(Arguments);
     }
 
