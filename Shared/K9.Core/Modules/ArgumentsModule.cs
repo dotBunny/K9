@@ -15,10 +15,7 @@ public class ArgumentsModule : IModule
 	public readonly List<string> BaseArguments = [];
 	public readonly Dictionary<string, string> OverrideArguments = new();
 
-    public bool HasOverrideArgument(string key)
-    {
-        return OverrideArguments.ContainsKey(key);
-    }
+
 
 	public ArgumentsModule()
 	{
@@ -131,6 +128,18 @@ public class ArgumentsModule : IModule
             Log.WriteLine($"\t{pair.Key}={pair.Value}", k_LogCategory, ILogOutput.LogType.Info);
         }
     }
+
+
+    public bool HasOverrideArgument(string key)
+    {
+        return OverrideArguments.ContainsKey(key);
+    }
+
+    public string GetFirstArgument()
+    {
+        return BaseArguments.Count > 0 ? BaseArguments[0] : string.Empty;
+    }
+
 
     public override string ToString()
     {

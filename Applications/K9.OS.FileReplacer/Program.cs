@@ -19,22 +19,21 @@ internal static class Program
             // ReSharper disable once StringLiteralTypo
             DefaultLogCategory = "OS.FILEREPLACER",
             LogOutputs = [new Core.LogOutputs.ConsoleLogOutput()]
-        }, new FileReplacerConfig());
+        }, new FileReplacerProvider());
 
         try
         {
-            // Get the filled-out config
-            FileReplacerConfig config = (FileReplacerConfig)framework.Config;
+            FileReplacerProvider provider = (FileReplacerProvider)framework.ProgramProvider;
 
-            if (config.TargetFile == null || config.SourceFile == null) return;
+            if (provider.TargetFile == null || provider.SourceFile == null) return;
 
-            string content = File.ReadAllText(config.SourceFile);
-            content = config.Replaces.Aggregate(content, (current, kvp) => current.Replace(kvp.Key, kvp.Value));
+            string content = File.ReadAllText(provider.SourceFile);
+            content = provider.Replaces.Aggregate(content, (current, kvp) => current.Replace(kvp.Key, kvp.Value));
 
             // Ensure target folder structure exists
-            FileUtil.EnsureFileFolderHierarchyExists(config.TargetFile);
+            FileUtil.EnsureFileFolderHierarchyExists(provider.TargetFile);
 
-            File.WriteAllText(config.TargetFile, content);
+            File.WriteAllText(provider.TargetFile, content);
         }
         catch (Exception ex)
         {

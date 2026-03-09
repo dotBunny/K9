@@ -24,14 +24,14 @@ public class ConsoleApplication : IDisposable
 	public readonly PlatformModule Platform = new();
 
     // Configuration
-    public readonly ProgramConfig Config;
+    public readonly ProgramProvider ProgramProvider;
 
     readonly Timer m_RuntimeTimer = new();
     bool m_HasTerminated;
     readonly bool m_ShouldPause;
     readonly bool m_DisplayRuntime;
 
-    public ConsoleApplication(ConsoleApplicationSettings settings, ProgramConfig config)
+    public ConsoleApplication(ConsoleApplicationSettings settings, ProgramProvider programProvider)
     {
         // Immediately setup logging
         if (settings.DefaultLogCategory != null)
@@ -43,8 +43,6 @@ public class ConsoleApplication : IDisposable
         Arguments.Init(m_Assembly);
         m_Assembly.Init(Arguments);
         Environment.Init(Platform);
-
-        // TODO: check for "help" and show it here, then shutdown
 
         // Should we pause on leaving?
         m_ShouldPause = settings.PauseOnExit;
@@ -77,23 +75,27 @@ public class ConsoleApplication : IDisposable
         }
 
         // Handle Config
-        Config = config;
-        if (!config.IsValid(Arguments))
-        {
-            Log.WriteLine("Issue with parsing configuration from arguments, please check the arguments and try again.", k_LogCategory, ILogOutput.LogType.Error);
+        ProgramProvider = programProvider;
 
-            KeyValuePair<string, string>[] arguments = config.GetArgumentHelp();
-            if (arguments.Length > 0)
-            {
-                Log.WriteLine("Valid Arguments:", k_LogCategory, ILogOutput.LogType.Info);
-                foreach (KeyValuePair<string, string> argument in arguments)
-                {
-                    Log.WriteLine($"\t{argument.Key}: {argument.Value}", k_LogCategory, ILogOutput.LogType.Info);
-                }
-            }
+        // Help Route
+        if (Arguments.BaseArguments.Contains("help"))
+        {
+            m_DisplayRuntime = false;
+            m_ShouldPause = false;
+            OutputHelp();
             Shutdown();
         }
-        config.Parse(Arguments);
+        // Bad Args
+        if (!ProgramProvider.IsValid(Arguments))
+        {
+            // Override as we are going straight to help
+            m_DisplayRuntime = false;
+            m_ShouldPause = false;
+            Log.WriteLine("Issue with parsing configuration from arguments, please check the arguments and try again.", k_LogCategory, ILogOutput.LogType.Error);
+            OutputHelp();
+            Shutdown();
+        }
+        ProgramProvider.ParseArguments(Arguments);
     }
 
 	public void Shutdown(bool forced = false)
@@ -130,6 +132,41 @@ public class ConsoleApplication : IDisposable
 
         System.Environment.Exit(Environment.ExitCode);
 	}
+
+    void OutputHelp()
+    {
+        if (m_Assembly.EntryAssembly != null)
+        {
+            Log.WriteLine($"# {m_Assembly.EntryAssembly.GetName().Name} #", ILogOutput.LogType.Notice);
+        }
+
+        // Do we have a description to output?
+        if (!string.IsNullOrEmpty(ProgramProvider.GetDescription()))
+        {
+            Log.WriteLine($"{ProgramProvider.GetDescription()}", ILogOutput.LogType.Notice);
+        }
+
+        // Output argument help
+        KeyValuePair<string, string>[] arguments = ProgramProvider.GetArgumentHelp();
+        if (arguments.Length > 0)
+        {
+            Log.WriteLine("Arguments:", ILogOutput.LogType.Notice);
+            foreach (KeyValuePair<string, string> argument in arguments)
+            {
+                Log.WriteLine($"\t{argument.Key}: {argument.Value}", ILogOutput.LogType.Notice);
+            }
+        }
+        // Output flag help
+        KeyValuePair<string, string>[] flags = ProgramProvider.GetFlagHelp();
+        if (flags.Length > 0)
+        {
+            Log.WriteLine("Flags:", ILogOutput.LogType.Notice);
+            foreach (KeyValuePair<string, string> flag in flags)
+            {
+                Log.WriteLine($"\t{flag.Key}: {flag.Value}", ILogOutput.LogType.Notice);
+            }
+        }
+    }
 
 	public void ExceptionHandler(Exception e)
 	{

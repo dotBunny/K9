@@ -6,9 +6,9 @@ using K9.Core.Modules;
 
 namespace K9.Core;
 
-public class ProgramConfig
+public class ProgramProvider
 {
-    public virtual void Parse(ArgumentsModule args)
+    public virtual void ParseArguments(ArgumentsModule args)
     {
 
     }
@@ -18,7 +18,17 @@ public class ProgramConfig
         return true;
     }
 
+    public virtual string GetDescription()
+    {
+        return string.Empty;
+    }
+
     public virtual KeyValuePair<string, string>[] GetArgumentHelp()
+    {
+        return [];
+    }
+
+    public virtual KeyValuePair<string, string>[] GetFlagHelp()
     {
         return [];
     }

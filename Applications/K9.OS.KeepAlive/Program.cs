@@ -15,39 +15,21 @@ internal static class Program
     static bool s_Alive = true;
     static DateTime s_LastHeartbeat;
     static ProcessMonitor? s_ProcessMonitor;
-    static KeepAliveConfig? s_Settings;
 
     static void Main()
     {
         using ConsoleApplication framework = new(
-         new ConsoleApplicationSettings()
+         new ConsoleApplicationSettings
          {
              DefaultLogCategory = "OS.KEEPALIVE",
              LogOutputs = [new Core.LogOutputs.ConsoleLogOutput()],
              PauseOnExit = true,
              RequiresElevatedAccess = false,
-         }, new ProgramConfig());
+         }, new KeepAliveProvider());
 
         try
         {
-            // The only argument is the path to a settings file
-            if(framework.Arguments.BaseArguments.Count  > 0)
-            {
-                string arg = framework.Arguments.BaseArguments[0];
-                if(File.Exists(arg))
-                {
-                    s_Settings = KeepAliveConfig.Get(arg);
-                }
-            }
-
-            // Ok no argument, use default
-            s_Settings ??= KeepAliveConfig.Get();
-
-            // Bad settings, let's bounce.
-            if (!s_Settings.IsValid())
-            {
-                framework.Shutdown();
-            }
+            KeepAliveProvider provider = (KeepAliveProvider)framework.ProgramProvider;
 
             // Setup exit logic
             Log.WriteLine("Press CTRL+C to Exit");
@@ -59,15 +41,17 @@ internal static class Program
 
 
             // Get an existing running process, just in case It's still there and this app failed?
-            int pid = ProcessMonitor.GetPIDFromFile(s_Settings.ProcessInfoPath);
+#pragma warning disable CS8602 // Dereference of a possibly null reference.
+            int pid = ProcessMonitor.GetPIDFromFile(provider.Config.ProcessInfoPath);
+#pragma warning restore CS8602 // Dereference of a possibly null reference.
             if (pid != ProcessMonitor.BadProcessIdentifier &&
                 ProcessMonitor.IsValidPID(pid) &&
-                ProcessMonitor.GetProcessName(pid) == Path.GetFileNameWithoutExtension(s_Settings.Application))
+                ProcessMonitor.GetProcessName(pid) == Path.GetFileNameWithoutExtension(provider.Config.Application))
             {
                 s_ProcessMonitor = new ProcessMonitor(pid)
                 {
-                    CheckHasExited = s_Settings.CheckHasExited,
-                    CheckResponding = s_Settings.CheckResponding,
+                    CheckHasExited = provider.Config.CheckHasExited,
+                    CheckResponding = provider.Config.CheckResponding,
                 };
                 if (s_ProcessMonitor.IsValid())
                 {
@@ -84,7 +68,7 @@ internal static class Program
             {
                 if (s_ProcessMonitor == null)
                 {
-                    StartMonitorProcess();
+                    StartMonitorProcess(provider.Config);
                 }
 #pragma warning disable CS8602 // Dereference of a possibly null reference.
                 s_ProcessMonitor.Refresh();
@@ -92,8 +76,8 @@ internal static class Program
 
                 if (!s_ProcessMonitor.IsValid())
                 {
-                    Log.WriteLine($"Monitor has reported an issue, waiting {s_Settings.TimeoutSleepMilliseconds / 1000} seconds to see if it resolves it self. Last good heartbeat was at {s_LastHeartbeat.ToLongDateString()} on {s_LastHeartbeat.ToLongTimeString()}");
-                    Thread.Sleep(s_Settings.TimeoutSleepMilliseconds);
+                    Log.WriteLine($"Monitor has reported an issue, waiting {provider.Config.TimeoutSleepMilliseconds / 1000} seconds to see if it resolves it self. Last good heartbeat was at {s_LastHeartbeat.ToLongDateString()} on {s_LastHeartbeat.ToLongTimeString()}");
+                    Thread.Sleep(provider.Config.TimeoutSleepMilliseconds);
 
                     if (!s_ProcessMonitor.IsValid())
                     {
@@ -107,7 +91,7 @@ internal static class Program
                     s_LastHeartbeat = DateTime.Now;
                 }
 
-                Thread.Sleep(s_Settings.SleepMilliseconds);
+                Thread.Sleep(provider.Config.SleepMilliseconds);
             }
 
             KillMonitorProcess();
@@ -119,30 +103,28 @@ internal static class Program
 
         framework.Shutdown();
     }
-    static void StartMonitorProcess()
+    static void StartMonitorProcess(KeepAliveConfig config)
     {
-        if (s_Settings == null) return;
-
         Process startProcess = new();
 
-        startProcess.StartInfo.WorkingDirectory = s_Settings.WorkingDirectory;
-        startProcess.StartInfo.FileName = s_Settings.Application;
-        startProcess.StartInfo.Arguments = s_Settings.Arguments;
+        startProcess.StartInfo.WorkingDirectory = config.WorkingDirectory;
+        startProcess.StartInfo.FileName = config.Application;
+        startProcess.StartInfo.Arguments = config.Arguments;
         startProcess.StartInfo.WindowStyle = ProcessWindowStyle.Normal;
         startProcess.StartInfo.CreateNoWindow = false;
         startProcess.StartInfo.UseShellExecute = true;
 
         startProcess.Start();
-        Thread.Sleep(s_Settings.StartSleepMilliseconds);
+        Thread.Sleep(config.StartSleepMilliseconds);
 
         s_ProcessMonitor = new ProcessMonitor(startProcess)
         {
-            CheckHasExited = s_Settings.CheckHasExited,
-            CheckResponding = s_Settings.CheckResponding,
+            CheckHasExited = config.CheckHasExited,
+            CheckResponding = config.CheckResponding,
         };
 
         Log.WriteLine($"Started with PID of {startProcess.Id}");
-        File.WriteAllText(s_Settings.ProcessInfoPath, startProcess.Id.ToString());
+        File.WriteAllText(config.ProcessInfoPath, startProcess.Id.ToString());
     }
 
     static void KillMonitorProcess()

@@ -15,27 +15,27 @@ internal static class Program
     static FileLock? s_Token;
     static string? s_TokenUsername;
 
-    static bool CheckoutToken(SteamTokenConfig config)
+    static bool CheckoutToken(SteamTokenProvider provider)
     {
         // Get token list / lock
-        string[] foundTokens = Directory.GetFiles(config.TokenFolder, "*.vdf");
+        string[] foundTokens = Directory.GetFiles(provider.TokenFolder, "*.vdf");
         if (foundTokens.Length <= 0)
         {
-            throw new Exception($"Unable to find tokens (*.vdf) at {config.TokenFolder}.");
+            throw new Exception($"Unable to find tokens (*.vdf) at {provider.TokenFolder}.");
         }
         Log.WriteLine($"Found {foundTokens.Length} Tokens In Pool.");
 
         // Handle Specific Target
-        if (config.Token != null)
+        if (provider.Token != null)
         {
-            s_Token = new FileLock(Path.Combine(config.TokenFolder, config.Token + ".vdf"));
-            s_Token.Lock(config.ForceFlag);
+            s_Token = new FileLock(Path.Combine(provider.TokenFolder, provider.Token + ".vdf"));
+            s_Token.Lock(provider.ForceFlag);
             if (!s_Token.HasLock())
             {
 
                 if (!s_Token.SafeLock())
                 {
-                    throw new Exception($"Was unable to acquire lock to {config.Token}");
+                    throw new Exception($"Was unable to acquire lock to {provider.Token}");
                 }
             }
         }
@@ -61,18 +61,18 @@ internal static class Program
 
         // We need to ensure the folder we are writing exists as it might be a brand-new installation
 #pragma warning disable CS8604 // Possible null reference argument.
-        FileUtil.EnsureFileFolderHierarchyExists(config.TokenTarget);
+        FileUtil.EnsureFileFolderHierarchyExists(provider.TokenTarget);
 #pragma warning restore CS8604 // Possible null reference argument.
 
-        File.Copy(s_Token.FilePath, config.TokenTarget, true);
+        File.Copy(s_Token.FilePath, provider.TokenTarget, true);
 
         s_TokenUsername = Path.GetFileNameWithoutExtension(s_Token.FilePath);
 
-        Log.WriteLine($"Checked out {s_Token.FilePath} to {config.TokenTarget} for user {s_TokenUsername}.");
+        Log.WriteLine($"Checked out {s_Token.FilePath} to {provider.TokenTarget} for user {s_TokenUsername}.");
 
         return true;
     }
-    static bool CheckinToken(SteamTokenConfig config)
+    static bool CheckinToken(SteamTokenProvider provider)
     {
 
         if (s_Token == null)
@@ -81,12 +81,12 @@ internal static class Program
         }
         if (s_Token.HasLock())
         {
-            if (config.TokenTarget != null)
+            if (provider.TokenTarget != null)
             {
-                Log.WriteLine($"Returned {config.TokenTarget} to {s_Token.FilePath}.");
+                Log.WriteLine($"Returned {provider.TokenTarget} to {s_Token.FilePath}.");
 
                 // Copy File
-                File.Copy(config.TokenTarget, s_Token.FilePath, true);
+                File.Copy(provider.TokenTarget, s_Token.FilePath, true);
             }
             s_Token.Unlock();
             return true;
@@ -102,23 +102,23 @@ internal static class Program
             // ReSharper disable once StringLiteralTypo
             DefaultLogCategory = "PUBLISH.STEAMTOKEN",
             LogOutputs = [new Core.LogOutputs.ConsoleLogOutput()]
-        }, new SteamTokenConfig());
+        }, new SteamTokenProvider());
 
         try
         {
-            // Get the filled-out config
-            SteamTokenConfig config = (SteamTokenConfig)framework.Config;
+            SteamTokenProvider provider = (SteamTokenProvider)framework.ProgramProvider;
+            provider.EnsureNetworkPath();
 
             // Check for existing installation
-            if (!Directory.Exists(Path.Combine(config.InstallLocation, "sdk")))
+            if (!Directory.Exists(Path.Combine(provider.InstallLocation, "sdk")))
             {
                 // We don't have an existing version installation we need to grab the package
-                Log.WriteLine($"Installing Steamworks SDK to {config.InstallLocation}.");
-                System.IO.Compression.ZipFile.ExtractToDirectory(config.InstallPackage, config.InstallLocation);
+                Log.WriteLine($"Installing Steamworks SDK to {provider.InstallLocation}.");
+                System.IO.Compression.ZipFile.ExtractToDirectory(provider.InstallPackage, provider.InstallLocation);
             }
 
             // ReSharper disable StringLiteralTypo
-            string steamCmd = Path.Combine(config.InstallLocation, "sdk", "tools", "ContentBuilder", "builder", "steamcmd.exe");
+            string steamCmd = Path.Combine(provider.InstallLocation, "sdk", "tools", "ContentBuilder", "builder", "steamcmd.exe");
             // ReSharper restore StringLiteralTypo
 
 
@@ -136,18 +136,18 @@ internal static class Program
             int updateExitCode = ProcessUtil.Execute(steamCmd, steamCmdDirectory, "+quit", null, processLogRedirect.GetAction());
             framework.Environment.UpdateExitCode(updateExitCode);
 
-            if (!CheckoutToken(config))
+            if (!CheckoutToken(provider))
             {
                 throw new Exception("Unable to checkout a token.");
             }
 
             // Run the upload
-            int uploadRetryCount = config.RetryCount;
+            int uploadRetryCount = provider.RetryCount;
             int uploadExitCode = -1;
             while (uploadExitCode != 0 && uploadRetryCount > 0)
             {
                 uploadExitCode = ProcessUtil.Execute(steamCmd, steamCmdDirectory,
-                    $"+login {s_TokenUsername} +run_app_build {config.AppBuild} +quit", null,
+                    $"+login {s_TokenUsername} +run_app_build {provider.AppBuild} +quit", null,
                     processLogRedirect.GetAction());
                 uploadRetryCount--;
                 Log.WriteLine("Upload exited with code: " + uploadExitCode);
@@ -156,12 +156,12 @@ internal static class Program
                     continue;
                 }
 
-                Log.WriteLine($"Sleeping 5 seconds before retry ({uploadRetryCount}/{config.RetryCount}) ...");
+                Log.WriteLine($"Sleeping 5 seconds before retry ({uploadRetryCount}/{provider.RetryCount}) ...");
                 Thread.Sleep(5000);
             }
             framework.Environment.UpdateExitCode(uploadExitCode);
 
-            if (!CheckinToken(config))
+            if (!CheckinToken(provider))
             {
                 Log.WriteLine("There was an issue returning the token.", ILogOutput.LogType.Warning);
             }

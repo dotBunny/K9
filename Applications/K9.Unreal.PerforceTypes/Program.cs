@@ -7,7 +7,6 @@ using System.Threading.Tasks;
 using K9.Core;
 using K9.Core.LogOutputs;
 using K9.Core.Utils;
-using K9.Services.Perforce;
 
 namespace K9.Unreal.Types;
 
@@ -55,41 +54,22 @@ internal static class Program
         {
             DefaultLogCategory = "UNREAL.TYPES",
             LogOutputs = [new ConsoleLogOutput()]
-        }, new ProgramConfig());
+        }, new PerforceTypesProvider());
 
         try
         {
-            // Find our root
-            string? workspaceRoot = PerforceUtil.GetWorkspaceRoot();
-            if (workspaceRoot == null)
-            {
-                Log.WriteLine("Unable to find workspace root.", ILogOutput.LogType.Error);
-                framework.Environment.UpdateExitCode(1, true);
-                return;
-            }
-
-            if (!framework.Arguments.HasOverrideArgument("changelist"))
-            {
-                Log.WriteLine("A changelist must be defined.", ILogOutput.LogType.Error);
-                framework.Environment.UpdateExitCode(1, true);
-                return;
-            }
-            string changelist = framework.Arguments.OverrideArguments["changelist"];
+            PerforceTypesProvider provider = (PerforceTypesProvider)framework.ProgramProvider;
 
             // Try to standardize our file/locations, etc.
-            SettingsProvider settings = new(workspaceRoot);
+#pragma warning disable CS8604 // Possible null reference argument.
+            SettingsProvider settings = new(provider.WorkspaceRoot);
 
             Log.AddLogOutput(new FileLogOutput(settings.LogsFolder, "UnrealTypes"));
             settings.Output();
 
-            string rootDirectory = workspaceRoot;
-            if (framework.Arguments.HasOverrideArgument("directory"))
-            {
-                rootDirectory = framework.Arguments.OverrideArguments["directory"];
-            }
-
-            WorkUnit[] workUnits = FindUntypedFiles(rootDirectory);
-            UpdateFileTypes(workspaceRoot, workUnits, changelist);
+            WorkUnit[] workUnits = FindUntypedFiles(provider.TargetDirectory);
+            UpdateFileTypes(provider.WorkspaceRoot, workUnits, provider.Changelist.ToString());
+#pragma warning restore CS8604 // Possible null reference argument.
         }
         catch (Exception ex)
         {
