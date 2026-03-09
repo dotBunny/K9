@@ -54,7 +54,16 @@ public class ConsoleApplication : IDisposable
 
         if (settings.DisplayHeader)
         {
-            Log.WriteLine($"Core Framework @ {GetCoreGitHead()}", ILogOutput.LogType.Notice);
+            string coreVersion = GetCoreGitHead();
+            string applicationVersion = GetApplicationGitHead();
+
+            if (coreVersion != applicationVersion)
+            {
+                Log.WriteLine($"{GetApplicationName()} @ {GetApplicationGitHead()}", ILogOutput.LogType.Notice);
+                Log.WriteLine($"Core @ {GetCoreGitHead()}", ILogOutput.LogType.Notice);
+            }
+
+            Log.WriteLine($"Built @ {GetCoreGitHead()}", ILogOutput.LogType.Notice);
         }
 
         m_DisplayRuntime = settings.DisplayRuntime;
@@ -188,7 +197,9 @@ public class ConsoleApplication : IDisposable
     public string GetCoreGitHead()
     {
         FileVersionInfo fvi = FileVersionInfo.GetVersionInfo(m_Assembly.CoreAssembly.Location);
-        string[] productVersion = fvi.ProductVersion.Split('+');
+        string raw = fvi.ProductVersion;
+        if(raw.Contains("fatal")) return "Unknown";
+        string[] productVersion = raw.Split('+');
         return productVersion.Length == 2 ? productVersion[1] : "Unknown";
     }
 
@@ -196,7 +207,15 @@ public class ConsoleApplication : IDisposable
     {
         if (m_Assembly.EntryAssembly == null) return "Unknown";
         FileVersionInfo fvi = FileVersionInfo.GetVersionInfo(m_Assembly.EntryAssembly.Location);
-        string[] productVersion = fvi.ProductVersion.Split('+');
+        string raw = fvi.ProductVersion;
+        if(raw.Contains("fatal")) return "Unknown";
+        string[] productVersion = raw.Split('+');
         return productVersion.Length == 2 ? productVersion[1] : "Unknown";
+    }
+
+    public string GetApplicationName()
+    {
+        if (m_Assembly.EntryAssembly == null) return "Unknown";
+        return m_Assembly.EntryAssembly.GetName().Name;
     }
 }
