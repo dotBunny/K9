@@ -49,7 +49,7 @@ public class SettingsProvider
         RootFolder = root;
 
         K9Folder = Path.Combine(RootFolder, "K9");
-        BoostrapLibrary = Path.Combine(K9Folder, "Bootstrap", "Bootstrap.dll");
+        BoostrapLibrary = Path.Combine(K9Folder, "Bootstrap", "K9.Workspace.Bootstrap.dll");
         LogsFolder = Path.Combine(RootFolder, "Logs");
         TempFile = Path.Combine(RootFolder, "k9.tmp");
 
