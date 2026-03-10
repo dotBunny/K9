@@ -5,15 +5,15 @@ using K9.Core;
 using K9.Core.Modules;
 using K9.Core.Utils;
 
-namespace K9;
+namespace K9.Workspace.Reset;
 
-public class K9Provider : ProgramProvider
+public class ResetProvider : ProgramProvider
 {
     public string? WorkspaceRoot;
 
     public override string GetDescription()
     {
-        return "A tool to execute pre-defined tasks.";
+        return "A tool for resetting the state of specific areas of the project.";
     }
 
     public override bool IsValid(ArgumentsModule args)
@@ -32,10 +32,5 @@ public class K9Provider : ProgramProvider
     {
         WorkspaceRoot = WorkspaceUtil.GetWorkspaceRoot();
         base.ParseArguments(args);
-    }
-
-    public override bool IsHelpOverride()
-    {
-        return true;
     }
 }

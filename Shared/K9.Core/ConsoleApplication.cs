@@ -47,7 +47,7 @@ public class ConsoleApplication : IDisposable
 
         // Should we pause on leaving?
         m_ShouldPause = settings.PauseOnExit;
-        if(Arguments.BaseArguments.Contains("no-pause") || Arguments.BaseArguments.Contains("quiet"))
+        if(Arguments.HasBaseArgument("no-pause") || Arguments.HasBaseArgument("quiet"))
         {
             m_ShouldPause = false;
         }
@@ -72,7 +72,7 @@ public class ConsoleApplication : IDisposable
         {
             string relaunchTarget = m_Assembly.EntryAssembly != null ? m_Assembly.EntryAssembly.Location : m_Assembly.ExecutingAssembly.Location;
             Log.WriteLine($"Elevation REQUIRED: {relaunchTarget}", k_LogCategory, ILogOutput.LogType.Error);
-            if (Arguments.BaseArguments.Contains("elevation-check"))
+            if (Arguments.HasBaseArgument("elevation-check"))
             {
                 Log.WriteLine($"Elevation FAILED: {relaunchTarget}", k_LogCategory, ILogOutput.LogType.Error);
             }
@@ -89,7 +89,7 @@ public class ConsoleApplication : IDisposable
         ProgramProvider = programProvider;
 
         // Help Route
-        if (Arguments.BaseArguments.Contains("help") && !ProgramProvider.IsHelpOverride())
+        if (Arguments.HasBaseArgument("help") && !ProgramProvider.IsHelpOverride())
         {
             m_DisplayRuntime = false;
             m_ShouldPause = false;

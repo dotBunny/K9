@@ -37,9 +37,9 @@ namespace K9.Test.CompareImage
             // LHS
             if (args.HasOverrideArgument("LHS"))
             {
-                if (!File.Exists(args.OverrideArguments["LHS"]))
+                if (!File.Exists(args.GetOverrideArgument("LHS")))
                 {
-                    Log.WriteLine($"Unable to find LHS path {args.OverrideArguments["LHS"]}.");
+                    Log.WriteLine($"Unable to find LHS path {args.GetOverrideArgument("LHS")}.");
                     return false;
                 }
             }
@@ -52,9 +52,9 @@ namespace K9.Test.CompareImage
             // RHS
             if (args.HasOverrideArgument("RHS"))
             {
-                if (!File.Exists(args.OverrideArguments["RHS"]))
+                if (!File.Exists(args.GetOverrideArgument("RHS")))
                 {
-                    Log.WriteLine($"Unable to find RHS path {args.OverrideArguments["RHS"]}.");
+                    Log.WriteLine($"Unable to find RHS path {args.GetOverrideArgument("RHS")}.");
                     return false;
                 }
             }
@@ -67,7 +67,7 @@ namespace K9.Test.CompareImage
             //  THRESHOLD
             if (args.HasOverrideArgument("THRESHOLD"))
             {
-                if(float.TryParse(args.OverrideArguments["THRESHOLD"], out float threshold))
+                if(float.TryParse(args.GetOverrideArgument("THRESHOLD"), out float threshold))
                 {
                     if (Threshold > 100.0f | Threshold < 0.0f)
                     {
@@ -85,7 +85,7 @@ namespace K9.Test.CompareImage
             // ReSharper disable StringLiteralTypo
             // ReSharper disable once CommentTypo
             // FAILCODE
-            if (args.HasOverrideArgument("FAILCODE") && !bool.TryParse(args.OverrideArguments["FAILCODE"], out bool _))
+            if (args.HasOverrideArgument("FAILCODE") && !bool.TryParse(args.GetOverrideArgument("FAILCODE"), out bool _))
             {
                 Log.WriteLine("FAILCODE must be able to be parsed to a boolean value.");
                 return false;
@@ -99,19 +99,19 @@ namespace K9.Test.CompareImage
         {
             base.ParseArguments(args);
 
-            LeftHandSidePath = args.OverrideArguments["LHS"];
-            RightHandSidePath = args.OverrideArguments["RHS"];
+            LeftHandSidePath = args.GetOverrideArgument("LHS");
+            RightHandSidePath = args.GetOverrideArgument("RHS");
 
 
             if (args.HasOverrideArgument("THRESHOLD"))
             {
-                Threshold = float.Parse(args.OverrideArguments["THRESHOLD"]);
+                Threshold = float.Parse(args.GetOverrideArgument("THRESHOLD"));
             }
 
             // ReSharper disable StringLiteralTypo
             if (args.HasOverrideArgument("FAILCODE"))
             {
-                ShouldFailCode = bool.Parse(args.OverrideArguments["FAILCODE"]);
+                ShouldFailCode = bool.Parse(args.GetOverrideArgument("FAILCODE"));
             }
             // ReSharper restore StringLiteralTypo
         }

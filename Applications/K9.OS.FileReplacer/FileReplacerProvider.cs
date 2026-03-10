@@ -37,9 +37,9 @@ public class FileReplacerProvider : ProgramProvider
         // Check SOURCE
         if (args.HasOverrideArgument("SOURCE"))
         {
-            if (!File.Exists(args.OverrideArguments["SOURCE"]))
+            if (!File.Exists(args.GetOverrideArgument("SOURCE")))
             {
-                Log.WriteLine($"Unable to find source {args.OverrideArguments["SOURCE"]}", ILogOutput.LogType.Warning);
+                Log.WriteLine($"Unable to find source {args.GetOverrideArgument("SOURCE")}", ILogOutput.LogType.Warning);
                 return false;
             }
         }
@@ -52,9 +52,9 @@ public class FileReplacerProvider : ProgramProvider
         // Check TARGET
         if (args.HasOverrideArgument("TARGET"))
         {
-            if (!File.Exists(args.OverrideArguments["TARGET"]))
+            if (!File.Exists(args.GetOverrideArgument("TARGET")))
             {
-                Log.WriteLine($"Unable to find target {args.OverrideArguments["TARGET"]}", ILogOutput.LogType.Warning);
+                Log.WriteLine($"Unable to find target {args.GetOverrideArgument("TARGET")}", ILogOutput.LogType.Warning);
                 return false;
             }
         }
@@ -62,8 +62,8 @@ public class FileReplacerProvider : ProgramProvider
         // Check KEY & VALUE
         if (args.HasOverrideArgument("KEY") && args.HasOverrideArgument("VALUE"))
         {
-            string[] keys = args.OverrideArguments["KEY"].Split(",", StringSplitOptions.RemoveEmptyEntries);
-            string[] values = args.OverrideArguments["VALUE"].Split(",", StringSplitOptions.RemoveEmptyEntries);
+            string[] keys = args.GetOverrideArgument("KEY").Split(",", StringSplitOptions.RemoveEmptyEntries);
+            string[] values = args.GetOverrideArgument("VALUE").Split(",", StringSplitOptions.RemoveEmptyEntries);
 
             if (keys.Length != values.Length)
             {
@@ -84,11 +84,11 @@ public class FileReplacerProvider : ProgramProvider
     {
         base.ParseArguments(args);
 
-        SourceFile = args.OverrideArguments["SOURCE"];
-        TargetFile = !args.HasOverrideArgument("TARGET") ? SourceFile : args.OverrideArguments["TARGET"];
+        SourceFile = args.GetOverrideArgument("SOURCE");
+        TargetFile = !args.HasOverrideArgument("TARGET") ? SourceFile : args.GetOverrideArgument("TARGET");
 
-        string[] keys = args.OverrideArguments["KEY"].Split(",", StringSplitOptions.RemoveEmptyEntries);
-        string[] values = args.OverrideArguments["VALUE"].Split(",", StringSplitOptions.RemoveEmptyEntries);
+        string[] keys = args.GetOverrideArgument("KEY").Split(",", StringSplitOptions.RemoveEmptyEntries);
+        string[] values = args.GetOverrideArgument("VALUE").Split(",", StringSplitOptions.RemoveEmptyEntries);
         for (int i = 0; i < keys.Length; i++)
         {
             Replaces.Add(keys[i], values[i]);

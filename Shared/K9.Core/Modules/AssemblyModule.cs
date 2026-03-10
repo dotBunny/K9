@@ -43,7 +43,7 @@ public class AssemblyModule : IModule
             return;
         }
 
-        string newPath = Path.GetFullPath(argumentsModule.OverrideArguments[k_AssemblyLocationKey]);
+        string newPath = Path.GetFullPath(argumentsModule.GetOverrideArgument(k_AssemblyLocationKey));
         if (!Directory.Exists(newPath))
         {
             return;

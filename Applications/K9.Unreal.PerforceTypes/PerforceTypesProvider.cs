@@ -6,7 +6,6 @@ using System.IO;
 using K9.Core;
 using K9.Core.Modules;
 using K9.Core.Utils;
-using K9.Services.Perforce;
 
 namespace K9.Unreal.Types;
 
@@ -47,14 +46,14 @@ public class PerforceTypesProvider : ProgramProvider
             return false;
         }
 
-        if(!int.TryParse(args.OverrideArguments["CHANGELIST"], out int _))
+        if(!int.TryParse(args.GetOverrideArgument("CHANGELIST"), out int _))
         {
-            Log.WriteLine($"Unable to parse CHANGELIST({args.OverrideArguments["CHANGELIST"]}).", ILogOutput.LogType.Warning);
+            Log.WriteLine($"Unable to parse CHANGELIST({args.GetOverrideArgument("CHANGELIST")}).", ILogOutput.LogType.Warning);
             return false;
         }
 
         if (args.HasOverrideArgument("TARGET-DIRECTORY") &&
-            !Directory.Exists(args.OverrideArguments["TARGET-DIRECTORY"]))
+            !Directory.Exists(args.GetOverrideArgument("TARGET-DIRECTORY")))
         {
             Log.WriteLine("Unable to find TARGET-DIRECTORY.", ILogOutput.LogType.Warning);
             return false;
@@ -68,11 +67,11 @@ public class PerforceTypesProvider : ProgramProvider
         WorkspaceRoot = WorkspaceUtil.GetWorkspaceRoot();
         TargetDirectory = WorkspaceRoot;
 
-        Changelist = int.Parse(args.OverrideArguments["CHANGELIST"]);
+        Changelist = int.Parse(args.GetOverrideArgument("CHANGELIST"));
 
         if (args.HasOverrideArgument("TARGET-DIRECTORY"))
         {
-            TargetDirectory = args.OverrideArguments["TARGET-DIRECTORY"];
+            TargetDirectory = args.GetOverrideArgument("TARGET-DIRECTORY");
         }
 
         base.ParseArguments(args);

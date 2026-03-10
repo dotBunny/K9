@@ -100,27 +100,29 @@ internal static class Program
 
         for (int i = 0; i < count; i++)
         {
-            if (arguments[i] == "update")
+            string arg = arguments[i].ToUpper();
+
+            if (arg == "UPDATE")
             {
                 s_UpdateCheck = true;
             }
 
-            if (arguments[i] == "no-clone")
+            if (arg == "NO-CLONE")
             {
                 s_ShouldClone = false;
             }
 
-            if (arguments[i] == "no-build")
+            if (arg == "NO-BUILD")
             {
                 s_ShouldBuild = false;
             }
 
-            if (arguments[i] == "no-workspace")
+            if (arg == "NO-WORKSPACE")
             {
                 s_ShouldSetupWorkspace = false;
             }
 
-            if (arguments[i] == "quiet")
+            if (arg == "QUIET")
             {
                 s_QuietMode = true;
             }

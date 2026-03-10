@@ -5,15 +5,15 @@ using K9.Core;
 using K9.Core.Modules;
 using K9.Core.Utils;
 
-namespace K9;
+namespace K9.Workspace.Setup;
 
-public class K9Provider : ProgramProvider
+public class SetupProvider : ProgramProvider
 {
     public string? WorkspaceRoot;
 
     public override string GetDescription()
     {
-        return "A tool to execute pre-defined tasks.";
+        return "This application sets up a user's workspace just how we want it.";
     }
 
     public override bool IsValid(ArgumentsModule args)
@@ -32,10 +32,5 @@ public class K9Provider : ProgramProvider
     {
         WorkspaceRoot = WorkspaceUtil.GetWorkspaceRoot();
         base.ParseArguments(args);
-    }
-
-    public override bool IsHelpOverride()
-    {
-        return true;
     }
 }

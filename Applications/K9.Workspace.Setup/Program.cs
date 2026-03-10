@@ -23,21 +23,16 @@ internal static class Program
             LogOutputs = [new ConsoleLogOutput()],
             PauseOnExit = true,
             RequiresElevatedAccess = true,
-        }, new ProgramProvider());
+        }, new SetupProvider());
 
         try
         {
-            // Find our root
-            string? workspaceRoot = WorkspaceUtil.GetWorkspaceRoot();
-            if (workspaceRoot == null)
-            {
-                Log.WriteLine("Unable to find workspace root.", ILogOutput.LogType.Error);
-                framework.Environment.UpdateExitCode(1, true);
-                return;
-            }
+            SetupProvider provider = (SetupProvider)framework.ProgramProvider;
 
             // Try to standardize our file/locations, etc.
-            SettingsProvider settings = new(workspaceRoot);
+#pragma warning disable CS8604 // Possible null reference argument.
+            SettingsProvider settings = new(provider.WorkspaceRoot);
+#pragma warning restore CS8604 // Possible null reference argument.
 
 
             Log.AddLogOutput(new FileLogOutput(settings.LogsFolder, "K9.Workspace.Setup"));
@@ -61,7 +56,7 @@ internal static class Program
     #region Process
     static void UpdateSourceCode(ConsoleApplication framework, SettingsProvider settings)
     {
-        if (framework.Arguments.BaseArguments.Contains("no-source"))
+        if (framework.Arguments.HasBaseArgument("no-source"))
         {
             Log.WriteLine("Skipping Source Check (Argument) ...", "SOURCE");
             return;
@@ -90,7 +85,7 @@ internal static class Program
 
     static void BuildSource(ConsoleApplication framework, SettingsProvider settings)
     {
-        if (framework.Arguments.BaseArguments.Contains("no-build"))
+        if (framework.Arguments.HasBaseArgument("no-build"))
         {
             Log.WriteLine("Skipping Build Check (Argument) ...", "BUILD");
             return;
@@ -255,7 +250,7 @@ internal static class Program
 
                 // Handle Git Dependencies (only if explicitly requested)
                 // In order for Horde to be able to build, the actual dependencies need to be committed to your perforce depo
-                if (framework.Arguments.BaseArguments.Contains("git-dependencies"))
+                if (framework.Arguments.HasBaseArgument("git-dependencies"))
                 {
                     string gitDependencies = Path.Combine(settings.RootFolder, "Engine", "Binaries", "DotNET", "GitDependencies", "win-x64", "GitDependencies.exe");
                     Log.WriteLine($"Running {gitDependencies} ...");

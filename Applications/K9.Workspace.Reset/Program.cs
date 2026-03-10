@@ -5,7 +5,6 @@ using System;
 using System.IO;
 using K9.Core;
 using K9.Core.LogOutputs;
-using K9.Core.Utils;
 
 namespace K9.Workspace.Reset;
 
@@ -20,21 +19,17 @@ internal static class Program
         {
             DefaultLogCategory = "RESET",
             LogOutputs = [new ConsoleLogOutput()]
-        }, new ProgramProvider());
+        }, new ResetProvider());
 
         try
         {
             // Find our root
-            string? workspaceRoot = WorkspaceUtil.GetWorkspaceRoot();
-            if (workspaceRoot == null)
-            {
-                Log.WriteLine("Unable to find workspace root.", ILogOutput.LogType.Error);
-                framework.Environment.UpdateExitCode(1, true);
-                return;
-            }
+            ResetProvider provider = (ResetProvider)framework.ProgramProvider;
 
             // Try to standardize our file/locations, etc.
-            SettingsProvider settings = new(workspaceRoot);
+#pragma warning disable CS8604 // Possible null reference argument.
+            SettingsProvider settings = new(provider.WorkspaceRoot);
+#pragma warning restore CS8604 // Possible null reference argument.
 
             Log.AddLogOutput(new FileLogOutput(settings.LogsFolder, "K9.Workspace.Reset"));
             settings.Output();
@@ -60,7 +55,7 @@ internal static class Program
 
     static void ClearProject(ConsoleApplication framework, SettingsProvider settingsProvider)
     {
-        if (!framework.Arguments.BaseArguments.Contains("project"))
+        if (!framework.Arguments.HasBaseArgument("project"))
         {
             return;
         }
@@ -88,7 +83,7 @@ internal static class Program
     }
     static void ClearProjectPlugins(ConsoleApplication framework, SettingsProvider settingsProvider)
     {
-        if (!framework.Arguments.BaseArguments.Contains("project-plugins"))
+        if (!framework.Arguments.HasBaseArgument("project-plugins"))
         {
             return;
         }

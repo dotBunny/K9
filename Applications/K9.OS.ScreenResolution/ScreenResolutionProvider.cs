@@ -33,12 +33,12 @@ namespace K9.OS.ScreenResolution
 
             if (args.HasOverrideArgument("WIDTH"))
             {
-                Width = int.Parse(args.OverrideArguments["WIDTH"]);
+                Width = int.Parse(args.GetOverrideArgument("WIDTH"));
             }
 
             if (args.HasOverrideArgument("HEIGHT"))
             {
-                Height = int.Parse(args.OverrideArguments["HEIGHT"]);
+                Height = int.Parse(args.GetOverrideArgument("HEIGHT"));
             }
         }
     }

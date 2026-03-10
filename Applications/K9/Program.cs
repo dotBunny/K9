@@ -85,7 +85,7 @@ internal static class Program
                 return;
             }
 
-            if (framework.Arguments.BaseArguments.Contains("help") || framework.Arguments.BaseArguments.Count == 0)
+            if (framework.Arguments.HasBaseArgument("help") || !framework.Arguments.HasArguments())
             {
                 Log.WriteLine(map.GetOutput(), "K9", ILogOutput.LogType.Info);
             }

@@ -1,7 +1,6 @@
 // Copyright dotBunny Inc. All Rights Reserved.
 // See the LICENSE file at the repository root for more information.
 
-using System;
 using System.Collections.Generic;
 using System.IO;
 using K9.Core;
@@ -19,6 +18,7 @@ public class SteamTokenProvider : ProgramProvider
     public string InstallLocation = "D:\\Steam";
     public string TokenFolder = @"H:\Steamworks\Tokens";
 
+    // ReSharper disable once UnassignedField.Global
     public string? AppBuild;
     public int RetryCount = 3;
     public string? TokenTarget;
@@ -69,20 +69,20 @@ public class SteamTokenProvider : ProgramProvider
 
     public override bool IsValid(ArgumentsModule args)
     {
-        if (args.HasOverrideArgument("TOKEN-FOLDER") && !Directory.Exists(args.OverrideArguments["TOKEN-FOLDER"]))
+        if (args.HasOverrideArgument("TOKEN-FOLDER") && !Directory.Exists(args.GetOverrideArgument("TOKEN-FOLDER")))
         {
-            Log.WriteLine($"Unable to reach the token folder @ {args.OverrideArguments["TOKEN-FOLDER"]}", ILogOutput.LogType.Warning);
+            Log.WriteLine($"Unable to reach the token folder @ {args.GetOverrideArgument("TOKEN-FOLDER")}", ILogOutput.LogType.Warning);
             return false;
         }
 
-        if (args.HasOverrideArgument("INSTALL-PACKAGE") && !File.Exists(args.OverrideArguments["INSTALL-PACKAGE"]))
+        if (args.HasOverrideArgument("INSTALL-PACKAGE") && !File.Exists(args.GetOverrideArgument("INSTALL-PACKAGE")))
         {
             Log.WriteLine($"Unable to reach the install package @ {InstallPackage}", ILogOutput.LogType.Warning);
             return false;
         }
 
         // ReSharper disable StringLiteralTypo
-        if (args.HasOverrideArgument("RETRYCOUNT") && int.TryParse(args.OverrideArguments["RETRYCOUNT"], out int count))
+        if (args.HasOverrideArgument("RETRYCOUNT") && int.TryParse(args.GetOverrideArgument("RETRYCOUNT"), out int count))
         {
             if (count < 0)
             {
@@ -93,9 +93,9 @@ public class SteamTokenProvider : ProgramProvider
 
         if (args.HasOverrideArgument("APPBUILD"))
         {
-            if (!File.Exists(args.OverrideArguments["APPBUILD"]))
+            if (!File.Exists(args.GetOverrideArgument("APPBUILD")))
             {
-                Log.WriteLine($"Unable to reach the app build @ {args.OverrideArguments["APPBUILD"]}", ILogOutput.LogType.Warning);
+                Log.WriteLine($"Unable to reach the app build @ {args.GetOverrideArgument("APPBUILD")}", ILogOutput.LogType.Warning);
                 return false;
             }
         }
@@ -120,54 +120,54 @@ public class SteamTokenProvider : ProgramProvider
         base.ParseArguments(args);
 
         // Should we force operations?
-        ForceFlag = args.BaseArguments.Contains("FORCE");
+        ForceFlag = args.HasBaseArgument("FORCE");
 
         // Network Share Settings
         if (args.HasOverrideArgument("NETWORK-USERNAME"))
         {
-            m_NetworkUsername = args.OverrideArguments["NETWORK-USERNAME"];
+            m_NetworkUsername = args.GetOverrideArgument("NETWORK-USERNAME");
         }
         if (args.HasOverrideArgument("NETWORK-PASSWORD"))
         {
-            m_NetworkPassword = args.OverrideArguments["NETWORK-PASSWORD"];
+            m_NetworkPassword = args.GetOverrideArgument("NETWORK-PASSWORD");
         }
         if (args.HasOverrideArgument("NETWORK-DRIVE"))
         {
-            m_NetworkDrive = args.OverrideArguments["NETWORK-DRIVE"];
+            m_NetworkDrive = args.GetOverrideArgument("NETWORK-DRIVE");
         }
         if (args.HasOverrideArgument("NETWORK-SHARE"))
         {
-            m_NetworkShare = args.OverrideArguments["NETWORK-SHARE"];
+            m_NetworkShare = args.GetOverrideArgument("NETWORK-SHARE");
         }
 
         if (args.HasOverrideArgument("TOKEN-FOLDER"))
         {
-            TokenFolder = args.OverrideArguments["TOKEN-FOLDER"];
+            TokenFolder = args.GetOverrideArgument("TOKEN-FOLDER");
         }
 
         if (args.HasOverrideArgument("TOKEN-TARGET"))
         {
-            TokenTarget = args.OverrideArguments["TOKEN-TARGET"];
+            TokenTarget = args.GetOverrideArgument("TOKEN-TARGET");
         }
 
         if (args.HasOverrideArgument("INSTALL-PACKAGE"))
         {
-            InstallPackage = args.OverrideArguments["INSTALL-PACKAGE"];
+            InstallPackage = args.GetOverrideArgument("INSTALL-PACKAGE");
         }
 
         if (args.HasOverrideArgument("INSTALL-LOCATION"))
         {
-            InstallLocation = args.OverrideArguments["INSTALL-LOCATION"];
+            InstallLocation = args.GetOverrideArgument("INSTALL-LOCATION");
         }
 
         if (args.HasOverrideArgument("TOKEN"))
         {
-            Token = args.OverrideArguments["TOKEN"];
+            Token = args.GetOverrideArgument("TOKEN");
         }
 
         if (args.HasOverrideArgument("RETRYCOUNT"))
         {
-            RetryCount = int.Parse(args.OverrideArguments["RETRYCOUNT"]);
+            RetryCount = int.Parse(args.GetOverrideArgument("RETRYCOUNT"));
         }
     }
     // ReSharper restore StringLiteralTypo
