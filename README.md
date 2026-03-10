@@ -24,6 +24,7 @@ In 2026, a modernization effort was made to bring all applications to target C# 
 | Documentation                                                                              | Description                                                                         |
 |:-------------------------------------------------------------------------------------------|:------------------------------------------------------------------------------------|
 | [K9.OS.CleanFolder](Applications/K9.OS.CleanFolder/K9.OS.CleanFolder.md)                   | Cleans a folder and its subdirectories based on the specified exclusion filters.    |
+| [K9.OS.CopyFolder](Applications/K9.OS.CopyFolder/K9.OS.CopyFolder.md)                      | A simple safe way to copy a folder's contents to another folder.                    |
 | [K9.OS.DeleteFile](Applications/K9.OS.DeleteFile/K9.OS.DeleteFile.md)                      | Deletes a file, with no nonsense.                                                   |
 | [K9.OS.DeleteFolder](Applications/K9.OS.DeleteFolder/K9.OS.DeleteFolder.md)                | Deletes a folder, with no nonsense.                                                 |
 | [K9.OS.FileReplacer](Applications/K9.OS.FileReplacer/K9.OS.FileReplacer.md)                | A tool for replacing content in a file in one-shot.                                 |

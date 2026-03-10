@@ -24,7 +24,7 @@ public static class FileUtil
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    static void EnsureFolderHierarchyExists(string? folderPath)
+    public static void EnsureFolderHierarchyExists(string? folderPath)
     {
         if (!string.IsNullOrEmpty(folderPath) && !Directory.Exists(folderPath))
         {
@@ -46,7 +46,7 @@ public static class FileUtil
     public static bool IsSafeToWrite(string? filePath)
     {
         if(filePath == null) return false;
-        
+
         if (File.Exists(filePath))
         {
             FileAttributes attributes = File.GetAttributes(filePath);
