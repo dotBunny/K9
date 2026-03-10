@@ -32,6 +32,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\Shared\K9.Core\K9.Core.csproj" />
+    <ProjectReference Include="..\..\Shared\K9.Unreal\K9.Unreal.csproj" />
   </ItemGroup>
 
   <Target Name="PreBuild" BeforeTargets="PreBuildEvent">
