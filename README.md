@@ -34,6 +34,7 @@ In 2026, a modernization effort was made to bring all applications to target C# 
 | [K9.OS.FileReplacer](Applications/K9.OS.FileReplacer/K9.OS.FileReplacer.md)                | A tool for replacing content in a file in one-shot.                                 |
 | [K9.OS.KeepAlive](Applications/K9.OS.KeepAlive/K9.OS.KeepAlive.md)                         | An application designed to keep a launched application running, much like a service |
 | [K9.OS.ScreenResolution](Applications/K9.OS.ScreenResolution/K9.OS.ScreenResolution.md)    | A tool to force a specific screen resolution.                                       |
+| [K9.OS.WriteTextFile](Applications/K9.OS.WriteTextFile/K9.OS.WriteTextFile.md)             | Write text content with replacements to a file.                                     |
 | [K9.Publish.SteamToken](Applications/K9.Publish.SteamToken/K9.Publish.SteamToken.md)       | An application to check out and check-in the token used for SteamGuard uploads.     |
 | [K9.Test.CompareImage](Applications/K9.Test.CompareImage/K9.Test.CompareImage.md)          | A tool to compare two images and fail if they are different.                        |
 | [K9.Unreal.PerforceTypes](Applications/K9.Unreal.PerforceTypes/K9.Unreal.PerforceTypes.md) | A tool to detect improper types of files in Perforce for Unreal Engine source.      |
