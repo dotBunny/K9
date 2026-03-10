@@ -837,10 +837,7 @@ public class PerforceProvider
 
     }
 
-#pragma warning disable IDE0051 // Remove unused private members
-    // ReSharper disable once UnusedMember.Local
-    private void ParseTamperedFile(string line, List<string> tamperedFiles)
-#pragma warning restore IDE0051 // Remove unused private members
+    public void ParseTamperedFile(string line, List<string> tamperedFiles)
     {
         const string k_Prefix = "Can't clobber writable file ";
         if (line.StartsWith(k_Prefix))

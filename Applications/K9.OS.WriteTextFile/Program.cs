@@ -21,8 +21,13 @@ internal static class Program
         try
         {
             WriteTextFileProvider provider = (WriteTextFileProvider)framework.ProgramProvider;
-#pragma warning disable CS8602 // Dereference of a possibly null reference.
-#pragma warning disable CS8604 // Possible null reference argument.
+            if (provider.Target == null)
+            {
+                Log.WriteLine("The TARGET is null for an unknown reason.", ILogOutput.LogType.Error);
+                framework.Shutdown();
+                return;
+            }
+
             if (provider.Content.Length > 0)
             {
                 System.IO.File.WriteAllLines(provider.Target, provider.Content);
@@ -32,8 +37,6 @@ internal static class Program
             {
                 System.IO.File.WriteAllText(provider.Target, string.Empty);
             }
-#pragma warning restore CS8604 // Possible null reference argument.
-#pragma warning restore CS8602 // Dereference of a possibly null reference.
         }
         catch (Exception ex)
         {

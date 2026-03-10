@@ -26,6 +26,20 @@ internal static class Program
 
             CopyFileProvider provider = (CopyFileProvider)framework.ProgramProvider;
 
+            if (provider.SourcePath == null)
+            {
+                Log.WriteLine("The SOURCE is null for an unknown reason.", ILogOutput.LogType.Error);
+                framework.Shutdown();
+                return;
+            }
+
+            if (provider.Target == null && provider.TargetFolder == null)
+            {
+                Log.WriteLine("The TARGET and TARGET-FOLDER are null for an unknown reason.", ILogOutput.LogType.Error);
+                framework.Shutdown();
+                return;
+            }
+
             // Handle existence check
             if (provider.CheckExists)
             {
@@ -44,9 +58,7 @@ internal static class Program
                 }
             }
 
-#pragma warning disable CS8604 // Possible null reference argument.
             IFileAccessor inputHandler = FileUtil.GetFileAccessor(provider.SourcePath);
-#pragma warning restore CS8604 // Possible null reference argument.
 
 
             if (!provider.Extract)
@@ -55,25 +67,20 @@ internal static class Program
                 if (provider.TargetFile)
                 {
                     FileUtil.EnsureFolderHierarchyExists(Path.GetDirectoryName(provider.Target));
-#pragma warning disable CS8604 // Possible null reference argument.
                     FileUtil.WriteStream(inputStream, provider.Target);
-#pragma warning restore CS8604 // Possible null reference argument.
                 }
-                else
+                else if(provider.TargetFolder != null)
                 {
                     FileUtil.EnsureFolderHierarchyExists(provider.TargetFolder);
-#pragma warning disable CS8604 // Possible null reference argument.
                     FileUtil.WriteStream(inputStream, Path.Combine(provider.TargetFolder, Path.GetFileName(provider.SourcePath)));
-#pragma warning restore CS8604 // Possible null reference argument.
                 }
                 inputStream.Close();
             }
             else
             {
-#pragma warning disable CS8604 // Possible null reference argument.
+
                 FileUtil.EnsureFolderHierarchyExists(provider.TargetFolder);
                 CompressionUtil.Extract(provider.SourcePath, provider.TargetFolder);
-#pragma warning restore CS8604 // Possible null reference argument.
             }
         }
         catch (Exception ex)

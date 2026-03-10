@@ -26,11 +26,15 @@ internal static class Program
         try
         {
             K9Provider provider = (K9Provider)framework.ProgramProvider;
+            if (provider.WorkspaceRoot == null)
+            {
+                Log.WriteLine("The WORKSPACE ROOT is null for an unknown reason.", ILogOutput.LogType.Error);
+                framework.Shutdown();
+                return;
+            }
 
             // Try to standardize our file/locations, etc.
-#pragma warning disable CS8604 // Possible null reference argument.
             SettingsProvider settings = new(provider.WorkspaceRoot);
-#pragma warning restore CS8604 // Possible null reference argument.
 
             Log.AddLogOutput(new FileLogOutput(settings.LogsFolder, "K9"));
 

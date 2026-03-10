@@ -28,8 +28,14 @@ public static class CompressionUtil
 
         return returnCode == 0;
     }
-    public static bool Extract(string sourcePath, string targetFolder)
+    public static bool Extract(string sourcePath, string? targetFolder)
     {
+        if (targetFolder == null)
+        {
+            Log.WriteLine("No target folder specified.", ILogOutput.LogType.Error);
+            return false;
+        }
+
         ProcessLogRedirect logRedirect = new();
         int returnCode;
 

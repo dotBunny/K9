@@ -11,7 +11,7 @@ namespace K9.OS.WriteTextFile;
 public class WriteTextFileProvider : ProgramProvider
 {
     public string? Target;
-    public string[]? Content;
+    public string[] Content = [];
 
     public override string GetDescription()
     {

@@ -17,8 +17,9 @@ public static class FileUtil
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static void EnsureFileFolderHierarchyExists(string filePath)
+    public static void EnsureFileFolderHierarchyExists(string? filePath)
     {
+        if(filePath == null) return;
         string? targetDirectory = Path.GetDirectoryName(filePath);
         EnsureFolderHierarchyExists(targetDirectory);
     }
@@ -141,8 +142,9 @@ public static class FileUtil
         writer.Write(lines[^1]);
     }
 
-    public static void WriteStream(Stream inputStream, string outputPath)
+    public static void WriteStream(Stream inputStream, string? outputPath)
     {
+        if(outputPath == null) return;
         IFileAccessor outputHandler = GetFileAccessor(outputPath);
         {
             int bufferSize = outputHandler.GetWriteBufferSize();

@@ -26,7 +26,7 @@ public class PerforceTypesProvider : ProgramProvider
         KeyValuePair<string, string>[] lines = new KeyValuePair<string, string>[2];
 
         lines[0] = new KeyValuePair<string, string>("CHANGELIST", "The changelist to add type changes too. This should already be created.");
-        lines[1] = new KeyValuePair<string, string>("TARGET-DIRECTORY", "The path where to recursively look for files needing changes. (Optional: Workspace Root)");
+        lines[1] = new KeyValuePair<string, string>("TARGET", "The path where to recursively look for files needing changes. (Optional: Workspace Root)");
 
         return lines;
     }
@@ -52,10 +52,10 @@ public class PerforceTypesProvider : ProgramProvider
             return false;
         }
 
-        if (args.HasOverrideArgument("TARGET-DIRECTORY") &&
-            !Directory.Exists(args.GetOverrideArgument("TARGET-DIRECTORY")))
+        if (args.HasOverrideArgument("TARGET") &&
+            !Directory.Exists(args.GetOverrideArgument("TARGET")))
         {
-            Log.WriteLine("Unable to find TARGET-DIRECTORY.", ILogOutput.LogType.Warning);
+            Log.WriteLine("Unable to find TARGET.", ILogOutput.LogType.Warning);
             return false;
         }
 
@@ -69,9 +69,9 @@ public class PerforceTypesProvider : ProgramProvider
 
         Changelist = int.Parse(args.GetOverrideArgument("CHANGELIST"));
 
-        if (args.HasOverrideArgument("TARGET-DIRECTORY"))
+        if (args.HasOverrideArgument("TARGET"))
         {
-            TargetDirectory = args.GetOverrideArgument("TARGET-DIRECTORY");
+            TargetDirectory = args.GetOverrideArgument("TARGET");
         }
 
         base.ParseArguments(args);

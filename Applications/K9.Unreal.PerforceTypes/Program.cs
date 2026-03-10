@@ -59,17 +59,20 @@ internal static class Program
         try
         {
             PerforceTypesProvider provider = (PerforceTypesProvider)framework.ProgramProvider;
+            if (provider.WorkspaceRoot == null || provider.TargetDirectory == null)
+            {
+                Log.WriteLine("The WORKSPACE ROOT or TARGET-DIRECTORY is null for an unknown reason.", ILogOutput.LogType.Error);
+                framework.Shutdown();
+                return;
+            }
 
             // Try to standardize our file/locations, etc.
-#pragma warning disable CS8604 // Possible null reference argument.
             SettingsProvider settings = new(provider.WorkspaceRoot);
-
             Log.AddLogOutput(new FileLogOutput(settings.LogsFolder, "UnrealTypes"));
             settings.Output();
 
             WorkUnit[] workUnits = FindUntypedFiles(provider.TargetDirectory);
             UpdateFileTypes(provider.WorkspaceRoot, workUnits, provider.Changelist.ToString());
-#pragma warning restore CS8604 // Possible null reference argument.
         }
         catch (Exception ex)
         {

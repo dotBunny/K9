@@ -54,16 +54,14 @@ internal static class Program
         }
 
 
-        if (s_Token == null)
+        if (s_Token == null || provider.TokenTarget == null)
         {
             return false;
         }
 
         // We need to ensure the folder we are writing exists as it might be a brand-new installation
-#pragma warning disable CS8604 // Possible null reference argument.
-        FileUtil.EnsureFileFolderHierarchyExists(provider.TokenTarget);
-#pragma warning restore CS8604 // Possible null reference argument.
 
+        FileUtil.EnsureFileFolderHierarchyExists(provider.TokenTarget);
         File.Copy(s_Token.FilePath, provider.TokenTarget, true);
 
         s_TokenUsername = Path.GetFileNameWithoutExtension(s_Token.FilePath);
@@ -126,9 +124,8 @@ internal static class Program
             {
                 throw new Exception("Unable to find SteamCMD");
             }
-#pragma warning disable CS8600 // Converting null literal or possible null value to non-nullable type.
-            string steamCmdDirectory = Path.GetDirectoryName(steamCmd);
-#pragma warning restore CS8600 // Converting null literal or possible null value to non-nullable type.
+
+            string? steamCmdDirectory = Path.GetDirectoryName(steamCmd);
 
             ProcessLogRedirect processLogRedirect = new(ILogOutput.LogType.ExternalProcess);
 

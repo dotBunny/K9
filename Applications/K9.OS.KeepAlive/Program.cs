@@ -30,6 +30,12 @@ internal static class Program
         try
         {
             KeepAliveProvider provider = (KeepAliveProvider)framework.ProgramProvider;
+            if (provider.Config == null)
+            {
+                Log.WriteLine("The CONFIG is null for an unknown reason.", ILogOutput.LogType.Error);
+                framework.Shutdown();
+                return;
+            }
 
             // Setup exit logic
             Log.WriteLine("Press CTRL+C to Exit");
@@ -41,9 +47,8 @@ internal static class Program
 
 
             // Get an existing running process, just in case It's still there and this app failed?
-#pragma warning disable CS8602 // Dereference of a possibly null reference.
+
             int pid = ProcessMonitor.GetPIDFromFile(provider.Config.ProcessInfoPath);
-#pragma warning restore CS8602 // Dereference of a possibly null reference.
             if (pid != ProcessMonitor.BadProcessIdentifier &&
                 ProcessMonitor.IsValidPID(pid) &&
                 ProcessMonitor.GetProcessName(pid) == Path.GetFileNameWithoutExtension(provider.Config.Application))
@@ -69,10 +74,10 @@ internal static class Program
                 if (s_ProcessMonitor == null)
                 {
                     StartMonitorProcess(provider.Config);
+                    continue;
                 }
-#pragma warning disable CS8602 // Dereference of a possibly null reference.
+
                 s_ProcessMonitor.Refresh();
-#pragma warning restore CS8602 // Dereference of a possibly null reference.
 
                 if (!s_ProcessMonitor.IsValid())
                 {

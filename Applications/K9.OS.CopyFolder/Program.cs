@@ -24,10 +24,16 @@ internal static class Program
         {
             CopyFolderProvider provider = (CopyFolderProvider)framework.ProgramProvider;
 
+            if (provider.SourceFolder == null || provider.TargetFolder == null)
+            {
+                Log.WriteLine("The SOURCE or TARGET is null for an unknown reason.", ILogOutput.LogType.Error);
+                framework.Shutdown();
+                return;
+            }
 
-#pragma warning disable CS8604 // Possible null reference argument.
+
             string[] originalFiles = Directory.GetFiles(provider.SourceFolder, "*", SearchOption.AllDirectories);
-#pragma warning restore CS8604 // Possible null reference argument.
+
             int fileCount = originalFiles.Length;
 
             if (provider.ClearTargetFolder && Directory.Exists(provider.TargetFolder))
@@ -39,9 +45,8 @@ internal static class Program
             for (int i = 0; i < fileCount; i++)
             {
                 string relativePath = Path.GetRelativePath(provider.SourceFolder, originalFiles[i]);
-#pragma warning disable CS8604 // Possible null reference argument.
+
                 string outputPath = Path.GetFullPath(Path.Combine(provider.TargetFolder, relativePath));
-#pragma warning restore CS8604 // Possible null reference argument.
 
                 FileUtil.EnsureFileFolderHierarchyExists(outputPath);
                 File.Copy(originalFiles[i], outputPath, true);

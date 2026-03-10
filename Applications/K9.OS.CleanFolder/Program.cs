@@ -24,9 +24,15 @@ internal static class Program
         try
         {
             CleanFolderProvider provider = (CleanFolderProvider)framework.ProgramProvider;
-#pragma warning disable CS8604 // Possible null reference argument.
+
+            if (provider.TargetFolder == null)
+            {
+                Log.WriteLine("The TARGET is null for an unknown reason.", ILogOutput.LogType.Error);
+                framework.Shutdown();
+                return;
+            }
+            
             string[] knownFiles = Directory.GetFiles(provider.TargetFolder, "*", SearchOption.AllDirectories);
-#pragma warning restore CS8604 // Possible null reference argument.
 
             // Build out the list of files that pass the filter
             List<string> filesToDelete = new (knownFiles.Length);
@@ -50,7 +56,7 @@ internal static class Program
             {
                 FileUtil.ForceDeleteFile(s);
             }
-            
+
             if (provider.ShouldDeleteEmptyDirectories)
             {
                 string[] knownDirectories = Directory.GetDirectories(provider.TargetFolder, "*", SearchOption.AllDirectories);

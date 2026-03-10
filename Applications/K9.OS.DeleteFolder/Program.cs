@@ -23,10 +23,14 @@ internal static class Program
         try
         {
             DeleteFolderProvider provider = (DeleteFolderProvider)framework.ProgramProvider;
-
-#pragma warning disable CS8604 // Possible null reference argument.
+            if (provider.TargetFolder == null)
+            {
+                Log.WriteLine("The TARGET is null for an unknown reason.", ILogOutput.LogType.Error);
+                framework.Shutdown();
+                return;
+            }
+            
             string[] originalFiles = Directory.GetFiles(provider.TargetFolder, "*", SearchOption.AllDirectories);
-#pragma warning restore CS8604 // Possible null reference argument.
 
             foreach(string path in originalFiles)
             {
