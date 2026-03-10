@@ -12,6 +12,7 @@ namespace K9.Core.Modules;
 public class ArgumentsModule : IModule
 {
 	private const string k_LogCategory = "ARGS";
+    private const string k_ArgumentPrefix = "---";
 
 	private readonly List<string> m_BaseArguments = [];
     private readonly List<string> m_UpperArguments = [];
@@ -95,7 +96,7 @@ public class ArgumentsModule : IModule
 			string arg = m_BaseArguments[i];
 
 			// Our parser will only work with arguments that comply with the ---ARG=VALUE format
-			if (arg.StartsWith("---"))
+			if (arg.StartsWith(k_ArgumentPrefix, StringComparison.Ordinal))
 			{
 				if (arg.Contains("="))
 				{
@@ -173,7 +174,7 @@ public class ArgumentsModule : IModule
 
         foreach(KeyValuePair<string,string> pair in m_OverrideArguments)
         {
-            builder.Append($"---{pair.Key}=\"{pair.Value}\" ");
+            builder.Append($"{k_ArgumentPrefix}{pair.Key}=\"{pair.Value}\" ");
         }
 
         return builder.ToString().Trim();
