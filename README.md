@@ -1,8 +1,11 @@
 # K9
 
-A collection of functionality useful for automation in Game Development.
+A collection of functionality useful for automation in Game Development. 
 
 > **Disclaimer**<br /> K9 is by no means the most optimized battle-ready code, nor is it meant to be. It is a finite set of functionality built for purpose over the years to augment and enhance existing automation and build systems.
+
+The origin of many of these tools simply comes from wanting to augment some automated process in a way that wasn't easily available or not platform agnostic. 
+
 
 ## Requirements
 
@@ -24,6 +27,7 @@ In 2026, a modernization effort was made to bring all applications to target C# 
 | Documentation                                                                              | Description                                                                         |
 |:-------------------------------------------------------------------------------------------|:------------------------------------------------------------------------------------|
 | [K9.OS.CleanFolder](Applications/K9.OS.CleanFolder/K9.OS.CleanFolder.md)                   | Cleans a folder and its subdirectories based on the specified exclusion filters.    |
+| [K9.OS.CopyFile](Applications/K9.OS.CopyFile/K9.OS.CopyFile.md)                            | Copy a file to the target folder, optionally extracting it.                         |
 | [K9.OS.CopyFolder](Applications/K9.OS.CopyFolder/K9.OS.CopyFolder.md)                      | A simple safe way to copy a folder's contents to another folder.                    |
 | [K9.OS.DeleteFile](Applications/K9.OS.DeleteFile/K9.OS.DeleteFile.md)                      | Deletes a file, with no nonsense.                                                   |
 | [K9.OS.DeleteFolder](Applications/K9.OS.DeleteFolder/K9.OS.DeleteFolder.md)                | Deletes a folder, with no nonsense.                                                 |

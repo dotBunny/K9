@@ -180,7 +180,7 @@ public static class FileUtil
         }
     }
 
-    static IFileAccessor GetFileAccessor(string connectionString)
+    public static IFileAccessor GetFileAccessor(string connectionString)
     {
         //Uri uri = new Uri(connectionString);
         //IFileAccessor.Type type = IFileAccessor.Type.Default;
