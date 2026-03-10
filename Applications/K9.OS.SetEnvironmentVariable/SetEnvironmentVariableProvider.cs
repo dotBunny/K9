@@ -7,5 +7,12 @@ namespace K9.OS.SetEnvironmentVariable;
 
 public class SetEnvironmentVariableProvider : ProgramProvider
 {
+    public string? UserTarget;
+    public string? SystemTarget;
 
+    public string? UserKeys;
+    public string? UserValues;
+
+    public string? SystemKeys;
+    public string? SystemValues;
 }
