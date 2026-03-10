@@ -32,4 +32,9 @@ public class ProgramProvider
     {
         return [];
     }
+
+    public virtual bool IsHelpOverride()
+    {
+        return false;
+    }
 }

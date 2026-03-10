@@ -89,7 +89,7 @@ public class ConsoleApplication : IDisposable
         ProgramProvider = programProvider;
 
         // Help Route
-        if (Arguments.BaseArguments.Contains("help"))
+        if (Arguments.BaseArguments.Contains("help") && !ProgramProvider.IsHelpOverride())
         {
             m_DisplayRuntime = false;
             m_ShouldPause = false;

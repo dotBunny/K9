@@ -5,7 +5,7 @@ using System;
 using System.IO;
 using K9.Core;
 using K9.Core.LogOutputs;
-using K9.Services.Perforce;
+using K9.Core.Utils;
 
 namespace K9.Workspace.Reset;
 
@@ -25,7 +25,7 @@ internal static class Program
         try
         {
             // Find our root
-            string? workspaceRoot = PerforceUtil.GetWorkspaceRoot();
+            string? workspaceRoot = WorkspaceUtil.GetWorkspaceRoot();
             if (workspaceRoot == null)
             {
                 Log.WriteLine("Unable to find workspace root.", ILogOutput.LogType.Error);

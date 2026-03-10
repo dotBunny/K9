@@ -28,7 +28,7 @@ internal static class Program
         try
         {
             // Find our root
-            string? workspaceRoot = PerforceUtil.GetWorkspaceRoot();
+            string? workspaceRoot = WorkspaceUtil.GetWorkspaceRoot();
             if (workspaceRoot == null)
             {
                 Log.WriteLine("Unable to find workspace root.", ILogOutput.LogType.Error);

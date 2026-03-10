@@ -3,7 +3,7 @@
 
 namespace K9.Core.Utils;
 
-public static class TestUtils
+public static class TestUtil
 {
     public const string PassPrefix = "###PASS";
     public const string FailPrefix = "###FAIL";

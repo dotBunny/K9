@@ -21,21 +21,16 @@ internal static class Program
             PauseOnExit = false,
             DisplayHeader = false,
             DisplayRuntime = false
-        }, new ProgramProvider());
+        }, new K9Provider());
 
         try
         {
-            // Find our root
-            string? workspaceRoot = PerforceUtil.GetWorkspaceRoot();
-            if (workspaceRoot == null)
-            {
-                Log.WriteLine("Unable to find workspace root.", ILogOutput.LogType.Error);
-                framework.Environment.UpdateExitCode(1, true);
-                return;
-            }
+            K9Provider provider = (K9Provider)framework.ProgramProvider;
 
             // Try to standardize our file/locations, etc.
-            SettingsProvider settings = new(workspaceRoot);
+#pragma warning disable CS8604 // Possible null reference argument.
+            SettingsProvider settings = new(provider.WorkspaceRoot);
+#pragma warning restore CS8604 // Possible null reference argument.
 
             Log.AddLogOutput(new FileLogOutput(settings.LogsFolder, "K9"));
 

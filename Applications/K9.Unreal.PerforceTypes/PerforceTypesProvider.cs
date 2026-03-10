@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.IO;
 using K9.Core;
 using K9.Core.Modules;
+using K9.Core.Utils;
 using K9.Services.Perforce;
 
 namespace K9.Unreal.Types;
@@ -33,7 +34,7 @@ public class PerforceTypesProvider : ProgramProvider
 
     public override bool IsValid(ArgumentsModule args)
     {
-        string? workspaceRoot = PerforceUtil.GetWorkspaceRoot();
+        string? workspaceRoot = WorkspaceUtil.GetWorkspaceRoot();
         if (workspaceRoot == null)
         {
             Log.WriteLine("Unable to find workspace root.", ILogOutput.LogType.Warning);
@@ -64,7 +65,7 @@ public class PerforceTypesProvider : ProgramProvider
 
     public override void ParseArguments(ArgumentsModule args)
     {
-        WorkspaceRoot = PerforceUtil.GetWorkspaceRoot();
+        WorkspaceRoot = WorkspaceUtil.GetWorkspaceRoot();
         TargetDirectory = WorkspaceRoot;
 
         Changelist = int.Parse(args.OverrideArguments["CHANGELIST"]);

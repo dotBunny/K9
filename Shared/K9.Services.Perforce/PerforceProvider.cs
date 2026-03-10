@@ -61,7 +61,7 @@ public class PerforceProvider
 
     public PerforceProvider()
     {
-        string? root = PerforceUtil.GetWorkspaceRoot();
+        string? root = WorkspaceUtil.GetWorkspaceRoot();
         if (root != null)
         {
             s_CurrentConfig = new PerforceConfig(Path.Combine(root, SettingsProvider.PerforceConfigFileName));
