@@ -34,6 +34,13 @@
     <ProjectReference Include="..\..\Shared\K9.Core\K9.Core.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Remove="K9.OS.DeleteFolder.md" />
+    <Content Include="K9.OS.DeleteFolder.md">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
   <Target Name="PreBuild" BeforeTargets="PreBuildEvent">
     <Exec Command="git rev-parse HEAD" StandardOutputImportance="Low" ConsoleToMsBuild="true">
       <Output TaskParameter="ConsoleOutput" PropertyName="SourceRevisionId" />

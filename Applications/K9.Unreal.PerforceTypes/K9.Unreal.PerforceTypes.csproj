@@ -40,6 +40,13 @@
     <ProjectReference Include="..\..\Shared\K9.Services.Perforce\K9.Services.Perforce.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Remove="K9.Unreal.PerforceTypes.md" />
+    <Content Include="K9.Unreal.PerforceTypes.md">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
   <Target Name="PreBuild" BeforeTargets="PreBuildEvent">
     <Exec Command="git rev-parse HEAD" StandardOutputImportance="Low" ConsoleToMsBuild="true">
       <Output TaskParameter="ConsoleOutput" PropertyName="SourceRevisionId" />
