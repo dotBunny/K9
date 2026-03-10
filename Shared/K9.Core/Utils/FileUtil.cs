@@ -32,8 +32,10 @@ public static class FileUtil
         }
     }
 
-    public static void ForceDeleteFile(string filePath)
+    public static void ForceDeleteFile(string? filePath)
     {
+        if(filePath == null) return;
+
         if (File.Exists(filePath))
         {
             File.SetAttributes(filePath, File.GetAttributes(filePath) & ~FileAttributes.ReadOnly);
@@ -41,8 +43,10 @@ public static class FileUtil
         }
     }
 
-    public static bool IsSafeToWrite(string filePath)
+    public static bool IsSafeToWrite(string? filePath)
     {
+        if(filePath == null) return false;
+        
         if (File.Exists(filePath))
         {
             FileAttributes attributes = File.GetAttributes(filePath);
