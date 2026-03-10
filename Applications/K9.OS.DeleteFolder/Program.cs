@@ -2,7 +2,9 @@
 // See the LICENSE file at the repository root for more information.
 
 using System;
+using System.IO;
 using K9.Core;
+using K9.Core.Utils;
 
 namespace K9.OS.DeleteFolder;
 
@@ -22,7 +24,15 @@ internal static class Program
         {
             DeleteFolderProvider provider = (DeleteFolderProvider)framework.ProgramProvider;
 
+#pragma warning disable CS8604 // Possible null reference argument.
+            string[] originalFiles = Directory.GetFiles(provider.TargetFolder, "*", SearchOption.AllDirectories);
+#pragma warning restore CS8604 // Possible null reference argument.
 
+            foreach(string path in originalFiles)
+            {
+                FileUtil.ForceDeleteFile(path);
+            }
+            Directory.Delete(provider.TargetFolder, true);
         }
         catch (Exception ex)
         {

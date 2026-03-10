@@ -1,6 +1,7 @@
 // Copyright dotBunny Inc. All Rights Reserved.
 // See the LICENSE file at the repository root for more information.
 
+using System.Collections.Generic;
 using System.IO;
 using K9.Core;
 using K9.Core.Modules;
@@ -10,6 +11,20 @@ namespace K9.OS.DeleteFile;
 public class DeleteFileProvider : ProgramProvider
 {
     public string? TargetFile;
+
+    public override string GetDescription()
+    {
+        return "Deletes a file, with no nonsense.";
+    }
+
+    public override KeyValuePair<string, string>[] GetArgumentHelp()
+    {
+        KeyValuePair<string, string>[] lines = new KeyValuePair<string, string>[4];
+
+        lines[0] = new KeyValuePair<string, string>("TARGET", "The absolute path of the file to delete.");
+
+        return lines;
+    }
 
     public override bool IsValid(ArgumentsModule args)
     {

@@ -24,6 +24,7 @@ In 2026, a modernization effort was made to bring all applications to target C# 
 | Documentation                                                                              | Description                                                                         |
 |:-------------------------------------------------------------------------------------------|:------------------------------------------------------------------------------------|
 | [K9.OS.DeleteFile](Applications/K9.OS.DeleteFile/K9.OS.DeleteFile.md)                      | Deletes a file, with no nonsense.                                                   |
+| [K9.OS.DeleteFolder](Applications/K9.OS.DeleteFolder/K9.OS.DeleteFolder.md)                | Deletes a folder, with no nonsense.                                                 |
 | [K9.OS.FileReplacer](Applications/K9.OS.FileReplacer/K9.OS.FileReplacer.md)                | A tool for replacing content in a file in one-shot.                                 |
 | [K9.OS.KeepAlive](Applications/K9.OS.KeepAlive/K9.OS.KeepAlive.md)                         | An application designed to keep a launched application running, much like a service |
 | [K9.OS.ScreenResolution](Applications/K9.OS.ScreenResolution/K9.OS.ScreenResolution.md)    | A tool to force a specific screen resolution.                                       |
