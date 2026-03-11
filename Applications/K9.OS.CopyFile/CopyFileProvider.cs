@@ -16,7 +16,7 @@ public class CopyFileProvider : ProgramProvider
     public bool CheckExists = true;
     public bool Extract;
 
-    public bool TargetFile = false;
+    public bool TargetFile;
 
     public override string GetDescription()
     {

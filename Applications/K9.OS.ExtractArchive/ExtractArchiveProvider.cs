@@ -12,7 +12,7 @@ public class ExtractArchiveProvider : ProgramProvider
 {
     public string? Source;
     public string? TargetFolder;
-    public bool CheckExists = false;
+    public bool CheckExists;
 
     public override bool IsValid(ArgumentsModule args)
     {

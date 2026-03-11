@@ -23,7 +23,6 @@ internal static class Program
         {
             CreateArchiveProvider provider = (CreateArchiveProvider)framework.ProgramProvider;
             if (provider.SourceFolder == null ||
-                provider.Source == null ||
                 provider.Target == null)
             {
                 Log.WriteLine("One or more of the required parameters are null for an unknown reason.", ILogOutput.LogType.Error);
