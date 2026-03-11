@@ -7,5 +7,8 @@ namespace K9.OS.Wrapper;
 
 public class WrapperProvider : ProgramProvider
 {
-
+    public override string GetDescription()
+    {
+        return "Wrap execution of applications to control error handling and logging.";
+    }
 }

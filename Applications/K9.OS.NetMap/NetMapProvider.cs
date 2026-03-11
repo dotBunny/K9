@@ -7,5 +7,8 @@ namespace K9.OS.NetMap;
 
 public class NetMapProvider : ProgramProvider
 {
-
+    public override string GetDescription()
+    {
+        return "Provide a mechanism for ensuring network shares are mapped as expected.";
+    }
 }
