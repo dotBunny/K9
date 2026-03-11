@@ -67,7 +67,7 @@ public class FileReplacerProvider : ProgramProvider
 
             if (keys.Length != values.Length)
             {
-                Log.WriteLine($"The number of KEYS({keys.Length}) does match the number of VALUES({values.Length}).", ILogOutput.LogType.Warning);
+                Log.WriteLine($"The number of KEY({keys.Length}) does match the number of VALUE({values.Length}).", ILogOutput.LogType.Warning);
                 return false;
             }
         }
