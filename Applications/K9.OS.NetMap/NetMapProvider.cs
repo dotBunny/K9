@@ -2,6 +2,7 @@
 // See the LICENSE file at the repository root for more information.
 
 using System.Collections.Generic;
+using System.Runtime.InteropServices;
 using K9.Core;
 using K9.Core.Extensions;
 using K9.Core.Modules;
@@ -10,10 +11,10 @@ namespace K9.OS.NetMap;
 
 public class NetMapProvider : ProgramProvider
 {
-    string? NetworkUsername;
-    string? NetworkPassword;
-    string NetworkDrive = "H"; // We'll add
-    string NetworkShare = @"\\192.168.20.21\Horde"; // This is the farms NAS path to the Horde share
+    public string? NetworkUsername;
+    public string? NetworkPassword;
+    public string NetworkMapping = "H:"; // Default to windows drive
+    public string NetworkShare = @"\\192.168.20.21\Horde"; // This is the farms NAS path to the Horde share
 
     public override string GetDescription()
     {
@@ -29,8 +30,17 @@ public class NetMapProvider : ProgramProvider
         lines[1] = new KeyValuePair<string, string>("NETWORK-PASSWORD",
             "Password for network access to be established.");
 
-        lines[2] = new KeyValuePair<string, string>("NETWORK-DRIVE",
-            "Drive letter to map the network share to. (Optional: H)");
+        if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+        {
+            lines[2] = new KeyValuePair<string, string>("NETWORK-MAPPING",
+                "Drive letter to map the network share to. (Optional: H)");
+        }
+        else
+        {
+            lines[2] = new KeyValuePair<string, string>("NETWORK-MAPPING",
+                "Path to map the network share to. (Optional: /dev/mapping)");
+        }
+
         lines[3] = new KeyValuePair<string, string>("NETWORK-SHARE",
             @"Network share path to the Horde share. (Optional: \\192.168.20.21\Horde)");
 
@@ -50,19 +60,22 @@ public class NetMapProvider : ProgramProvider
             return false;
         }
 
-        if (args.HasOverrideArgument("NETWORK-DRIVE"))
+        if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
         {
-            string testDriveLetter = args.GetOverrideArgument("NETWORK-DRIVE");
-            if (testDriveLetter.Length != 1)
+            if (args.HasOverrideArgument("NETWORK-MAPPING"))
             {
-                Log.WriteLine("NETWORK-DRIVE must be a single letter (---NETWORK-DRIVE=H)");
-                return false;
-            }
+                string testDriveLetter = args.GetOverrideArgument("NETWORK-MAPPING");
+                if (testDriveLetter.Length != 1)
+                {
+                    Log.WriteLine("NETWORK-MAPPING must be a single letter (---NETWORK-MAPPING=H)");
+                    return false;
+                }
 
-            if (testDriveLetter.IsNumeric())
-            {
-                Log.WriteLine("NETWORK-DRIVE cannot be a number (---NETWORK-DRIVE=H)");
-                return false;
+                if (testDriveLetter.IsNumeric())
+                {
+                    Log.WriteLine("NETWORK-MAPPING cannot be a number (---NETWORK-MAPPING=H)");
+                    return false;
+                }
             }
         }
 
@@ -73,9 +86,17 @@ public class NetMapProvider : ProgramProvider
     {
         NetworkUsername = args.GetOverrideArgument("NETWORK-USERNAME");
         NetworkPassword = args.GetOverrideArgument("NETWORK-PASSWORD");
-        if (args.HasOverrideArgument("NETWORK-DRIVE"))
+
+        if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
         {
-            NetworkDrive = args.GetOverrideArgument("NETWORK-DRIVE").ToUpper() + ":";
+            if (args.HasOverrideArgument("NETWORK-MAPPING"))
+            {
+                NetworkMapping = args.GetOverrideArgument("NETWORK-MAPPING").ToUpper() + ":";
+            }
+        }
+        else
+        {
+            NetworkMapping = args.GetOverrideArgument("NETWORK-MAPPING");
         }
 
         if (args.HasOverrideArgument("NETWORK-SHARE"))

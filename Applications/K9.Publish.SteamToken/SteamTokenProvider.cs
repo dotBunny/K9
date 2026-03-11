@@ -179,10 +179,10 @@ public class SteamTokenProvider : ProgramProvider
         if (!string.IsNullOrEmpty(m_NetworkPassword) && !string.IsNullOrEmpty(m_NetworkUsername) && !Directory.Exists(TokenFolder))
         {
             Log.WriteLine($"Establishing network share {m_NetworkDrive} -> {m_NetworkShare}");
-            ProcessUtil.Execute("net", null, $"use {m_NetworkDrive} {m_NetworkShare} /USER:{m_NetworkUsername} {m_NetworkPassword}", null, (processIdentifier, line) =>
-            {
-                Log.WriteLine($"[{processIdentifier}]\t{line}");
-            });
+            ProcessLogRedirect logRedirect = new();
+            ProcessUtil.Execute("net", null,
+                $"use {m_NetworkDrive} {m_NetworkShare} /USER:{m_NetworkUsername} {m_NetworkPassword}", null,
+                logRedirect.GetAction());
         }
 
     }
