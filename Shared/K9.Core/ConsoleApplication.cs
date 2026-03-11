@@ -72,14 +72,14 @@ public class ConsoleApplication : IDisposable
         {
             string relaunchTarget = m_Assembly.EntryAssembly != null ? m_Assembly.EntryAssembly.Location : m_Assembly.ExecutingAssembly.Location;
             Log.WriteLine($"Elevation REQUIRED: {relaunchTarget}", k_LogCategory, ILogOutput.LogType.Error);
-            if (Arguments.HasBaseArgument("elevation-check"))
+            if (Arguments.HasBaseArgument("ELEVATION-CHECK"))
             {
                 Log.WriteLine($"Elevation FAILED: {relaunchTarget}", k_LogCategory, ILogOutput.LogType.Error);
             }
             else
             {
                 Log.Shutdown(); // Need to unlock files
-                ProcessUtil.Elevate("dotnet", Directory.GetCurrentDirectory(), $"{relaunchTarget} {Arguments} elevation-check", false);
+                ProcessUtil.Elevate("dotnet", Directory.GetCurrentDirectory(), $"{relaunchTarget} {Arguments} ELEVATION-CHECK", false);
             }
             m_ShouldPause = false;
             Shutdown();
@@ -89,7 +89,7 @@ public class ConsoleApplication : IDisposable
         ProgramProvider = programProvider;
 
         // Help Route
-        if (Arguments.HasBaseArgument("help") && !ProgramProvider.IsHelpOverride())
+        if (Arguments.HasBaseArgument("HELP") && !ProgramProvider.IsHelpOverride())
         {
             m_DisplayRuntime = false;
             m_ShouldPause = false;
