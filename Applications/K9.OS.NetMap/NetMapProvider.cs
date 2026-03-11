@@ -13,7 +13,7 @@ public class NetMapProvider : ProgramProvider
 {
     public string? NetworkUsername;
     public string? NetworkPassword;
-    public string NetworkMapping = "H:"; // Default to windows drive
+    public string NetworkMapping = "H:"; // Default to windows' drive
     public string NetworkShare = @"\\192.168.20.21\Horde"; // This is the farms NAS path to the Horde share
 
     public override string GetDescription()
@@ -51,12 +51,12 @@ public class NetMapProvider : ProgramProvider
     {
         if (!args.HasOverrideArgument("NETWORK-USERNAME"))
         {
-            Log.WriteLine("A NETWORK-USERNAME is required (---NETWORK-USERNAME=myusername)");
+            Log.WriteLine("A NETWORK-USERNAME is required (---NETWORK-USERNAME=username)");
             return false;
         }
         if (!args.HasOverrideArgument("NETWORK-PASSWORD"))
         {
-            Log.WriteLine("A NETWORK-PASSWORD is required (---NETWORK-PASSWORD=mypassword)");
+            Log.WriteLine("A NETWORK-PASSWORD is required (---NETWORK-PASSWORD=password)");
             return false;
         }
 
