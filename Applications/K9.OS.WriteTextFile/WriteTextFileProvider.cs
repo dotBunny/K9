@@ -20,7 +20,7 @@ public class WriteTextFileProvider : ProgramProvider
 
     public override KeyValuePair<string, string>[] GetArgumentHelp()
     {
-        KeyValuePair<string, string>[] lines = new KeyValuePair<string, string>[3];
+        KeyValuePair<string, string>[] lines = new KeyValuePair<string, string>[2];
 
         lines[0] = new KeyValuePair<string, string>("TARGET", "The target file to write to.");
         lines[1] = new KeyValuePair<string, string>("CONTENT", "The content you wish to write to the file. (Optional)");

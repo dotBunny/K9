@@ -29,12 +29,12 @@ public class CleanFolderProvider : ProgramProvider
 
     public override string GetDescription()
     {
-        return "Cleans a folder and its subdirectories based on the specified exclusion filters.";
+        return "Set different environment variables based on inputs.";
     }
 
     public override KeyValuePair<string, string>[] GetArgumentHelp()
     {
-        KeyValuePair<string, string>[] lines = new KeyValuePair<string, string>[4];
+        KeyValuePair<string, string>[] lines = new KeyValuePair<string, string>[8];
 
         lines[0] = new KeyValuePair<string, string>("TARGET", "The absolute path of the folder to clean.");
 
@@ -51,7 +51,7 @@ public class CleanFolderProvider : ProgramProvider
 
     public override KeyValuePair<string, string>[] GetFlagHelp()
     {
-        KeyValuePair<string, string>[] lines = new KeyValuePair<string, string>[1];
+        KeyValuePair<string, string>[] lines = new KeyValuePair<string, string>[2];
 
         lines[0] = new KeyValuePair<string, string>("CHECK-CASE", "Does the case of the file names and paths matter?");
         lines[1] = new KeyValuePair<string, string>("IGNORE-EMPTY-DIR", "Should empty directories not be deleted?");

@@ -19,7 +19,7 @@ public class DeleteFileProvider : ProgramProvider
 
     public override KeyValuePair<string, string>[] GetArgumentHelp()
     {
-        KeyValuePair<string, string>[] lines = new KeyValuePair<string, string>[4];
+        KeyValuePair<string, string>[] lines = new KeyValuePair<string, string>[1];
 
         lines[0] = new KeyValuePair<string, string>("TARGET", "The absolute path of the file to delete.");
 
