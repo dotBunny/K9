@@ -8,25 +8,25 @@ namespace K9.Unreal;
 public class UnrealTestReport
 {
     [JsonPropertyName("clientDescriptor")]
-    public string? ClientDescriptor;
+    public string? ClientDescriptor { get; set; }
 
     [JsonPropertyName("succeeded")]
-    public int Succeeded;
+    public int Succeeded { get; set; }
     [JsonPropertyName("succeededWithWarnings")]
-    public int SucceededWithWarnings;
+    public int SucceededWithWarnings { get; set; }
     [JsonPropertyName("failed")]
-    public int Failed;
+    public int Failed { get; set; }
     [JsonPropertyName("notRun")]
-    public int NotRun;
+    public int NotRun { get; set; }
 
     [JsonPropertyName("totalDuration")]
-    public string? TotalDuration;
+    public string? TotalDuration { get; set; }
 
     [JsonPropertyName("reportCreatedOn")]
-    public string? CreatedOn;
+    public string? CreatedOn { get; set; }
 
     [JsonPropertyName("tests")]
-    public UnrealTestResult[] Tests = [];
+    public UnrealTestResult[] Tests { get; set; } = [];
 
     public int TotalTests => Succeeded + SucceededWithWarnings + Failed + NotRun;
 }

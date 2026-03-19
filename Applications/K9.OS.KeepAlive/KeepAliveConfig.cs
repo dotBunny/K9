@@ -15,16 +15,18 @@ public class KeepAliveConfig
     public const int IssueSleep = 1000 * 10;
     public const int StartSleep = 1000 * 2;
 
-    public string Application = @"C:\Program Files\Epic Games\Horde\Agent\HordeAgent.exe";
-    public string? Arguments;
-    public string? WorkingDirectory = @"C:\Program Files\Epic Games\Horde\Agent\";
-    public string ProcessInfoPath = Path.Combine(Path.GetTempPath(), "HordeAgent.pid");
-    public int SleepMilliseconds;
-    public int TimeoutSleepMilliseconds;
-    public int StartSleepMilliseconds;
-
-    public bool CheckResponding = true;
-    public bool CheckHasExited = true;
+    // Required for JSON
+    // ReSharper disable PropertyCanBeMadeInitOnly.Global
+    public string Application { get; set; } = @"C:\Program Files\Epic Games\Horde\Agent\HordeAgent.exe";
+    public string? Arguments { get; set; }
+    public string? WorkingDirectory { get; set; } = @"C:\Program Files\Epic Games\Horde\Agent\";
+    public string ProcessInfoPath { get; set; } = Path.Combine(Path.GetTempPath(), "HordeAgent.pid");
+    public int SleepMilliseconds { get; set; }
+    public int TimeoutSleepMilliseconds { get; set; }
+    public int StartSleepMilliseconds{ get; set; }
+    public bool CheckResponding { get; set; } = true;
+    public bool CheckHasExited { get; set; } = true;
+    // ReSharper restore PropertyCanBeMadeInitOnly.Global
 
 
     public static KeepAliveConfig Get(string? jsonPath = null)
@@ -111,7 +113,7 @@ public class KeepAliveConfig
 
         if(!File.Exists(Application))
         {
-            Log.WriteLine("No application found at provided path.", ILogOutput.LogType.Warning);
+            Log.WriteLine($"No application found at provided path. ({Application})", ILogOutput.LogType.Warning);
             return false;
         }
 
