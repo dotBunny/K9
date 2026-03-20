@@ -53,10 +53,13 @@ public class SettingsProvider
         LogsFolder = Path.Combine(RootFolder, "Logs");
         TempFile = Path.Combine(RootFolder, "k9.tmp");
 
-
         SourceFolder = Path.Combine(K9Folder, "Source");
         BinariesFolder = Path.Combine(K9Folder, "Binaries");
         DefaultsFolder = Path.Combine(K9Folder, "Defaults");
+        if (Directory.Exists(DefaultsFolder))
+        {
+            Directory.CreateDirectory(DefaultsFolder);
+        }
 
         WorkspaceSettingsFile = Path.Combine(K9Folder, "K9_SETTINGS");
         WorkspaceVersionFile = Path.Combine(K9Folder, "K9_WORKSPACE");
