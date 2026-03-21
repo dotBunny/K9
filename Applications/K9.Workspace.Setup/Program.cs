@@ -139,6 +139,7 @@ internal static class Program
         CustomTools.CustomToolDefList baseCustomTools = CustomTools.Get();
 
         // We need to find all the extra tools throughout the workspace
+        Log.WriteLine($"Searching in {settings.DefaultsFolder} and {settings.UnrealProjectsFolder} ...");
         List<string> p4Tools =
         [
             .. Directory.GetFiles(settings.DefaultsFolder, SettingsProvider.PerforceCustomToolsFileName, SearchOption.AllDirectories),

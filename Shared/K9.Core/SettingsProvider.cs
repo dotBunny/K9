@@ -56,8 +56,9 @@ public class SettingsProvider
         SourceFolder = Path.Combine(K9Folder, "Source");
         BinariesFolder = Path.Combine(K9Folder, "Binaries");
         DefaultsFolder = Path.Combine(K9Folder, "Defaults");
-        if (Directory.Exists(DefaultsFolder))
+        if (!Directory.Exists(DefaultsFolder))
         {
+            Log.WriteLine($"Creating K9 Defaults folder at {DefaultsFolder}");
             Directory.CreateDirectory(DefaultsFolder);
         }
 
@@ -68,8 +69,9 @@ public class SettingsProvider
         UnrealEngineBuildBatchFilesFolder = Path.Combine(RootFolder, "Engine", "Build", "BatchFiles");
         UnrealEngineBuildVersionFile = Path.Combine(RootFolder, "Engine", "Build", "Build.version");
         UnrealProjectsFolder = Path.Combine(RootFolder, "Projects");
-        if (Directory.Exists(UnrealProjectsFolder))
+        if (!Directory.Exists(UnrealProjectsFolder))
         {
+            Log.WriteLine($"Creating Projects folder at {UnrealProjectsFolder}");
             Directory.CreateDirectory(UnrealProjectsFolder);
         }
 
