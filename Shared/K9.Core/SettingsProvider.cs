@@ -68,6 +68,10 @@ public class SettingsProvider
         UnrealEngineBuildBatchFilesFolder = Path.Combine(RootFolder, "Engine", "Build", "BatchFiles");
         UnrealEngineBuildVersionFile = Path.Combine(RootFolder, "Engine", "Build", "Build.version");
         UnrealProjectsFolder = Path.Combine(RootFolder, "Projects");
+        if (Directory.Exists(UnrealProjectsFolder))
+        {
+            Directory.CreateDirectory(UnrealProjectsFolder);
+        }
 
         PerforceConfigFile = Path.Combine(RootFolder, PerforceConfigFileName);
 
