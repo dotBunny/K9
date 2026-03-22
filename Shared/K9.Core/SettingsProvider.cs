@@ -14,8 +14,8 @@ public class SettingsProvider
 {
     public const string PerforcePort = "ssl:perforce.dotbunny.com:1666";
     public const string PerforceCharacterSet = "none";
-    public const string PerforceIgnoreFileName = "p4ignore.txt";
-    public const string PerforceConfigFileName = "p4config.txt";
+    public const string PerforceIgnoreFileName = ".p4ignore";
+    public const string PerforceConfigFileName = ".p4config";
     public const string PerforceCustomToolsFileName = "p4v-custom-tools.xml";
     public readonly string PerforceConfigFile;
 
