@@ -401,3 +401,7 @@ FodyWeavers.xsd
 # K9 Tooling
 K9_BUILD_SHA
 !Applications/Publish/
+
+# Claude
+.claude/tmp
+.claude/settings.local.json
