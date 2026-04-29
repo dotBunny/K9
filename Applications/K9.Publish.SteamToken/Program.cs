@@ -127,6 +127,8 @@ internal static class Program
 
             string? steamCmdDirectory = Path.GetDirectoryName(steamCmd);
 
+            // TODO: if we moved this to log replacer and had it handle errors HORDE wouldnt error unless acutal problem
+
             ProcessLogRedirect processLogRedirect = new(ILogOutput.LogType.ExternalProcess);
 
             // Make sure the installation is up to date
