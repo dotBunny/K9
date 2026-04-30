@@ -19,7 +19,7 @@ public class SteamTokenProvider : ProgramProvider
     public string TokenFolder = @"H:\Steamworks\Tokens";
 
     // ReSharper disable once UnassignedField.Global
-    public string? AppBuild;
+    public string AppBuild = string.Empty;
     public int RetryCount = 3;
     public string? TokenTarget;
 
@@ -121,6 +121,7 @@ public class SteamTokenProvider : ProgramProvider
 
         // Should we force operations?
         ForceFlag = args.HasBaseArgument("FORCE");
+        AppBuild = args.GetOverrideArgument("APPBUILD");
 
         // Network Share Settings
         if (args.HasOverrideArgument("NETWORK-USERNAME"))
