@@ -6,9 +6,9 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 K9 is a collection of small, single-purpose .NET CLI executables that augment game-development automation (heavily oriented around Unreal Engine and Perforce workspaces). Each application under `Applications/` is a self-contained `Exe` project; shared functionality lives in `Shared/` class libraries.
 
-- Executables target `net10.0` with `<LangVersion>14</LangVersion>`.
+- Executables target `net8.0` with `<LangVersion>12</LangVersion>`.
 - Shared libraries (`K9.Core`, `K9.Services.*`, `K9.Unreal`) target `netstandard2.1`.
-- `global.json` pins the SDK to version 5.0 with `rollForward: latestMajor` — **.NET 10.0 SDK is required** (see README).
+- `global.json` pins the SDK to version 5.0 with `rollForward: latestMajor` — **.NET 8.0 SDK is required** (see README).
 
 ## Build & Run
 

@@ -13,10 +13,11 @@ The origin of many of these tools simply comes from wanting to augment some auto
 
 Git needs to be accessible from your command prompt; some Git clients do not add Git to the `PATH` so it may be easier to just use the installers found at: https://git-scm.com/download/.
 
-### .NET SDK 10.0
+### .NET SDK 8.0
 
-The bootstrapped build requires the installation of the .NET 10.0 SDK, which can be found at: https://dotnet.microsoft.com/en-us/download/dotnet/10.0.
-In 2026, a modernization effort was made to bring all applications to target C# 14 w/ .NET Runtime 10, and libraries targeting C# 14 w/ .NET Standard 2.1.
+The bootstrapped build requires the installation of the .NET 8.0 SDK, which can be found at: https://dotnet.microsoft.com/en-us/download/dotnet/8.0.
+
+In 2026, a modernization effort was made to bring all applications to target C# 14 w/ .NET Runtime 10, and libraries targeting C# 14 w/ .NET Standard 2.1. Proving it was possible, but until Epic moves their bundled version forward we cannot land this. 
 
 ## Development
 

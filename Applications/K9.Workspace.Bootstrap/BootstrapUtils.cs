@@ -21,7 +21,7 @@ public static class BootstrapUtils
     {
         private int m_ProcessIdentifier;
 
-        private readonly Lock m_LockObject = new();
+        private readonly object m_LockObject = new();
 
         public void SetProcessIdentifier(int processIdentifier)
         {

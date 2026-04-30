@@ -21,7 +21,10 @@ namespace K9.Core.Files
             }
 
             returnValue = JsonSerializer.Deserialize<WorkspaceSettings>(File.ReadAllText(filePath));
-            returnValue?.m_Path = filePath;
+            if (returnValue != null)
+            {
+                returnValue.m_Path = filePath;
+            }
             return returnValue;
         }
     }

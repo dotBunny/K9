@@ -675,45 +675,41 @@ public static class StringExtensions
 		return false;
 	}
 
-    /// <param name="targetString">The target <see cref="string" />.</param>
-    extension(string targetString)
+    /// <summary>
+    ///     Create a new string, splitting an existing string up based on camel case formatting.
+    /// </summary>
+    /// <param name="divider">The <see cref="string" /> to put in between the split <see cref="string" />.</param>
+    /// <returns>A new <see cref="string" />.</returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static string SplitCamelCase(this string targetString, string divider = " ")
     {
-        /// <summary>
-        ///     Create a new string, splitting an existing string up based on camel case formatting.
-        /// </summary>
-        /// <param name="divider">The <see cref="string" /> to put in between the split <see cref="string" />.</param>
-        /// <returns>A new <see cref="string" />.</returns>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public string SplitCamelCase(string divider = " ")
+        return Regex.Replace(targetString, "([A-Z])", $"{divider}$1", RegexOptions.None).Trim();
+    }
+
+    /// <summary>
+    ///     Remove non-ASCII characters from a <see cref="string" />.
+    /// </summary>
+    /// <returns>A <see cref="string" /> without ASCII characters.</returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static string StripNonAscii(this string targetString)
+    {
+        return Regex.Replace(targetString, @"[^\u0000-\u007F]+", string.Empty);
+    }
+
+    public static string MarkedSubstring(this string targetString, string marker, string terminator)
+    {
+        int startIndex = targetString.IndexOf(marker, StringComparison.Ordinal);
+
+        // We didnt find anything
+        if (startIndex < 0)
         {
-            return Regex.Replace(targetString, "([A-Z])", $"{divider}$1", RegexOptions.None).Trim();
+            return string.Empty;
         }
 
-        /// <summary>
-        ///     Remove non-ASCII characters from a <see cref="string" />.
-        /// </summary>
-        /// <returns>A <see cref="string" /> without ASCII characters.</returns>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public string StripNonAscii()
-        {
-            return Regex.Replace(targetString, @"[^\u0000-\u007F]+", string.Empty);
-        }
+        int markerLength = marker.Length;
+        int start = startIndex + markerLength;
 
-        public string MarkedSubstring(string marker, string terminator)
-        {
-            int startIndex = targetString.IndexOf(marker, StringComparison.Ordinal);
-
-            // We didnt find anything
-            if (startIndex < 0)
-            {
-                return string.Empty;
-            }
-
-            int markerLength = marker.Length;
-            int start = startIndex + markerLength;
-
-            return targetString.Substring(start,
-                targetString.IndexOf(terminator, startIndex + markerLength, StringComparison.Ordinal) - start);
-        }
+        return targetString.Substring(start,
+            targetString.IndexOf(terminator, startIndex + markerLength, StringComparison.Ordinal) - start);
     }
 }

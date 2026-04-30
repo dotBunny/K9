@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using K9.Core;
 using K9.Core.Utils;
 
@@ -31,7 +32,7 @@ internal static class Program
                 framework.Shutdown();
                 return;
             }
-            
+
             string[] knownFiles = Directory.GetFiles(provider.TargetFolder, "*", SearchOption.AllDirectories);
 
             // Build out the list of files that pass the filter
@@ -60,10 +61,14 @@ internal static class Program
             if (provider.ShouldDeleteEmptyDirectories)
             {
                 string[] knownDirectories = Directory.GetDirectories(provider.TargetFolder, "*", SearchOption.AllDirectories);
+                string[] reversedDirectories = new string[knownDirectories.Length];
+                for (int i = knownDirectories.Length - 1; i >= 0; i--)
+                {
+                    reversedDirectories[i] = knownDirectories[i];
+                }
 
                 // Bottom up
-                knownDirectories.Reverse();
-                foreach (string folder in knownDirectories)
+                foreach (string folder in reversedDirectories)
                 {
                     string[] files = Directory.GetFiles(folder);
                     if (files.Length == 0)
