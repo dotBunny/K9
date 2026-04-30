@@ -12,6 +12,12 @@ public class KeepAliveProvider : ProgramProvider
 
     public override bool IsValid(ArgumentsModule args)
     {
+        // No arguement use default value
+        if (string.IsNullOrEmpty(args.GetFirstArgument()))
+        {
+            return true;
+        }
+
         string jsonPath = args.GetFirstArgument();
         if (!System.IO.File.Exists(jsonPath))
         {
