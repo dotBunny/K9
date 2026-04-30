@@ -49,16 +49,6 @@ public class FileReplacerProvider : ProgramProvider
             return false;
         }
 
-        // Check TARGET
-        if (args.HasOverrideArgument("TARGET"))
-        {
-            if (!File.Exists(args.GetOverrideArgument("TARGET")))
-            {
-                Log.WriteLine($"Unable to find target {args.GetOverrideArgument("TARGET")}", ILogOutput.LogType.Warning);
-                return false;
-            }
-        }
-
         // Check KEY & VALUE
         if (args.HasOverrideArgument("KEY") && args.HasOverrideArgument("VALUE"))
         {
