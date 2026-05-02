@@ -23,11 +23,6 @@ public class SteamTokenProvider : ProgramProvider
     public int RetryCount = 3;
     public string? TokenTarget;
 
-    string? m_NetworkUsername;
-    string? m_NetworkPassword;
-    string m_NetworkDrive = "H:";
-    string m_NetworkShare = @"\\192.168.20.21\Horde"; // This is the farms NAS path to the Horde share
-
     public override string GetDescription()
     {
         return
@@ -36,23 +31,18 @@ public class SteamTokenProvider : ProgramProvider
 
     public override KeyValuePair<string, string>[] GetArgumentHelp()
     {
-        KeyValuePair<string, string>[] lines = new KeyValuePair<string, string>[11];
+        KeyValuePair<string, string>[] lines = new KeyValuePair<string, string>[7];
 
-        lines[0] = new KeyValuePair<string, string>("NETWORK-USERNAME", "Username for network access to be established. (Optional: required to map a network share.)");
-        lines[1] = new KeyValuePair<string, string>("NETWORK-PASSWORD", "Password for network access to be established. (Optional: required to map a network share.)");
-        lines[2] = new KeyValuePair<string, string>("NETWORK-DRIVE", "Drive letter to map the network share to. (Optional: H:)");
-        lines[3] = new KeyValuePair<string, string>("NETWORK-SHARE", @"Network share path to the Horde share. (Optional: \\192.168.20.21\Horde)");
+        lines[0] = new KeyValuePair<string, string>("TOKEN-TARGET", "The absolute path to write the token file for SteamGuard to.");
+        lines[1] = new KeyValuePair<string, string>("TOKEN-FOLDER", @"Where the SteamGuard tokens are stored remotely. (Optional: H:\Steamworks\Tokens)");
 
-        lines[4] = new KeyValuePair<string, string>("TOKEN-TARGET", "The absolute path to write the token file for SteamGuard to.");
-        lines[5] = new KeyValuePair<string, string>("TOKEN-FOLDER", @"Where the SteamGuard tokens are stored remotely. (Optional: H:\Steamworks\Tokens)");
+        lines[2] = new KeyValuePair<string, string>("INSTALL-LOCATION", @"Where should the SDK be installed/extracted? (Optional: D:\Steam)");
+        lines[3] = new KeyValuePair<string, string>("INSTALL-PACKAGE", @"The default Steam SDK to uncompress. (Optional: H:\Steamworks\SDK\161.zip) ");
 
-        lines[6] = new KeyValuePair<string, string>("INSTALL-LOCATION", @"Where should the SDK be installed/extracted? (Optional: D:\Steam)");
-        lines[7] = new KeyValuePair<string, string>("INSTALL-PACKAGE", @"The default Steam SDK to uncompress. (Optional: H:\Steamworks\SDK\161.zip) ");
-
-        lines[8] = new KeyValuePair<string, string>("TOKEN", "Looks to force the use of a specifically named token / user.");
+        lines[4] = new KeyValuePair<string, string>("TOKEN", "Looks to force the use of a specifically named token / user.");
         // ReSharper disable StringLiteralTypo
-        lines[9] = new KeyValuePair<string, string>("RETRYCOUNT", "Sometimes, Steam randomly has some odd failures about network connectivity issues. This will retry the operation a few times before giving up. (Optional: 3)");
-        lines[10] = new KeyValuePair<string, string>("APPBUILD", "The absolute path to the VDF file to use to facilitate the SteamCMD upload.");
+        lines[5] = new KeyValuePair<string, string>("RETRYCOUNT", "Sometimes, Steam randomly has some odd failures about network connectivity issues. This will retry the operation a few times before giving up. (Optional: 3)");
+        lines[6] = new KeyValuePair<string, string>("APPBUILD", "The absolute path to the VDF file to use to facilitate the SteamCMD upload.");
         // ReSharper restore StringLiteralTypo
 
         return lines;
@@ -123,23 +113,6 @@ public class SteamTokenProvider : ProgramProvider
         ForceFlag = args.HasBaseArgument("FORCE");
         AppBuild = args.GetOverrideArgument("APPBUILD");
 
-        // Network Share Settings
-        if (args.HasOverrideArgument("NETWORK-USERNAME"))
-        {
-            m_NetworkUsername = args.GetOverrideArgument("NETWORK-USERNAME");
-        }
-        if (args.HasOverrideArgument("NETWORK-PASSWORD"))
-        {
-            m_NetworkPassword = args.GetOverrideArgument("NETWORK-PASSWORD");
-        }
-        if (args.HasOverrideArgument("NETWORK-DRIVE"))
-        {
-            m_NetworkDrive = args.GetOverrideArgument("NETWORK-DRIVE");
-        }
-        if (args.HasOverrideArgument("NETWORK-SHARE"))
-        {
-            m_NetworkShare = args.GetOverrideArgument("NETWORK-SHARE");
-        }
 
         if (args.HasOverrideArgument("TOKEN-FOLDER"))
         {
@@ -171,21 +144,4 @@ public class SteamTokenProvider : ProgramProvider
             RetryCount = int.Parse(args.GetOverrideArgument("RETRYCOUNT"));
         }
     }
-    // ReSharper restore StringLiteralTypo
-
-
-    public void EnsureNetworkPath()
-    {
-        // We need to early configure the network share if we have a password
-        if (!string.IsNullOrEmpty(m_NetworkPassword) && !string.IsNullOrEmpty(m_NetworkUsername) && !Directory.Exists(TokenFolder))
-        {
-            Log.WriteLine($"Establishing network share {m_NetworkDrive} -> {m_NetworkShare}");
-            ProcessLogRedirect logRedirect = new();
-            ProcessUtil.Execute("net", null,
-                $"use {m_NetworkDrive} {m_NetworkShare} /USER:{m_NetworkUsername} {m_NetworkPassword}", null,
-                logRedirect.GetAction());
-        }
-
-    }
-
 }

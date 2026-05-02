@@ -105,7 +105,6 @@ internal static class Program
         try
         {
             SteamTokenProvider provider = (SteamTokenProvider)framework.ProgramProvider;
-            provider.EnsureNetworkPath();
 
             // Check for existing installation
             if (!Directory.Exists(Path.Combine(provider.InstallLocation, "sdk")))
