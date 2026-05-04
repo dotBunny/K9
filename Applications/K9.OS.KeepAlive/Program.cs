@@ -41,6 +41,7 @@ internal static class Program
             Log.WriteLine("Press CTRL+C to Exit");
             Console.CancelKeyPress += delegate (object? _, ConsoleCancelEventArgs e)
             {
+                Log.WriteLine("Cancel Requested ...");
                 e.Cancel = true;
                 s_Alive = false;
             };
