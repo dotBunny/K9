@@ -15,7 +15,7 @@ public class WriteTextFileProvider : ProgramProvider
 
     public override string GetDescription()
     {
-        return "Copy a file to target folder, optionally extracting it.";
+        return "Write text content with replacements to a file.";
     }
 
     public override KeyValuePair<string, string>[] GetArgumentHelp()

@@ -29,7 +29,7 @@ public class CleanFolderProvider : ProgramProvider
 
     public override string GetDescription()
     {
-        return "Set different environment variables based on inputs.";
+        return "Cleans a folder and its subdirectories based on the specified exclusion filters.";
     }
 
     public override KeyValuePair<string, string>[] GetArgumentHelp()

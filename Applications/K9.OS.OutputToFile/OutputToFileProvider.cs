@@ -16,7 +16,7 @@ public class OutputToFileProvider : ProgramProvider
 
     public override string GetDescription()
     {
-        return "Wrap execution of applications to control error handling and logging.";
+        return "Outputs the console log output from executing a command to a specific file.";
     }
 
     public override KeyValuePair<string, string>[] GetArgumentHelp()
