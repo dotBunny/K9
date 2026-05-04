@@ -88,7 +88,7 @@ public class PerforceProvider
         ClientName = config.Client;
     }
 
-    public PerforceProvider(string username, string clientName, string serverAndPort)
+    public PerforceProvider(string? username, string clientName, string? serverAndPort)
     {
         ServerAndPort = serverAndPort;
         UserName = username;
@@ -646,6 +646,11 @@ public class PerforceProvider
         return result && records is { Count: > 0 };
     }
 
+    public bool SimpleCommand(string command)
+    {
+        return RunCommand(command, CommandOptions.None);
+    }
+
     public bool SwitchStream(string newStream)
     {
         return RunCommand($"client -f -s -S \"{newStream}\" \"{ClientName}\"",
@@ -893,6 +898,62 @@ public class PerforceProvider
 
         streamName = null;
         return false;
+    }
+
+    public int Reconcile(string path, string commitMessage)
+    {
+        // Preview reconcile to see whether anything would actually change.
+        bool previewResult = RunCommand($"reconcile -n \"{path}\"", out List<FileRecord>? previewRecords,
+            CommandOptions.NoFailOnErrors | CommandOptions.IgnoreExitCode |
+            CommandOptions.IgnoreNoSuchFilesError | CommandOptions.IgnoreFilesNotInClientViewError);
+        if (!previewResult || previewRecords == null || previewRecords.Count == 0)
+        {
+            return -1;
+        }
+
+        // Pull a default change form, set the description, and submit it back to create a pending CL.
+        if (!RunCommand("change -o", out List<string>? changeFormLines, CommandOptions.None) ||
+            changeFormLines == null || !Spec.TryParse(changeFormLines, out Spec? changeSpec))
+        {
+            Log.WriteLine("Unable to read default change spec.", ILogOutput.LogType.Error, LogCategory);
+            return -1;
+        }
+
+        changeSpec.SetField("Description", commitMessage);
+
+        int changeNumber = -1;
+        bool createResult = RunCommand("change -i", changeSpec.ToString(), line =>
+        {
+            if (line.Channel == OutputLine.OutputChannel.Info)
+            {
+                string[] tokens = line.Text.Split([' '], StringSplitOptions.RemoveEmptyEntries);
+                if (tokens.Length >= 3 && tokens[0] == "Change" && tokens[2] == "created.")
+                {
+                    int.TryParse(tokens[1], out changeNumber);
+                }
+                return true;
+            }
+
+            Log.WriteLine(line.Text, LogCategory);
+            return line.Channel != OutputLine.OutputChannel.Error;
+        }, CommandOptions.None);
+
+        if (!createResult || changeNumber == -1)
+        {
+            Log.WriteLine("Failed to create pending changelist.", ILogOutput.LogType.Error, LogCategory);
+            return -1;
+        }
+
+        // Move the reconciled files into the new pending changelist.
+        if (!RunCommand($"reconcile -c {changeNumber} \"{path}\"",
+                CommandOptions.IgnoreNoSuchFilesError | CommandOptions.IgnoreFilesNotInClientViewError))
+        {
+            Log.WriteLine($"Failed to reconcile files into changelist {changeNumber}.",
+                ILogOutput.LogType.Error, LogCategory);
+            return -1;
+        }
+
+        return changeNumber;
     }
 
     private bool RunCommand(string commandLine, out List<FileRecord>? fileRecords, CommandOptions options)

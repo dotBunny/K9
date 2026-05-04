@@ -16,15 +16,14 @@ public class GitToPerforceConfig
     public string DataRoot { get; set; } = @"D:\GitToPerforce\";
     public int CheckSleep { get; set; } = 5; //5 * 60;
 
+    public string? PerforcePort { get; set; } = "ssl:perforce.dotbunny.com:1666";
     public string? PerforceUsername { get; set; }
     public string? PerforcePassword { get; set; }
-    public string PerforceRelativeRoot { get; set; } = "workspace";
     public string PerforceWorkspaceName { get; set; } = "K9_GitToPerforce_Sync";
-    public string PerforceWorkspaceStreamName { get; set; } = "DETHOL";
-    public string PerforceCommitMessageTemplate { get; set; } = "#K9 Updated Git repository at <GitRepositoryRelativeRoot> to <CommitHash>";
+    public string PerforceWorkspaceStreamName { get; set; } = "//UE5/DETHOL";
+    public string PerforceCommitMessageTemplate { get; set; } = "#K9 Updated Git repository at $GitPath to $GitHash";
 
     public string GitRepositoryUrl { get; set; } = "https://github.com/dotBunny/NEXUS.git";
-    public string GitRemote { get; set; } = "origin/main";
     public string GitBranch { get; set; } = "main";
     public string GitRepositoryRelativeRoot { get; set; } = "Projects/DETHOL/Plugins/NEXUS";
     // ReSharper restore PropertyCanBeMadeInitOnly.Global
@@ -78,48 +77,43 @@ public class GitToPerforceConfig
     {
         if (string.IsNullOrEmpty(DataRoot))
         {
-            Log.WriteLine("A data root is REQUIRED", ILogOutput.LogType.Warning);
+            Log.WriteLine("A DataRoot is REQUIRED", ILogOutput.LogType.Warning);
+            return false;
+        }
+        if (string.IsNullOrEmpty(PerforcePort))
+        {
+            Log.WriteLine("PerforcePort username is REQUIRED", ILogOutput.LogType.Warning);
             return false;
         }
         if (string.IsNullOrEmpty(PerforceUsername))
         {
-            Log.WriteLine("Perforce username is REQUIRED", ILogOutput.LogType.Warning);
+            Log.WriteLine("PerforceUsername is REQUIRED", ILogOutput.LogType.Warning);
             return false;
         }
         if (string.IsNullOrEmpty(PerforcePassword))
         {
-            Log.WriteLine("Perforce password is REQUIRED", ILogOutput.LogType.Warning);
+            Log.WriteLine("PerforcePassword is REQUIRED", ILogOutput.LogType.Warning);
             return false;
         }
         if (string.IsNullOrEmpty(PerforceWorkspaceName))
         {
-            Log.WriteLine("A relative root for where to checkout the Perforce workspace is REQUIRED", ILogOutput.LogType.Warning);
-            return false;
-        }
-        if (string.IsNullOrEmpty(PerforceRelativeRoot))
-        {
-            Log.WriteLine("A relative path to where workspace should go is REQUIRED", ILogOutput.LogType.Warning);
+            Log.WriteLine("A PerforceWorkspaceName is REQUIRED", ILogOutput.LogType.Warning);
             return false;
         }
         if (string.IsNullOrEmpty(PerforceWorkspaceStreamName))
         {
-            Log.WriteLine("A workspace stream name is REQUIRED", ILogOutput.LogType.Warning);
+            Log.WriteLine("A PerforceWorkspaceStreamName is REQUIRED", ILogOutput.LogType.Warning);
             return false;
         }
         if (string.IsNullOrEmpty(PerforceCommitMessageTemplate))
         {
-            Log.WriteLine("A commit message template is REQUIRED", ILogOutput.LogType.Warning);
+            Log.WriteLine("A PerforceCommitMessageTemplate is REQUIRED", ILogOutput.LogType.Warning);
             return false;
         }
 
         if (string.IsNullOrEmpty(GitRepositoryUrl))
         {
             Log.WriteLine("A git repository URL is REQUIRED", ILogOutput.LogType.Warning);
-            return false;
-        }
-        if (string.IsNullOrEmpty(GitRemote))
-        {
-            Log.WriteLine("A git remote is REQUIRED", ILogOutput.LogType.Warning);
             return false;
         }
         if (string.IsNullOrEmpty(GitBranch))
@@ -142,6 +136,8 @@ public class GitToPerforceConfig
         {
             config.CheckSleep = 5 * 60;
         }
+
+        config.PerforceWorkspaceName = (config.PerforceWorkspaceName + Environment.MachineName.Replace(" ", "_").ToUpper());
     }
 
 

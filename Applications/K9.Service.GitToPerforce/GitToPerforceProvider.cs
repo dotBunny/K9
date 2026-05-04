@@ -38,4 +38,5 @@ public class GitToPerforceProvider : ProgramProvider
     {
         Config = GitToPerforceConfig.Get(args.GetFirstArgument());
     }
+
 }

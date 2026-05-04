@@ -2,9 +2,12 @@
 // See the LICENSE file at the repository root for more information.
 
 using System;
+using System.IO;
 using System.Threading;
 using K9.Core;
 using K9.Core.Utils;
+using K9.Services.Git;
+using K9.Services.Perforce;
 
 namespace K9.Service.GitToPerforce;
 
@@ -44,24 +47,89 @@ internal static class Program
                 s_Alive = false;
             };
 
-            // Loop until otherwise
+            // Establish some of our settings
+            string workspaceFolder = Path.Combine(provider.Config.DataRoot, "workspace");
+            string repoFolder = Path.Combine(workspaceFolder, provider.Config.GitRepositoryRelativeRoot);
+            string gitFolder = Path.Combine(repoFolder, ".git");
+            PerforceProvider perforceProvider = new(provider.Config.PerforceUsername, provider.Config.PerforceWorkspaceName, provider.Config.PerforcePort);
+
+            // START: PREAMBLE
+
+            // Before we get into our monitored loop going to check a bunch of things
+            if (!CheckPerforceConnection(perforceProvider, provider.Config))
+            {
+                Log.WriteLine("Issue connecting with Perforce; stopping preamble.", ILogOutput.LogType.Error);
+                framework.Shutdown();
+                return;
+            }
+
+            // Check that the client is created
+            if (!InitializePerforceClient(perforceProvider, provider.Config, workspaceFolder))
+            {
+                Log.WriteLine("Issue with Perforce client; stopping preamble", ILogOutput.LogType.Error);
+                framework.Shutdown();
+                return;
+            }
+
+            // Check that a workspace exists and is ready
+            if (!InitializePerforceWorkspace(perforceProvider, provider.Config, workspaceFolder))
+            {
+                Log.WriteLine("Issue with Perforce workspace; stopping preamble", ILogOutput.LogType.Error);
+                framework.Shutdown();
+                return;
+            }
+
+            // Check if we have the git repository checked out into the workspace
+            if (!Directory.Exists(gitFolder))
+            {
+                FileUtil.EnsureFolderHierarchyExists(repoFolder);
+                GitProvider.CheckoutRepo(provider.Config.GitRepositoryUrl, repoFolder, provider.Config.GitBranch);
+            }
+
+            // TODO: Ensure .git is ignored
+
+            // END: PREAMBLE
+
+            // Monitor Logic
             while (s_Alive)
             {
-                // Check if we have a local workspace checked out
+                // Ensure that we are logged in and able to do things
+                if (!CheckPerforceConnection(perforceProvider, provider.Config))
+                {
+                    Log.WriteLine("Issue with Perforce connection, stopping service.", ILogOutput.LogType.Error);
+                    s_Alive = false;
+                    break;
+                }
 
-                // Update the local workspace
+                perforceProvider.Sync(workspaceFolder + @"\...#head");
 
-                // Ensure that the workspace ignore file will ignore the git repository .git folder
+                // Check for Git update
+                string localCommitHash = GitProvider.GetLocalCommit(repoFolder);
+                string? remoteCommitHash = GitProvider.GetRemoteCommit(repoFolder, provider.Config.GitBranch);
+                if (localCommitHash != remoteCommitHash)
+                {
+                    Log.WriteLine($"Depot needs updating as the local {localCommitHash} differs from {remoteCommitHash}.", "SOURCE", ILogOutput.LogType.Info);
+                    GitProvider.UpdateRepo(repoFolder, provider.Config.GitBranch);
 
-                // Check if we have the git repository checked out into the workspace
+                    string commitMessage = provider.Config.PerforceCommitMessageTemplate
+                        .Replace("$GitPath", provider.Config.GitRepositoryRelativeRoot)
+                        .Replace("$GitHash", remoteCommitHash);
 
-                // Check for update to the git repository
+                    // Reconcile to changelist
+                    int changelist = perforceProvider.Reconcile(workspaceFolder, commitMessage);
+                    if (changelist != -1)
+                    {
+                        if (!perforceProvider.SimpleCommand("submit -c " + changelist))
+                        {
+                            Log.WriteLine("We failed to commit changelist: " + changelist, ILogOutput.LogType.Error);
+                        }
+                    }
+                    else
+                    {
+                        Log.WriteLine("We did not generate a proper changelist, something is wrong!", ILogOutput.LogType.Error);
 
-                // If update, get it, reconcile the p4 workspace
-
-                // Commit to perforce as new CL with message from template PerforceCommitMessageTemplate
-
-                Log.WriteLine("TICK");
+                    }
+                }
 
                 // Sleep till next check
                 Thread.Sleep(provider.Config.CheckSleep * 1000);
@@ -71,5 +139,50 @@ internal static class Program
         {
             framework.ExceptionHandler(ex);
         }
+    }
+
+
+    static bool CheckPerforceConnection(PerforceProvider perforceProvider, GitToPerforceConfig config)
+    {
+        perforceProvider.GetLoggedInState(out bool isConnected);
+        if (isConnected)
+        {
+            return true;
+        }
+
+        switch (perforceProvider.Login(config.PerforcePassword, out string? perforceMessage))
+        {
+            case PerforceProvider.LoginResult.Succeeded:
+                return true;
+            case PerforceProvider.LoginResult.Failed:
+                Log.WriteLine("Attempting to login to Perforce has failed: " + perforceMessage, ILogOutput.LogType.Error);
+                return false;
+            case PerforceProvider.LoginResult.MissingPassword:
+                Log.WriteLine("Failed to login to Perforce as the password was missing: " + perforceMessage, ILogOutput.LogType.Error);
+                return false;
+            case PerforceProvider.LoginResult.IncorrectPassword:
+                Log.WriteLine("Failed to login to Perforce as the password was incorrect: " + perforceMessage, ILogOutput.LogType.Error);
+                return false;
+            default:
+                Log.WriteLine("Unknown issue when attempting to update the Perforce connection status.", ILogOutput.LogType.Error);
+                return false;
+        }
+    }
+
+    static bool InitializePerforceClient(PerforceProvider perforceProvider, GitToPerforceConfig config,  string workspaceFolder)
+    {
+        if(!perforceProvider.ClientExists(config.PerforceWorkspaceName, out bool hasClient))
+        {
+            perforceProvider.SimpleCommand("client -o -S " + config.PerforceWorkspaceStreamName + " " + config.PerforceWorkspaceName);
+        }
+
+        return true;
+    }
+
+    public static bool InitializePerforceWorkspace(PerforceProvider perforceProvider, GitToPerforceConfig config,  string workspaceFolder)
+    {
+        // TODO: Check workspace and or checkout
+
+        return true;
     }
 }
