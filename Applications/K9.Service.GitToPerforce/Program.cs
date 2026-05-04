@@ -25,8 +25,8 @@ internal static class Program
                 LogOutputs = [new Core.LogOutputs.ConsoleLogOutput()]
             }, new GitToPerforceProvider());
 
-        try
-        {
+    //    try
+   //     {
             GitToPerforceProvider provider = (GitToPerforceProvider)framework.ProgramProvider;
             if (provider.Config == null)
             {
@@ -51,7 +51,7 @@ internal static class Program
             string workspaceFolder = Path.Combine(provider.Config.DataRoot, "workspace");
             string repoFolder = Path.Combine(workspaceFolder, provider.Config.GitRepositoryRelativeRoot);
             string gitFolder = Path.Combine(repoFolder, ".git");
-            PerforceProvider perforceProvider = new(provider.Config.PerforceUsername, provider.Config.PerforceWorkspaceName, provider.Config.PerforcePort);
+            PerforceProvider perforceProvider = new(provider.Config.PerforceUsername, provider.Config.PerforceClientName, provider.Config.PerforcePort);
 
             // START: PREAMBLE
 
@@ -64,27 +64,45 @@ internal static class Program
             }
 
             // Check that the client is created
-            if (!InitializePerforceClient(perforceProvider, provider.Config, workspaceFolder))
+            perforceProvider.ClientExists(provider.Config.PerforceClientName, out bool hasClient);
+            if(!hasClient)
             {
-                Log.WriteLine("Issue with Perforce client; stopping preamble", ILogOutput.LogType.Error);
-                framework.Shutdown();
-                return;
+                Spec clientSpec = new Spec();
+
+                clientSpec.SetField("Client", provider.Config.PerforceClientName);
+                clientSpec.SetField("Owner", provider.Config.PerforceUsername);
+                clientSpec.SetField("Host", Environment.MachineName);
+                clientSpec.SetField("Description", "K9.Service.GitToPerforce");
+                clientSpec.SetField("Root", workspaceFolder);
+                clientSpec.SetField("Stream", provider.Config.PerforceWorkspaceStreamName);
+                clientSpec.SetField("Options", "clobber rmdir");
+
+
+                Log.WriteLine("Creating client " + provider.Config.PerforceClientName, ILogOutput.LogType.Info);
+                if (!perforceProvider.CreateClient(clientSpec, out string errorMessage))
+                {
+                    Log.WriteLine("Unable to create client; stopping preamble.", ILogOutput.LogType.Error);
+                    framework.Shutdown();
+                    return;
+                }
+            }
+            else
+            {
+                Log.WriteLine($"Perforce client({provider.Config.PerforceClientName}) exists.", ILogOutput.LogType.Info);
             }
 
-            // Check that a workspace exists and is ready
-            if (!InitializePerforceWorkspace(perforceProvider, provider.Config, workspaceFolder))
-            {
-                Log.WriteLine("Issue with Perforce workspace; stopping preamble", ILogOutput.LogType.Error);
-                framework.Shutdown();
-                return;
-            }
-
-            // Check if we have the git repository checked out into the workspace
+            // Check if we have the git repository checked out into the workspace BEFORE we pull anything
             if (!Directory.Exists(gitFolder))
             {
                 FileUtil.EnsureFolderHierarchyExists(repoFolder);
                 GitProvider.CheckoutRepo(provider.Config.GitRepositoryUrl, repoFolder, provider.Config.GitBranch);
             }
+
+            Log.WriteLine($"Getting latest before starting monitor.", ILogOutput.LogType.Info);
+            perforceProvider.Sync(workspaceFolder + @"\...#head");
+
+
+            return;
 
             // TODO: Ensure .git is ignored
 
@@ -134,13 +152,12 @@ internal static class Program
                 // Sleep till next check
                 Thread.Sleep(provider.Config.CheckSleep * 1000);
             }
-        }
-        catch (Exception ex)
-        {
-            framework.ExceptionHandler(ex);
-        }
+            // }
+        // catch (Exception ex)
+        // {
+        //     framework.ExceptionHandler(ex);
+        // }
     }
-
 
     static bool CheckPerforceConnection(PerforceProvider perforceProvider, GitToPerforceConfig config)
     {
@@ -167,22 +184,5 @@ internal static class Program
                 Log.WriteLine("Unknown issue when attempting to update the Perforce connection status.", ILogOutput.LogType.Error);
                 return false;
         }
-    }
-
-    static bool InitializePerforceClient(PerforceProvider perforceProvider, GitToPerforceConfig config,  string workspaceFolder)
-    {
-        if(!perforceProvider.ClientExists(config.PerforceWorkspaceName, out bool hasClient))
-        {
-            perforceProvider.SimpleCommand("client -o -S " + config.PerforceWorkspaceStreamName + " " + config.PerforceWorkspaceName);
-        }
-
-        return true;
-    }
-
-    public static bool InitializePerforceWorkspace(PerforceProvider perforceProvider, GitToPerforceConfig config,  string workspaceFolder)
-    {
-        // TODO: Check workspace and or checkout
-
-        return true;
     }
 }

@@ -19,8 +19,8 @@ public class GitToPerforceConfig
     public string? PerforcePort { get; set; } = "ssl:perforce.dotbunny.com:1666";
     public string? PerforceUsername { get; set; }
     public string? PerforcePassword { get; set; }
-    public string PerforceWorkspaceName { get; set; } = "K9_GitToPerforce_Sync";
-    public string PerforceWorkspaceStreamName { get; set; } = "//UE5/DETHOL";
+    public string PerforceClientName { get; set; } = "K9_GitToPerforce_Sync";
+    public string PerforceWorkspaceStreamName { get; set; } = "//UE5/NEXUS-SYNC";
     public string PerforceCommitMessageTemplate { get; set; } = "#K9 Updated Git repository at $GitPath to $GitHash";
 
     public string GitRepositoryUrl { get; set; } = "https://github.com/dotBunny/NEXUS.git";
@@ -95,9 +95,9 @@ public class GitToPerforceConfig
             Log.WriteLine("PerforcePassword is REQUIRED", ILogOutput.LogType.Warning);
             return false;
         }
-        if (string.IsNullOrEmpty(PerforceWorkspaceName))
+        if (string.IsNullOrEmpty(PerforceClientName))
         {
-            Log.WriteLine("A PerforceWorkspaceName is REQUIRED", ILogOutput.LogType.Warning);
+            Log.WriteLine("A PerforceClientName is REQUIRED", ILogOutput.LogType.Warning);
             return false;
         }
         if (string.IsNullOrEmpty(PerforceWorkspaceStreamName))
@@ -137,7 +137,7 @@ public class GitToPerforceConfig
             config.CheckSleep = 5 * 60;
         }
 
-        config.PerforceWorkspaceName = (config.PerforceWorkspaceName + Environment.MachineName.Replace(" ", "_").ToUpper());
+        config.PerforceClientName = (config.PerforceClientName + "_" + Environment.MachineName.Replace(" ", "_").ToUpper());
     }
 
 

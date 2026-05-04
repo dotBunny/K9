@@ -13,7 +13,7 @@ public class Spec
     /// <summary>
     ///     Default constructor.
     /// </summary>
-    Spec()
+    public Spec()
     {
         m_Sections = [];
     }
