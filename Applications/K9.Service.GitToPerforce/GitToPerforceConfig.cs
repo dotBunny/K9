@@ -14,7 +14,7 @@ public class GitToPerforceConfig
     // Required for JSON
     // ReSharper disable PropertyCanBeMadeInitOnly.Global
     public string DataRoot { get; set; } = @"D:\GitToPerforce\";
-    public int CheckSleep { get; set; } = 5; //5 * 60;
+    public int CheckSleep { get; set; } = 5 * 60;
 
     public string? PerforcePort { get; set; } = "ssl:perforce.dotbunny.com:1666";
     public string? PerforceUsername { get; set; }

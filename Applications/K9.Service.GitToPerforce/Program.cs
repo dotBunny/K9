@@ -160,6 +160,12 @@ internal static class Program
 
                     }
                 }
+                else
+                {
+                    Log.WriteLine(
+                        $"Workspace repository ({localCommitHash}) matches remote repository ({remoteCommitHash}) commit.",
+                        ILogOutput.LogType.Info);
+                }
 
                 // Sleep till next check
                 Thread.Sleep(provider.Config.CheckSleep * 1000);
