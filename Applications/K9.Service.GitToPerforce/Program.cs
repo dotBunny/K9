@@ -35,6 +35,12 @@ internal static class Program
                 return;
             }
 
+            // Useful for testing
+            if (framework.Arguments.HasOverrideArgument("DATA-DIR"))
+            {
+                provider.Config.DataRoot = framework.Arguments.GetOverrideArgument("DATA-DIR");
+            }
+
             // Ensure that the data path exists
             FileUtil.EnsureFolderHierarchyExists(provider.Config.DataRoot);
 
@@ -106,27 +112,27 @@ internal static class Program
                 GitProvider.CheckoutRepo(provider.Config.GitRepositoryUrl, repoFolder, provider.Config.GitBranch);
             }
 
+            // We need to get our last sync of the workspace
+            perforceProvider.Sync(workspaceFolder + @"/...#head");
+
+            // Bring our repo back to a prestine state, because we are going to do a reconcile
+            GitProvider.Cleanup(repoFolder);
+
             Log.WriteLine($"Set perforce ignore file {provider.Config.PerforceIgnoreFile}.", ILogOutput.LogType.Info);
             perforceProvider.SimpleCommand("set P4IGNORE=" + provider.Config.PerforceIgnoreFile);
+
+            bool shouldReconcile = true;
 
             // END: PREAMBLE
 
             // Monitor Logic
             while (s_Alive)
             {
-                // Ensure that we are logged in and able to do things
-                if (!CheckPerforceConnection(perforceProvider, provider.Config))
-                {
-                    Log.WriteLine("Issue with Perforce connection, stopping service.", ILogOutput.LogType.Error);
-                    s_Alive = false;
-                    break;
-                }
-
-                perforceProvider.Sync(workspaceFolder + @"/...#head");
-
                 // Check for Git update
                 string localCommitHash = GitProvider.GetLocalCommit(repoFolder);
                 string? remoteCommitHash = GitProvider.GetRemoteCommit(repoFolder, provider.Config.GitBranch);
+
+                // Check that we have a valid remote hash
                 if (string.IsNullOrEmpty(remoteCommitHash) || remoteCommitHash.Length < 39)
                 {
                     Log.WriteLine($"Weird RemoteCommitHash {remoteCommitHash}; waiting for next cycle ...", ILogOutput.LogType.Error);
@@ -136,7 +142,7 @@ internal static class Program
                     continue;
                 }
 
-                // Check if there is an update needed
+                // Check if there is an update needed because the hashes are different
                 if (localCommitHash != remoteCommitHash)
                 {
                     Log.WriteLine(
@@ -144,14 +150,33 @@ internal static class Program
                         ILogOutput.LogType.Info);
 
                     GitProvider.UpdateRepo(repoFolder, provider.Config.GitBranch, null);
-                    GitProvider.Cleanup(repoFolder);
+                    GitProvider.Cleanup(repoFolder); // ensure we clean up things
+                    shouldReconcile = true;
+                }
+                else
+                {
+                    Log.WriteLine(
+                        $"Workspace repository ({localCommitHash}) matches remote repository ({remoteCommitHash}) commit.",
+                        ILogOutput.LogType.Info);
+                }
 
+                if(shouldReconcile)
+                {
+                    // Ensure that we are logged in and able to do things
+                    if (!CheckPerforceConnection(perforceProvider, provider.Config))
+                    {
+                        Log.WriteLine("Issue with Perforce connection, stopping service.", ILogOutput.LogType.Error);
+                        s_Alive = false;
+                        break;
+                    }
+
+                    // Reconcile to changelist
                     string commitMessage = provider.Config.PerforceCommitMessageTemplate
                         .Replace("$GitPath", provider.Config.GitRepositoryRelativeRoot)
                         .Replace("$GitHash", remoteCommitHash);
 
-                    // Reconcile to changelist
-                    int changelist = perforceProvider.Reconcile(repoFolder, commitMessage);
+                    int changelist = perforceProvider.Reconcile(repoFolder + "/...", commitMessage);
+
                     if (changelist != -1)
                     {
                         if (!perforceProvider.SimpleCommand("submit -c " + changelist))
@@ -161,16 +186,10 @@ internal static class Program
                     }
                     else
                     {
-                        Log.WriteLine("We did not generate a proper changelist, something is wrong!",
-                            ILogOutput.LogType.Error);
-
+                        Log.WriteLine("We did not generate a proper changelist despite wanting too?", ILogOutput.LogType.Warning);
                     }
-                }
-                else
-                {
-                    Log.WriteLine(
-                        $"Workspace repository ({localCommitHash}) matches remote repository ({remoteCommitHash}) commit.",
-                        ILogOutput.LogType.Info);
+
+                    shouldReconcile = false;
                 }
 
                 // Sleep till next check

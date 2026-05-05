@@ -142,6 +142,9 @@ public class GitToPerforceConfig
             config.CheckSleep = 5 * 60;
         }
 
+
+
+
         config.PerforceClientName = (config.PerforceClientName + "_" + Environment.MachineName.Replace(" ", "_").ToUpper());
     }
 
