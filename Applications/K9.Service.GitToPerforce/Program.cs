@@ -25,8 +25,8 @@ internal static class Program
                 LogOutputs = [new Core.LogOutputs.ConsoleLogOutput()]
             }, new GitToPerforceProvider());
 
-    //    try
-   //     {
+        try
+        {
             GitToPerforceProvider provider = (GitToPerforceProvider)framework.ProgramProvider;
             if (provider.Config == null)
             {
@@ -40,7 +40,7 @@ internal static class Program
 
             // Setup exit logic
             Log.WriteLine("Press CTRL+C to Exit");
-            Console.CancelKeyPress += delegate (object? _, ConsoleCancelEventArgs e)
+            Console.CancelKeyPress += delegate(object? _, ConsoleCancelEventArgs e)
             {
                 Log.WriteLine("Cancel Requested ...");
                 e.Cancel = true;
@@ -49,9 +49,12 @@ internal static class Program
 
             // Establish some of our settings
             string workspaceFolder = Path.Combine(provider.Config.DataRoot, "workspace");
+            FileUtil.EnsureFolderHierarchyExists(workspaceFolder);
+
             string repoFolder = Path.Combine(workspaceFolder, provider.Config.GitRepositoryRelativeRoot);
             string gitFolder = Path.Combine(repoFolder, ".git");
-            PerforceProvider perforceProvider = new(provider.Config.PerforceUsername, provider.Config.PerforceClientName, provider.Config.PerforcePort);
+            PerforceProvider perforceProvider = new(provider.Config.PerforceUsername,
+                provider.Config.PerforceClientName, provider.Config.PerforcePort);
 
             // START: PREAMBLE
 
@@ -65,9 +68,9 @@ internal static class Program
 
             // Check that the client is created
             perforceProvider.ClientExists(provider.Config.PerforceClientName, out bool hasClient);
-            if(!hasClient)
+            if (!hasClient)
             {
-                Spec clientSpec = new Spec();
+                Spec clientSpec = new();
 
                 clientSpec.SetField("Client", provider.Config.PerforceClientName);
                 clientSpec.SetField("Owner", provider.Config.PerforceUsername);
@@ -81,14 +84,16 @@ internal static class Program
                 Log.WriteLine("Creating client " + provider.Config.PerforceClientName, ILogOutput.LogType.Info);
                 if (!perforceProvider.CreateClient(clientSpec, out string errorMessage))
                 {
-                    Log.WriteLine("Unable to create client; stopping preamble.", ILogOutput.LogType.Error);
+                    Log.WriteLine($"Unable to create client({errorMessage}); stopping preamble.",
+                        ILogOutput.LogType.Error);
                     framework.Shutdown();
                     return;
                 }
             }
             else
             {
-                Log.WriteLine($"Perforce client({provider.Config.PerforceClientName}) exists.", ILogOutput.LogType.Info);
+                Log.WriteLine($"Perforce client({provider.Config.PerforceClientName}) exists.",
+                    ILogOutput.LogType.Info);
             }
 
             // Check if we have the git repository checked out into the workspace BEFORE we pull anything
@@ -97,14 +102,6 @@ internal static class Program
                 FileUtil.EnsureFolderHierarchyExists(repoFolder);
                 GitProvider.CheckoutRepo(provider.Config.GitRepositoryUrl, repoFolder, provider.Config.GitBranch);
             }
-
-            Log.WriteLine($"Getting latest before starting monitor.", ILogOutput.LogType.Info);
-            perforceProvider.Sync(workspaceFolder + @"\...#head");
-
-
-            return;
-
-            // TODO: Ensure .git is ignored
 
             // END: PREAMBLE
 
@@ -124,17 +121,31 @@ internal static class Program
                 // Check for Git update
                 string localCommitHash = GitProvider.GetLocalCommit(repoFolder);
                 string? remoteCommitHash = GitProvider.GetRemoteCommit(repoFolder, provider.Config.GitBranch);
+                if (string.IsNullOrEmpty(remoteCommitHash) || remoteCommitHash.Length < 39)
+                {
+                    Log.WriteLine($"Weird RemoteCommitHash {remoteCommitHash}; waiting for next cycle ...", ILogOutput.LogType.Error);
+
+                    // Sleep till next check
+                    Thread.Sleep(provider.Config.CheckSleep * 1000);
+                    continue;
+                }
+
+                // Check if there is an update needed
                 if (localCommitHash != remoteCommitHash)
                 {
-                    Log.WriteLine($"Depot needs updating as the local {localCommitHash} differs from {remoteCommitHash}.", "SOURCE", ILogOutput.LogType.Info);
-                    GitProvider.UpdateRepo(repoFolder, provider.Config.GitBranch);
+                    Log.WriteLine(
+                        $"Depot needs updating as the local {localCommitHash} differs from {remoteCommitHash}.",
+                        ILogOutput.LogType.Info);
+
+                    GitProvider.UpdateRepo(repoFolder, provider.Config.GitBranch, null);
+                    GitProvider.Cleanup(repoFolder);
 
                     string commitMessage = provider.Config.PerforceCommitMessageTemplate
                         .Replace("$GitPath", provider.Config.GitRepositoryRelativeRoot)
                         .Replace("$GitHash", remoteCommitHash);
 
                     // Reconcile to changelist
-                    int changelist = perforceProvider.Reconcile(workspaceFolder, commitMessage);
+                    int changelist = perforceProvider.Reconcile(repoFolder, commitMessage);
                     if (changelist != -1)
                     {
                         if (!perforceProvider.SimpleCommand("submit -c " + changelist))
@@ -144,7 +155,8 @@ internal static class Program
                     }
                     else
                     {
-                        Log.WriteLine("We did not generate a proper changelist, something is wrong!", ILogOutput.LogType.Error);
+                        Log.WriteLine("We did not generate a proper changelist, something is wrong!",
+                            ILogOutput.LogType.Error);
 
                     }
                 }
@@ -152,11 +164,11 @@ internal static class Program
                 // Sleep till next check
                 Thread.Sleep(provider.Config.CheckSleep * 1000);
             }
-            // }
-        // catch (Exception ex)
-        // {
-        //     framework.ExceptionHandler(ex);
-        // }
+        }
+        catch (Exception ex)
+        {
+            framework.ExceptionHandler(ex);
+        }
     }
 
     static bool CheckPerforceConnection(PerforceProvider perforceProvider, GitToPerforceConfig config)

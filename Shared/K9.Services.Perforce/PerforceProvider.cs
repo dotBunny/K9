@@ -256,8 +256,8 @@ public class PerforceProvider
             lines.Add(line.Text);
             return line.Channel == OutputLine.OutputChannel.Info;
         }, CommandOptions.None);
-        errorMessage = string.Join("\n", lines);
 
+        errorMessage = string.Join("\n", lines);
         return result;
     }
 

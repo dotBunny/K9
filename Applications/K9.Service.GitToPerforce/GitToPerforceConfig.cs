@@ -20,7 +20,7 @@ public class GitToPerforceConfig
     public string? PerforceUsername { get; set; }
     public string? PerforcePassword { get; set; }
     public string PerforceClientName { get; set; } = "K9_GitToPerforce_Sync";
-    public string PerforceWorkspaceStreamName { get; set; } = "//NEXUS/NEXUS-Sync";
+    public string PerforceWorkspaceStreamName { get; set; } = "//NEXUS/Sync";
     public string PerforceCommitMessageTemplate { get; set; } = "#K9 Updated Git repository at $GitPath to $GitHash";
 
     public string GitRepositoryUrl { get; set; } = "https://github.com/dotBunny/NEXUS.git";

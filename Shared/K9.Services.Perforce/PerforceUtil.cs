@@ -6,6 +6,24 @@ namespace K9.Services.Perforce;
 public static class PerforceUtil
 {
 
+    static bool TryStripPrefix(string text, string prefix, out string body)
+    {
+        if (text.Length == prefix.Length && text.StartsWith(prefix))
+        {
+            body = string.Empty;
+            return true;
+        }
+
+        if (text.Length > prefix.Length && text.StartsWith(prefix) && text[prefix.Length] == ' ')
+        {
+            body = text[(prefix.Length + 1)..];
+            return true;
+        }
+
+        body = string.Empty;
+        return false;
+    }
+
     static bool IsValidTag(string line, int startIndex)
     {
         // Annoyingly, we sometimes get commentary with an info1: prefix. Since it typically starts with a depot or file path, we can pick it out.
@@ -142,27 +160,27 @@ public static class PerforceUtil
         if (!IgnoreCommandOutput(text, options))
         {
             OutputLine line;
-            if (text.StartsWith("text: "))
+            if (TryStripPrefix(text, "text:", out string textBody))
             {
-                line = new OutputLine(OutputLine.OutputChannel.Text, text[6..]);
+                line = new OutputLine(OutputLine.OutputChannel.Text, textBody);
             }
-            else if (text.StartsWith("info: "))
+            else if (TryStripPrefix(text, "info:", out string infoBody))
             {
-                line = new OutputLine(OutputLine.OutputChannel.Info, text[6..]);
+                line = new OutputLine(OutputLine.OutputChannel.Info, infoBody);
             }
-            else if (text.StartsWith("info1: "))
+            else if (TryStripPrefix(text, "info1:", out string info1Body))
             {
                 line = new OutputLine(
                     IsValidTag(text, 7) ? OutputLine.OutputChannel.TaggedInfo : OutputLine.OutputChannel.Info,
-                    text[7..]);
+                    info1Body);
             }
-            else if (text.StartsWith("warning: "))
+            else if (TryStripPrefix(text, "warning:", out string warningBody))
             {
-                line = new OutputLine(OutputLine.OutputChannel.Warning, text[9..]);
+                line = new OutputLine(OutputLine.OutputChannel.Warning, warningBody);
             }
-            else if (text.StartsWith("error: "))
+            else if (TryStripPrefix(text, "error:", out string errorBody))
             {
-                line = new OutputLine(OutputLine.OutputChannel.Error, text[7..]);
+                line = new OutputLine(OutputLine.OutputChannel.Error, errorBody);
             }
             else
             {

@@ -44,7 +44,7 @@ public static class GitProvider
         return parts[0];
     }
 
-    public static string GetLocalCommit(string checkoutFolder)
+    public static string GetLocalCommit(string checkoutFolder, bool outputQuery = false)
     {
         // Check current
         List<string> output = [];
@@ -53,22 +53,29 @@ public static class GitProvider
         ProcessUtil.Execute(GetExecutablePath(), checkoutFolder,
             $"rev-parse HEAD", null, (_, line) =>
             {
-                Log.WriteLine(line, "GIT", ILogOutput.LogType.ExternalProcess);
+                if (outputQuery)
+                {
+                    Log.WriteLine(line, "GIT", ILogOutput.LogType.ExternalProcess);
+                }
                 output.Add(line);
             });
 
         return output[0].Trim();
     }
 
-    public static string? GetRemoteCommit(string checkoutFolder, string branch = "main")
+    public static string? GetRemoteCommit(string checkoutFolder, string branch = "main", bool outputQuery = false)
     {
         // Check current
         List<string> output = [];
         ProcessUtil.Execute(GetExecutablePath(), checkoutFolder,
             // ReSharper disable once StringLiteralTypo
-            $"ls-remote --sort=committerdate", null, (_, line) =>
+            $"ls-remote", null, (_, line) =>
             {
-                Log.WriteLine(line, "GIT", ILogOutput.LogType.ExternalProcess);
+                if (outputQuery)
+                {
+                    Log.WriteLine(line, "GIT", ILogOutput.LogType.ExternalProcess);
+                }
+
                 output.Add(line);
             });
 
@@ -188,6 +195,12 @@ public static class GitProvider
             commandLineBuilder.ToString().Trim(), null, logRedirect.GetAction());
     }
 
+    public static void Cleanup(string checkoutFolder)
+    {
+        string executablePath = GetExecutablePath();
+        ProcessLogRedirect logRedirect = new(ILogOutput.LogType.ExternalProcess, "GIT");
+        ProcessUtil.Execute(executablePath, checkoutFolder, "clean -dfx", null, logRedirect.GetAction());
+    }
     public static void UpdateRepo(string checkoutFolder, string? branch = null, string? commit = null,
         bool forceUpdate = true)
     {
