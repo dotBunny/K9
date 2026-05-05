@@ -73,7 +73,10 @@ internal static class Program
                 Spec clientSpec = new();
 
                 clientSpec.SetField("Client", provider.Config.PerforceClientName);
-                clientSpec.SetField("Owner", provider.Config.PerforceUsername);
+                if(!string.IsNullOrEmpty(provider.Config.PerforceUsername!))
+                {
+                    clientSpec.SetField("Owner", provider.Config.PerforceUsername);
+                }
                 clientSpec.SetField("Host", Environment.MachineName);
                 clientSpec.SetField("Description", "K9.Service.GitToPerforce");
                 clientSpec.SetField("Root", workspaceFolder);
