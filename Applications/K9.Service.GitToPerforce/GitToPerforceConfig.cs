@@ -23,9 +23,14 @@ public class GitToPerforceConfig
     public string PerforceWorkspaceStreamName { get; set; } = "//NEXUS/Sync";
     public string PerforceCommitMessageTemplate { get; set; } = "#K9 Updated Git repository at $GitPath to $GitHash";
 
+    public string PerforceIgnoreFile { get; set; }= ".p4ignore";
+
+
     public string GitRepositoryUrl { get; set; } = "https://github.com/dotBunny/NEXUS.git";
     public string GitBranch { get; set; } = "main";
     public string GitRepositoryRelativeRoot { get; set; } = "NEXUS";
+
+
     // ReSharper restore PropertyCanBeMadeInitOnly.Global
 
     public static GitToPerforceConfig Get(string? jsonPath = null)

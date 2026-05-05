@@ -106,6 +106,9 @@ internal static class Program
                 GitProvider.CheckoutRepo(provider.Config.GitRepositoryUrl, repoFolder, provider.Config.GitBranch);
             }
 
+            Log.WriteLine($"Set perforce ignore file {provider.Config.PerforceIgnoreFile}.", ILogOutput.LogType.Info);
+            perforceProvider.SimpleCommand("set P4IGNORE=" + provider.Config.PerforceIgnoreFile);
+
             // END: PREAMBLE
 
             // Monitor Logic
