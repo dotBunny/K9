@@ -119,7 +119,7 @@ internal static class Program
                     break;
                 }
 
-                perforceProvider.Sync(workspaceFolder + @"\...#head");
+                perforceProvider.Sync(workspaceFolder + @"/...#head");
 
                 // Check for Git update
                 string localCommitHash = GitProvider.GetLocalCommit(repoFolder);
