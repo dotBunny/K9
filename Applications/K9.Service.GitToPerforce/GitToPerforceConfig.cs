@@ -29,6 +29,8 @@ public class GitToPerforceConfig
     public string GitRepositoryUrl { get; set; } = "https://github.com/dotBunny/NEXUS.git";
     public string GitBranch { get; set; } = "main";
     public string GitRepositoryRelativeRoot { get; set; } = "NEXUS";
+    
+    public string WriteGitCommitHash { get; set; } = "GIT_COMMIT_SHA";
 
 
     // ReSharper restore PropertyCanBeMadeInitOnly.Global

@@ -170,6 +170,13 @@ internal static class Program
                         break;
                     }
 
+                    // Should we be writing the commit hash
+                    if (string.IsNullOrEmpty(provider.Config.WriteGitCommitHash))
+                    {
+                        File.WriteAllText(Path.Combine(repoFolder, provider.Config.WriteGitCommitHash),
+                            GitProvider.GetLocalCommit(repoFolder));
+                    }
+
                     // Reconcile to changelist
                     string commitMessage = provider.Config.PerforceCommitMessageTemplate
                         .Replace("$GitPath", provider.Config.GitRepositoryRelativeRoot)
