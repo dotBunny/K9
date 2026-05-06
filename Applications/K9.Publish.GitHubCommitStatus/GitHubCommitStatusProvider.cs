@@ -28,12 +28,13 @@ public class GitHubCommitStatusProvider : ProgramProvider
 
     public override KeyValuePair<string, string>[] GetArgumentHelp()
     {
-        KeyValuePair<string, string>[] lines = new KeyValuePair<string, string>[8];
+        KeyValuePair<string, string>[] lines = new KeyValuePair<string, string>[9];
 
         lines[0] = new KeyValuePair<string, string>("AUTH-TOKEN", "GitHub Personal Access Token - https://github.com/settings/personal-access-tokens/.");
         lines[1] = new KeyValuePair<string, string>("REPO-OWNER", "The repository's Owner.");
         lines[2] = new KeyValuePair<string, string>("REPO-NAME", "The repository's Name.");
         lines[3] = new KeyValuePair<string, string>("SHA", "The full commit hash (SHA) of the target commit to update status on.");
+        lines[3] = new KeyValuePair<string, string>("SHA-FILE", "A file containing the full commit hash (SHA) of the local repository.");
 
         lines[4] = new KeyValuePair<string, string>("STATE", "The state of the given description (pending, success, error, failure).");
         lines[5] = new KeyValuePair<string, string>("DESCRIPTION", "The commit status description.");
@@ -63,7 +64,7 @@ public class GitHubCommitStatusProvider : ProgramProvider
             return false;
         }
 
-        if (!args.HasOverrideArgument("SHA") || string.IsNullOrEmpty(args.GetOverrideArgument("SHA")))
+        if(!args.HasOverrideArgument("SHA-FILE") && (!args.HasOverrideArgument("SHA") || string.IsNullOrEmpty(args.GetOverrideArgument("SHA"))))
         {
             Log.WriteLine("SHA is required (---SHA=9e52d9a1800f9fb2d8d7208a75d1f3ba3436a544");
             return false;
@@ -77,7 +78,16 @@ public class GitHubCommitStatusProvider : ProgramProvider
         AuthToken = args.GetOverrideArgument("AUTH-TOKEN");
         RepositoryOwner = args.GetOverrideArgument("REPO-OWNER");
         RepositoryName = args.GetOverrideArgument("REPO-NAME");
-        CommitHash = args.GetOverrideArgument("SHA");
+
+        if (args.HasOverrideArgument("SHA-FILE") && Path.Exists(args.GetOverrideArgument("SHA-FILE")))
+        {
+            CommitHash = File.ReadAllText(args.GetOverrideArgument("SHA-FILE"));
+        }
+        else
+        {
+            CommitHash = args.GetOverrideArgument("SHA");
+
+        }
 
         if (args.HasOverrideArgument("STATE"))
         {
