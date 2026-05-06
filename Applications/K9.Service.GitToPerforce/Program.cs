@@ -171,7 +171,7 @@ internal static class Program
                     }
 
                     // Should we be writing the commit hash
-                    if (string.IsNullOrEmpty(provider.Config.WriteGitCommitHash))
+                    if (!string.IsNullOrEmpty(provider.Config.WriteGitCommitHash))
                     {
                         File.WriteAllText(Path.Combine(repoFolder, provider.Config.WriteGitCommitHash),
                             GitProvider.GetLocalCommit(repoFolder));
