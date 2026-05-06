@@ -173,8 +173,12 @@ internal static class Program
                     // Should we be writing the commit hash
                     if (!string.IsNullOrEmpty(provider.Config.WriteGitCommitHash))
                     {
-                        File.WriteAllText(Path.Combine(repoFolder, provider.Config.WriteGitCommitHash),
-                            GitProvider.GetLocalCommit(repoFolder));
+                        string commitPath = Path.Combine(repoFolder, provider.Config.WriteGitCommitHash);
+                        if (File.Exists(commitPath))
+                        {
+                            commitPath.MakeWritable();
+                        }
+                        File.WriteAllText(commitPath, GitProvider.GetLocalCommit(repoFolder));
                     }
 
                     // Reconcile to changelist
