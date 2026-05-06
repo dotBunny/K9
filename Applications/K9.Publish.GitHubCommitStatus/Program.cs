@@ -2,6 +2,7 @@
 // See the LICENSE file at the repository root for more information.
 
 using System;
+using System.Threading.Tasks;
 using K9.Core;
 using Octokit;
 
@@ -10,7 +11,7 @@ namespace K9.Publish.GitHubCommitStatus;
 
 internal static class Program
 {
-    static void Main()
+    static async Task Main()
     {
         using ConsoleApplication framework = new(
             new ConsoleApplicationSettings()
@@ -29,6 +30,8 @@ internal static class Program
                 Credentials = new Credentials(provider.AuthToken)
             };
 
+
+
             NewCommitStatus status = new()
             {
                 State = provider.State,
@@ -38,8 +41,9 @@ internal static class Program
             };
 
             // Send update
-            github.Repository.Status.Create(provider.RepositoryOwner, provider.RepositoryName,
+            CommitStatus? commandResult = await github.Repository.Status.Create(provider.RepositoryOwner, provider.RepositoryName,
                 provider.CommitHash, status);
+            Log.WriteLine($"Commit ({provider.CommitHash}) updated with: {status.State}");
         }
         catch (Exception ex)
         {
