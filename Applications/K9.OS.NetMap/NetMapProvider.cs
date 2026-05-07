@@ -57,7 +57,7 @@ public class NetMapProvider : ProgramProvider
             Log.WriteLine("A NETWORK-USERNAME is required (---NETWORK-USERNAME=username) or CREDENTIALS.");
             return false;
         }
-        if (!args.HasOverrideArgument("NETWORK-PASSWORD"))
+        if (!args.HasOverrideArgument("CREDENTIALS") && !args.HasOverrideArgument("NETWORK-PASSWORD"))
         {
             Log.WriteLine("A NETWORK-PASSWORD is required (---NETWORK-PASSWORD=password)");
             return false;
@@ -90,9 +90,27 @@ public class NetMapProvider : ProgramProvider
         if (args.HasOverrideArgument("CREDENTIALS") &&
             Path.Exists(args.GetOverrideArgument("CREDENTIALS")))
         {
+            int lineIndex = 0;
             string[] lines = File.ReadAllLines(args.GetOverrideArgument("CREDENTIALS"));
-            NetworkUsername = lines[0].Trim();
-            NetworkPassword = lines[1].Trim();
+            int lineCount = lines.Length;
+            for (int i = 0; i < lineCount; i++)
+            {
+                string line = lines[i].Trim();
+                if (line.Length > 0 && lineIndex < 2)
+                {
+                    switch (lineIndex)
+                    {
+                        case 0:
+                            NetworkUsername = line;
+                            lineIndex++;
+                            break;
+                        case 1:
+                            NetworkPassword = line;
+                            lineIndex++;
+                            break;
+                    }
+                }
+            }
         }
         else
         {
