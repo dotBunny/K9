@@ -28,7 +28,7 @@ public class GitHubCommitStatusProvider : ProgramProvider
 
     public override KeyValuePair<string, string>[] GetArgumentHelp()
     {
-        KeyValuePair<string, string>[] lines = new KeyValuePair<string, string>[9];
+        KeyValuePair<string, string>[] lines = new KeyValuePair<string, string>[10];
 
         lines[0] = new KeyValuePair<string, string>("AUTH-TOKEN", "GitHub Personal Access Token - https://github.com/settings/personal-access-tokens/.");
         lines[1] = new KeyValuePair<string, string>("CREDENTIALS", "A file containing the GitHub personal access token.");

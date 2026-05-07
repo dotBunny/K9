@@ -2,6 +2,7 @@
 // See the LICENSE file at the repository root for more information.
 
 using System.Collections.Generic;
+using System.IO;
 using System.Runtime.InteropServices;
 using K9.Core;
 using K9.Core.Extensions;
@@ -23,25 +24,27 @@ public class NetMapProvider : ProgramProvider
 
     public override KeyValuePair<string, string>[] GetArgumentHelp()
     {
-        KeyValuePair<string, string>[] lines = new KeyValuePair<string, string>[4];
+        KeyValuePair<string, string>[] lines = new KeyValuePair<string, string>[5];
 
-        lines[0] = new KeyValuePair<string, string>("NETWORK-USERNAME",
+        lines[0] = new KeyValuePair<string, string>("CREDENTIALS",
+            "A path to a file with two lines, first line being the username, second being the password.");
+        lines[1] = new KeyValuePair<string, string>("NETWORK-USERNAME",
             "Username for network access to be established.");
-        lines[1] = new KeyValuePair<string, string>("NETWORK-PASSWORD",
+        lines[2] = new KeyValuePair<string, string>("NETWORK-PASSWORD",
             "Password for network access to be established.");
 
         if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
         {
-            lines[2] = new KeyValuePair<string, string>("NETWORK-MAPPING",
+            lines[3] = new KeyValuePair<string, string>("NETWORK-MAPPING",
                 "Drive letter to map the network share to. (Optional: H)");
         }
         else
         {
-            lines[2] = new KeyValuePair<string, string>("NETWORK-MAPPING",
+            lines[4] = new KeyValuePair<string, string>("NETWORK-MAPPING",
                 "Path to map the network share to. (Optional: /dev/mapping)");
         }
 
-        lines[3] = new KeyValuePair<string, string>("NETWORK-SHARE",
+        lines[5] = new KeyValuePair<string, string>("NETWORK-SHARE",
             @"Network share path to the Horde share. (Optional: \\192.168.20.21\Horde)");
 
         return lines;
@@ -49,9 +52,9 @@ public class NetMapProvider : ProgramProvider
 
     public override bool IsValid(ArgumentsModule args)
     {
-        if (!args.HasOverrideArgument("NETWORK-USERNAME"))
+        if (!args.HasOverrideArgument("CREDENTIALS") && !args.HasOverrideArgument("NETWORK-USERNAME"))
         {
-            Log.WriteLine("A NETWORK-USERNAME is required (---NETWORK-USERNAME=username)");
+            Log.WriteLine("A NETWORK-USERNAME is required (---NETWORK-USERNAME=username) or CREDENTIALS.");
             return false;
         }
         if (!args.HasOverrideArgument("NETWORK-PASSWORD"))
@@ -84,8 +87,19 @@ public class NetMapProvider : ProgramProvider
 
     public override void ParseArguments(ArgumentsModule args)
     {
-        NetworkUsername = args.GetOverrideArgument("NETWORK-USERNAME");
-        NetworkPassword = args.GetOverrideArgument("NETWORK-PASSWORD");
+        if (args.HasOverrideArgument("CREDENTIALS") &&
+            Path.Exists(args.GetOverrideArgument("CREDENTIALS")))
+        {
+            string[] lines = File.ReadAllLines(args.GetOverrideArgument("CREDENTIALS"));
+            NetworkUsername = lines[0].Trim();
+            NetworkPassword = lines[1].Trim();
+        }
+        else
+        {
+            NetworkUsername = args.GetOverrideArgument("NETWORK-USERNAME");
+            NetworkPassword = args.GetOverrideArgument("NETWORK-PASSWORD");
+        }
+
 
         if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
         {
