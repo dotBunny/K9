@@ -7,6 +7,7 @@ using System.Runtime.InteropServices;
 using K9.Core;
 using K9.Core.Extensions;
 using K9.Core.Modules;
+using K9.Core.Utils;
 
 namespace K9.OS.NetMap;
 
@@ -90,27 +91,10 @@ public class NetMapProvider : ProgramProvider
         if (args.HasOverrideArgument("CREDENTIALS") &&
             Path.Exists(args.GetOverrideArgument("CREDENTIALS")))
         {
-            int lineIndex = 0;
-            string[] lines = File.ReadAllLines(args.GetOverrideArgument("CREDENTIALS"));
-            int lineCount = lines.Length;
-            for (int i = 0; i < lineCount; i++)
-            {
-                string line = lines[i].Trim();
-                if (line.Length > 0 && lineIndex < 2)
-                {
-                    switch (lineIndex)
-                    {
-                        case 0:
-                            NetworkUsername = line;
-                            lineIndex++;
-                            break;
-                        case 1:
-                            NetworkPassword = line;
-                            lineIndex++;
-                            break;
-                    }
-                }
-            }
+            string[] lines = FileUtil.GetAllNonEmptyLines(args.GetOverrideArgument("CREDENTIALS"));
+            NetworkUsername = lines[0];
+            NetworkPassword = lines[1];
+
         }
         else
         {

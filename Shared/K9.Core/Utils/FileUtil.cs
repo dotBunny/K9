@@ -2,6 +2,7 @@
 // See the LICENSE file at the repository root for more information.
 
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Runtime.CompilerServices;
 using K9.Core.IO;
@@ -11,6 +12,22 @@ namespace K9.Core.Utils;
 
 public static class FileUtil
 {
+    public static string[] GetAllNonEmptyLines(string inputPath)
+    {
+        if (!File.Exists(inputPath)) return [];
+
+        string[] lines = File.ReadAllLines(inputPath);
+        List<string> returnLines = new List<string>(lines.Length);
+        for (int i = 0; i < lines.Length; i++)
+        {
+            string cleanLine = lines[i].Trim();
+            if (!string.IsNullOrWhiteSpace(cleanLine))
+            {
+                returnLines.Add(cleanLine);
+            }
+        }
+        return returnLines.ToArray();
+    }
     public static void AlwaysWrite(string outputPath, string contents)
     {
         File.WriteAllText(outputPath, contents);
