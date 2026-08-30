@@ -44,6 +44,7 @@ In 2026, a modernization effort was made to bring all applications to target C# 
 | [K9.OS.WriteTextFile](Applications/K9.OS.WriteTextFile/K9.OS.WriteTextFile.md)                               | Write text content with replacements to a file.                                     |
 | [K9.Publish.GitHubCommitStatus](Applications/K9.Publish.GitHubCommitStatus/K9.Publish.GitHubCommitStatus.md) | An application to update a specific GitHub commit status message.                   |
 | [K9.Publish.SteamToken](Applications/K9.Publish.SteamToken/K9.Publish.SteamToken.md)                         | An application to check out and check-in the token used for SteamGuard uploads.     |
+| [K9.Service.PerforceBackup](Applications/K9.Service.PerforceBackup/K9.Service.PerforceBackup.md)             | Keeps a Perforce workspace synced and archives a folder to a network share daily.   |
 | [K9.Test.CompareImage](Applications/K9.Test.CompareImage/K9.Test.CompareImage.md)                            | A tool to compare two images and fail if they are different.                        |
 | [K9.Unreal.PerforceTypes](Applications/K9.Unreal.PerforceTypes/K9.Unreal.PerforceTypes.md)                   | A tool to detect improper types of files in Perforce for Unreal Engine source.      |
 | [K9.Unreal.ToNUnit](Applications/K9.Unreal.ToNUnit/K9.Unreal.ToNUnit.md)                                     | Convert Gauntlet JSON reports to NUnit XML reports.                                 |

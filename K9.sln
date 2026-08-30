@@ -93,6 +93,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Service", "Service", "{AFC1
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "K9.Service.GitToPerforce", "Applications\K9.Service.GitToPerforce\K9.Service.GitToPerforce.csproj", "{9394BE97-B10F-4FB2-A2E9-69BD54475008}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "K9.Service.PerforceBackup", "Applications\K9.Service.PerforceBackup\K9.Service.PerforceBackup.csproj", "{9BC641B6-1255-4434-89D7-9D62C7503147}"
+EndProject
 
 
 Global
@@ -275,6 +277,12 @@ Global
 		{9394BE97-B10F-4FB2-A2E9-69BD54475008}.Release|Any CPU.Build.0 = Release|Any CPU
 		{9394BE97-B10F-4FB2-A2E9-69BD54475008}.Workspace|Any CPU.ActiveCfg = Debug|Any CPU
 		{9394BE97-B10F-4FB2-A2E9-69BD54475008}.Workspace|Any CPU.Build.0 = Debug|Any CPU
+		{9BC641B6-1255-4434-89D7-9D62C7503147}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9BC641B6-1255-4434-89D7-9D62C7503147}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9BC641B6-1255-4434-89D7-9D62C7503147}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9BC641B6-1255-4434-89D7-9D62C7503147}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9BC641B6-1255-4434-89D7-9D62C7503147}.Workspace|Any CPU.ActiveCfg = Debug|Any CPU
+		{9BC641B6-1255-4434-89D7-9D62C7503147}.Workspace|Any CPU.Build.0 = Debug|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -330,6 +338,7 @@ Global
 		{2DDA3834-89A7-48F4-91B2-AF91B170E9CF} = {E4CCF069-9072-4D74-B000-2D2ABB660091}
 		{AFC14680-83AC-42EE-9F5C-EB0DD2DE3284} = {E4CCF069-9072-4D74-B000-2D2ABB660090}
 		{9394BE97-B10F-4FB2-A2E9-69BD54475008} = {AFC14680-83AC-42EE-9F5C-EB0DD2DE3284}
+		{9BC641B6-1255-4434-89D7-9D62C7503147} = {AFC14680-83AC-42EE-9F5C-EB0DD2DE3284}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {8F2E7BB1-7BB3-49FB-A9AC-1A9A8DA9B43B}
