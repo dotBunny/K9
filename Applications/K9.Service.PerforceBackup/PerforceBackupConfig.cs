@@ -26,7 +26,7 @@ public class PerforceBackupConfig
     public string? PerforceUsername { get; set; }
     public string? PerforcePassword { get; set; }
     public string PerforceClientName { get; set; } = "K9_PerforceBackup_Sync";
-    public string PerforceWorkspaceStreamName { get; set; } = "//NEXUS/Main";
+    public string PerforceWorkspaceStreamName { get; set; } = "//UE5/DETHOL-Main";
 
     public string BackupTimeOfDay { get; set; } = "03:00";
     public string? BackupSourceFolder { get; set; }
@@ -40,8 +40,7 @@ public class PerforceBackupConfig
 
     public string? SevenZipPath { get; set; }
     public string? SevenZipArguments { get; set; }
-
-    public string NetworkShare { get; set; } = @"\\192.168.20.21\Backups";
+    public string NetworkShare { get; set; } = @"\\192.168.20.21\PerforceBackup";
     public string? NetworkMapping { get; set; }
     public string? NetworkUsername { get; set; }
     public string? NetworkPassword { get; set; }
