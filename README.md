@@ -42,6 +42,7 @@ In 2026, a modernization effort was made to bring all applications to target C# 
 | [K9.OS.ScreenResolution](Applications/K9.OS.ScreenResolution/K9.OS.ScreenResolution.md)                      | A tool to force a specific screen resolution.                                       |
 | [K9.OS.Wrapper](Applications/K9.OS.Wrapper/K9.OS.Wrapper.md)                                                 | Wrap execution of applications to control error handling and logging.               |
 | [K9.OS.WriteTextFile](Applications/K9.OS.WriteTextFile/K9.OS.WriteTextFile.md)                               | Write text content with replacements to a file.                                     |
+| [K9.Publish.CloudflareAssets](Applications/K9.Publish.CloudflareAssets/K9.Publish.CloudflareAssets.md)       | Publish a folder as a Cloudflare Worker's static assets, uploading what changed.    |
 | [K9.Publish.GitHubCommitStatus](Applications/K9.Publish.GitHubCommitStatus/K9.Publish.GitHubCommitStatus.md) | An application to update a specific GitHub commit status message.                   |
 | [K9.Publish.SteamToken](Applications/K9.Publish.SteamToken/K9.Publish.SteamToken.md)                         | An application to check out and check-in the token used for SteamGuard uploads.     |
 | [K9.Service.PerforceBackup](Applications/K9.Service.PerforceBackup/K9.Service.PerforceBackup.md)             | Keeps a Perforce workspace synced and archives a folder to a network share daily.   |
