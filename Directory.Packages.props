@@ -1,0 +1,11 @@
+<Project>
+  <!--
+    K9 is cloned into <workspace>/K9/Source, underneath the Unreal Engine workspace root. MSBuild walks up the
+    directory tree and imports the first Directory.Packages.props it finds, which picks up the engine's (UE 5.9+)
+    and forces Central Package Management onto every K9 project (NU1008). Having this file here stops that walk.
+    K9 projects declare their own package versions inline.
+  -->
+  <PropertyGroup>
+    <ManagePackageVersionsCentrally>false</ManagePackageVersionsCentrally>
+  </PropertyGroup>
+</Project>
